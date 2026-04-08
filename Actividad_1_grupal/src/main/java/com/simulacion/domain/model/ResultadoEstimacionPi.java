@@ -19,6 +19,7 @@ public class ResultadoEstimacionPi {
         this.puntosDentro = (int) puntos.stream()
             .filter(PuntoSimulado::isDentroDeLCirculo)
             .count();
+        // Estimador Monte Carlo: pi_hat = 4 * (x / n).
         this.piEstimado = 4.0 * puntosDentro / numeroPuntos;
     }
 

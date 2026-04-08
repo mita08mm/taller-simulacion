@@ -1,6 +1,7 @@
 package com.simulacion.presentation;
 
 import com.simulacion.presentation.apuestas.VentanaSimulacionApuestas;
+import com.simulacion.presentation.inversion.VentanaSimulacionInversion;
 import com.simulacion.presentation.pi.VentanaEstimacionPi;
 
 import javax.swing.*;
@@ -51,8 +52,13 @@ public class MainApplication extends JFrame {
         JButton btnPi = crearBoton("Estimación de π");
         btnPi.addActionListener(e -> abrirVentanaEstimacionPi());
         panel.add(btnPi, gbc);
-        
+
         gbc.gridy = 2;
+        JButton btnInversion = crearBoton("Proyecto de Inversión");
+        btnInversion.addActionListener(e -> abrirVentanaInversion());
+        panel.add(btnInversion, gbc);
+        
+        gbc.gridy = 3;
         gbc.insets = new Insets(30, 20, 15, 20);
         JButton btnSalir = crearBoton("Salir");
         btnSalir.addActionListener(e -> System.exit(0));
@@ -83,9 +89,16 @@ public class MainApplication extends JFrame {
         });
     }
 
+    private void abrirVentanaInversion() {
+        SwingUtilities.invokeLater(() -> {
+            VentanaSimulacionInversion ventana = new VentanaSimulacionInversion();
+            ventana.setVisible(true);
+        });
+    }
+
     private void configurarVentana() {
         setTitle("Simulación Monte Carlo");
-        setSize(500, 350);
+        setSize(560, 440);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);

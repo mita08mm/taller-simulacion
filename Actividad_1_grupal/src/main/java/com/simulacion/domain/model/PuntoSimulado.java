@@ -14,6 +14,7 @@ public class PuntoSimulado {
         this.numero = numero;
         this.r1 = r1;
         this.r2 = r2;
+        // Criterio geometrico: sqrt(R1^2 + R2^2) <= 1.
         this.distancia = Math.sqrt(r1 * r1 + r2 * r2);
         this.dentroDeLCirculo = distancia <= 1.0;
     }
@@ -25,7 +26,6 @@ public class PuntoSimulado {
     public double getR1() {
         return r1;
     }
-
     public double getR2() {
         return r2;
     }

@@ -41,6 +41,7 @@ public class SimularJuegoApuestas {
 
         while (cantidadActual < config.getMeta() && cantidadActual > 0) {
             double numeroAleatorio = generador.nextDouble();
+            // Evento Bernoulli: ganar si U(0,1) < p.
             boolean gano = numeroAleatorio < config.getProbabilidadGanar();
 
             int cantidadAntes = cantidadActual;
@@ -50,9 +51,11 @@ public class SimularJuegoApuestas {
 
             if (gano) {
                 cantidadActual += apuestaReal;
+                // Politica del contexto: al ganar, volver a apuesta base X.
                 siguienteApuesta = config.getApuestaInicial(); // Resetear apuesta
             } else {
                 cantidadActual -= apuestaReal;
+                // Politica del contexto: al perder, doblar apuesta (2X, 4X, ...).
                 siguienteApuesta = apuestaReal * 2; // Doblar la apuesta
             }
 
