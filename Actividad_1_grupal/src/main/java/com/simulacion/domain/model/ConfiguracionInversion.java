@@ -4,8 +4,14 @@ package com.simulacion.domain.model;
  * Value Object inmutable con la configuracion de la simulacion de inversion.
  */
 public class ConfiguracionInversion {
+    public enum ModoSimulacion {
+        ALEATORIO_TRIANGULAR,
+        PESIMISTA_FIJO
+    }
+
     private final int numeroCorridas;
     private final int vidaFiscal;
+    private final ModoSimulacion modoSimulacion;
 
     private final double afPesimista;
     private final double afProbable;
@@ -25,6 +31,7 @@ public class ConfiguracionInversion {
     public ConfiguracionInversion(
         int numeroCorridas,
         int vidaFiscal,
+        ModoSimulacion modoSimulacion,
         double afPesimista,
         double afProbable,
         double afOptimista,
@@ -40,6 +47,7 @@ public class ConfiguracionInversion {
         validar(
             numeroCorridas,
             vidaFiscal,
+            modoSimulacion,
             afPesimista,
             afProbable,
             afOptimista,
@@ -55,6 +63,7 @@ public class ConfiguracionInversion {
 
         this.numeroCorridas = numeroCorridas;
         this.vidaFiscal = vidaFiscal;
+    this.modoSimulacion = modoSimulacion;
         this.afPesimista = afPesimista;
         this.afProbable = afProbable;
         this.afOptimista = afOptimista;
@@ -71,6 +80,7 @@ public class ConfiguracionInversion {
     private void validar(
         int numeroCorridas,
         int vidaFiscal,
+        ModoSimulacion modoSimulacion,
         double afPesimista,
         double afProbable,
         double afOptimista,
@@ -88,6 +98,9 @@ public class ConfiguracionInversion {
         }
         if (vidaFiscal <= 0) {
             throw new IllegalArgumentException("La vida fiscal debe ser mayor que 0");
+        }
+        if (modoSimulacion == null) {
+            throw new IllegalArgumentException("El modo de simulacion es obligatorio");
         }
         if (tasaImpuestos < 0 || tasaImpuestos > 1) {
             throw new IllegalArgumentException("La tasa de impuestos debe estar entre 0 y 1");
@@ -120,6 +133,10 @@ public class ConfiguracionInversion {
 
     public int getVidaFiscal() {
         return vidaFiscal;
+    }
+
+    public ModoSimulacion getModoSimulacion() {
+        return modoSimulacion;
     }
 
     public double getAfPesimista() {

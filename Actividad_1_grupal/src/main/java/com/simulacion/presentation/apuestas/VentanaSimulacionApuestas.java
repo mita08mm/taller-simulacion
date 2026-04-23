@@ -1,6 +1,6 @@
 package com.simulacion.presentation.apuestas;
 
-import com.simulacion.application.usecases.SimularJuegoApuestas;
+import com.simulacion.application.usecases.JuegoApuestas;
 import com.simulacion.domain.model.*;
 import com.simulacion.infrastructure.random.GeneradorAleatorioJava;
 
@@ -29,10 +29,10 @@ public class VentanaSimulacionApuestas extends JFrame {
     private DefaultTableModel modeloTabla;
     private ChartPanel panelGrafico;
     
-    private final SimularJuegoApuestas casoDeUso;
+    private final JuegoApuestas casoDeUso;
 
     public VentanaSimulacionApuestas() {
-        this.casoDeUso = new SimularJuegoApuestas(new GeneradorAleatorioJava());
+        this.casoDeUso = new JuegoApuestas(new GeneradorAleatorioJava());
         inicializarComponentes();
         configurarVentana();
     }

@@ -1,4 +1,11 @@
 {
+  "editor.formatOnSave": true,
+  "editor.detectIndentation": false,
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
   "cSpell.enabled": false,
   "cSpell.language": "en,es",
   "cSpell.allowCompoundWords": true,

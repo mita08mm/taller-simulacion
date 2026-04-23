@@ -1,7 +1,8 @@
 package com.simulacion.presentation.inversion;
 
-import com.simulacion.application.usecases.SimularProyectoInversion;
+import com.simulacion.application.usecases.ProyectoInversion;
 import com.simulacion.domain.model.ConfiguracionInversion;
+import com.simulacion.domain.model.ConfiguracionInversion.ModoSimulacion;
 import com.simulacion.domain.model.ResultadoCorridaInversion;
 import com.simulacion.domain.model.ResultadoSimulacionInversion;
 import org.jfree.chart.ChartFactory;
@@ -39,6 +40,7 @@ public class VentanaSimulacionInversion extends JFrame {
     private JTextField txtImpuestos;
     private JTextField txtTREMA;
     private JTextField txtVida;
+    private JComboBox<String> cmbModo;
 
     private JButton btnSimular;
     private JTextArea txtResumen;
@@ -48,10 +50,10 @@ public class VentanaSimulacionInversion extends JFrame {
     private ChartPanel panelHistograma;
     private ChartPanel panelAcumulada;
 
-    private final SimularProyectoInversion casoDeUso;
+    private final ProyectoInversion casoDeUso;
 
     public VentanaSimulacionInversion() {
-        this.casoDeUso = new SimularProyectoInversion();
+        this.casoDeUso = new ProyectoInversion();
         inicializarComponentes();
         configurarVentana();
     }
@@ -93,6 +95,7 @@ public class VentanaSimulacionInversion extends JFrame {
         txtImpuestos = new JTextField("50", 10);
         txtTREMA = new JTextField("15", 10);
         txtVida = new JTextField("5", 10);
+        cmbModo = new JComboBox<>(new String[]{"Aleatorio triangular", "Caso pesimista fijo"});
 
         int y = 0;
         agregarCampo(panel, gbc, y++, "Num. corridas:", txtNumCorridas);
@@ -102,6 +105,7 @@ public class VentanaSimulacionInversion extends JFrame {
         agregarCampo(panel, gbc, y++, "Impuestos (%):", txtImpuestos);
         agregarCampo(panel, gbc, y++, "TREMA (%):", txtTREMA);
         agregarCampo(panel, gbc, y++, "Vida fiscal (anios):", txtVida);
+        agregarCampo(panel, gbc, y++, "Modo de simulacion:", cmbModo);
 
         gbc.gridx = 0;
         gbc.gridy = y;
@@ -144,7 +148,7 @@ public class VentanaSimulacionInversion extends JFrame {
         txtResumen.setText(
             "Configure parametros y ejecute la simulacion.\n\n" +
             "La logica de negocio esta en:\n" +
-            "- application/usecases/SimularProyectoInversion\n" +
+            "- application/usecases/ProyectoInversion\n" +
             "- domain/model/ConfiguracionInversion\n" +
             "- domain/model/ResultadoSimulacionInversion\n\n" +
             "Criterio de decision: ACEPTAR si Prob(TIR > TREMA) >= 0.90"
@@ -224,6 +228,7 @@ public class VentanaSimulacionInversion extends JFrame {
         return new ConfiguracionInversion(
             entInt(txtNumCorridas, 1000),
             entInt(txtVida, 5),
+            modoSeleccionado(),
             entDbl(txtAFPes, -100000),
             entDbl(txtAFProb, -70000),
             entDbl(txtAFOpt, -60000),
@@ -236,6 +241,12 @@ public class VentanaSimulacionInversion extends JFrame {
             entDbl(txtImpuestos, 50) / 100.0,
             entDbl(txtTREMA, 15)
         );
+    }
+
+    private ModoSimulacion modoSeleccionado() {
+        return cmbModo.getSelectedIndex() == 1
+            ? ModoSimulacion.PESIMISTA_FIJO
+            : ModoSimulacion.ALEATORIO_TRIANGULAR;
     }
 
     private void mostrarResultados(ResultadoSimulacionInversion resultado) {
