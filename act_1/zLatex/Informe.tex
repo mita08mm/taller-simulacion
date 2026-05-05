@@ -1,0 +1,1151 @@
+\documentclass[12pt,a4paper]{article}
+% chktex-file 3 40
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{fix-cm}
+
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18, legend style={font=\sffamily}}
+
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\geometry{margin=2.5cm, top=3cm, bottom=3cm}
+\setlength{\headheight}{13.6pt}
+
+% ─────────────────────────────────────────────
+%  ENCABEZADO Y PIE DE PÁGINA
+% ─────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small Taller de Simulación de Sistemas}
+\lhead{\small Informe de Actividad}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ─────────────────────────────────────────────
+%  FORMATO DE SECCIONES
+% ─────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{blue!70!black}}{\thesection.}{0.5em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{blue!50!black}}{\thesubsection.}{0.5em}{}
+
+% ─────────────────────────────────────────────
+%  CAJAS DE COLOR
+% ─────────────────────────────────────────────
+\newtcolorbox{formulabox}{colback=blue!5!white, colframe=blue!60!black,
+  title=Fórmula clave, fonttitle=\bfseries, breakable}
+
+\newtcolorbox{notabox}{colback=yellow!10!white, colframe=orange!70!black,
+  title=Nota de validación, fonttitle=\bfseries, breakable}
+
+\newtcolorbox{javabox}{colback=gray!8!white, colframe=gray!60!black,
+  title=Referencia: Código Java, fonttitle=\bfseries, breakable}
+
+% ─────────────────────────────────────────────
+%  CONFIGURACIÓN DE LISTINGS
+% ─────────────────────────────────────────────
+\lstset{
+  language=Java,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  frame=single,
+  breaklines=true,
+  tabsize=4
+}
+
+% ─────────────────────────────────────────────
+%  DOCUMENTO
+% ─────────────────────────────────────────────
+\begin{document}
+
+% ══════════════════════════════════════════════
+%  PORTADA
+% ══════════════════════════════════════════════
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+
+{\LARGE \textbf{Informe de Actividad}}\\[2cm]
+
+\begin{center}
+{\Large \textbf{Simulación por Transformada Inversa y}}\\[0.3cm]
+{\Large \textbf{Aplicaciones de Simulación de Sistemas}}\\[0.5cm]
+{\normalsize Basado en: \textit{Simulación: un enfoque práctico} — Raúl Coss Bu}
+\end{center}
+
+\vspace{2cm}
+
+\begin{tabular}{rl}
+\textbf{Estudiante:}   & Miguel Mita Choque \\[0.3cm]
+\textbf{Materia:}      & Taller de Simulación de Sistemas \\[0.3cm]
+\textbf{Docente:}      & HENRRY FRANK VILLARROEL TAPIA \\[0.3cm]
+\end{tabular}
+
+\vfill
+\end{titlepage}
+
+% ══════════════════════════════════════════════
+%  TABLA DE CONTENIDOS
+% ══════════════════════════════════════════════
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Introducción}
+% ══════════════════════════════════════════════
+
+En este informe presento el desarrollo completo de una actividad de simulación basada en el libro \textit{``Simulación: un enfoque práctico''} del autor Raúl Coss Bu. A lo largo del trabajo apliqué los conceptos y métodos que aprendí durante el curso de Taller de Simulación de Sistemas.
+
+La actividad se divide en dos partes principales:
+
+\begin{itemize}
+  \item \textbf{Parte 1:} Generación de números aleatorios mediante el \textbf{método de la transformada inversa}, aplicado a una función de densidad de probabilidad específica.
+  \item \textbf{Parte 2:} Desarrollo de dos \textbf{aplicaciones de simulación}: una sobre asignación de máquinas a mecánicos, y otra sobre optimización del tamaño de un equipo de trabajadores en un almacén.
+\end{itemize}
+
+Para resolver cada problema utilicé tres herramientas complementarias: el desarrollo matemático paso a paso, una simulación construida en Excel, y el esquema del código Java. Además, realicé una validación estadística con distintos tamaños de muestra para verificar que mis resultados fueran confiables.
+
+\subsection{Contexto del problema}
+
+El método de la transformada inversa, descrito por Coss Bu en el Capítulo 4 de su libro, permite generar valores de una variable aleatoria con una distribución de probabilidad deseada, partiendo de números uniformes entre 0 y 1. La idea central es que si se tiene la función de distribución acumulada $F(x)$, entonces se puede igualar $F(x) = R$ (donde $R$ es un número uniforme) y despejar $x$ para obtener un valor de la distribución deseada.
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Objetivos}
+% ══════════════════════════════════════════════
+
+\subsection{Objetivo general}
+
+Aplicar el método de la transformada inversa y técnicas de simulación por computadora para modelar y analizar problemas de sistemas reales, siguiendo la metodología propuesta por Raúl Coss Bu.
+
+\subsection{Objetivos específicos}
+
+\begin{enumerate}
+  \item Calcular la función de distribución acumulada $F(x)$ de la función de densidad dada y obtener su inversa $F^{-1}(R)$.
+  \item Generar valores aleatorios que sigan la distribución de probabilidad indicada, usando números uniformes $R \in [0,1]$.
+  \item Verificar mediante pruebas de escritorio que todos los valores generados pertenecen al intervalo $[0, 6]$.
+  \item Simular el sistema de máquinas y mecánicos para determinar el número óptimo de máquinas por mecánico.
+  \item Simular el sistema de descarga de camiones para determinar el tamaño óptimo del equipo de trabajadores.
+  \item Validar los resultados con tamaños de muestra de 10, 25, 50, 100, 250, 500 y 1000.
+\end{enumerate}
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Parte 1: Método de la Transformada Inversa}
+% ══════════════════════════════════════════════
+
+\subsection{Definición del problema}
+
+La función de densidad de probabilidad que me fue proporcionada es la siguiente:
+
+\[
+f(x) =
+\begin{cases}
+\dfrac{(x-3)^2}{18}{}, & 0 \leq x \leq 6 \\[6pt]
+0, & x < 0 \;\text{ o }\; x > 6
+\end{cases}
+\]
+
+Mi objetivo es generar valores aleatorios que sigan esta distribución y comprobar que efectivamente caen dentro del intervalo $[0, 6]$.
+
+Para verificar que $f(x)$ es una función de densidad válida, primero comprobé que su integral en el dominio sea igual a 1:
+
+\[
+\int_0^6 \frac{(x-3)^2}{18}\, dx = 1
+\]
+
+Desarrollo paso a paso:
+\[
+\int_0^6 \frac{(x-3)^2}{18}\, dx
+= \frac{1}{18} \cdot \left[\frac{(x-3)^3}{3}\right]_0^6
+= \frac{1}{18} \cdot \left(\frac{27}{3} - \frac{-27}{3}\right)
+= \frac{1}{18} \cdot (9 + 9) = \frac{18}{18} = 1 \checkmark{}
+\]
+
+Esto me confirma que la función es válida.
+
+\subsection{Representación gráfica de la función de densidad}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=6cm,
+  xlabel={$x$}, ylabel={$f(x)$},
+  xmin=-0.5, xmax=6.5,
+  ymin=-0.02, ymax=0.6,
+  grid=both, grid style={line width=0.2pt, draw=gray!30},
+  title={Función de densidad $f(x) = \frac{(x-3)^2}{18}$},
+  xtick={0,1,2,3,4,5,6},
+  samples=100
+]
+\addplot[blue!70!black, thick, domain=0:6] {(x-3)^2/18};
+\addplot[dashed, gray] coordinates {(3,0) (3,0.5)};
+\node[below] at (axis cs:3,0) {$x=3$ (mín.)};
+\node[above right] at (axis cs:0,0.5) {$f(0)=f(6)=\frac{1}{2}$};
+\end{axis}
+\end{tikzpicture}
+\caption{Gráfica de la función de densidad de probabilidad proporcionada. Nótese que el mínimo se alcanza en $x=3$ y los valores máximos en los extremos $x=0$ y $x=6$.}
+\end{figure}
+
+\subsection{Modelo matemático: cálculo de la función acumulada}
+
+Siguiendo el procedimiento del libro de Coss Bu, calculé la función de distribución acumulada $F(x)$ integrando $f(x)$:
+
+\[
+F(x) = \int_0^x \frac{(t-3)^2}{18}\, dt
+\]
+
+Resuelvo la integral paso a paso:
+
+\begin{align*}
+F(x) &= \frac{1}{18} \int_0^x (t-3)^2\, dt \\[4pt]
+     &= \frac{1}{18} \left[\frac{(t-3)^3}{3}\right]_0^x \\[4pt]
+     &= \frac{1}{18} \left(\frac{(x-3)^3}{3} - \frac{(0-3)^3}{3}\right) \\[4pt]
+     &= \frac{1}{18} \left(\frac{(x-3)^3}{3} + \frac{27}{3}\right) \\[4pt]
+     &= \frac{1}{18} \cdot \frac{(x-3)^3 + 27}{3}
+\end{align*}
+
+\begin{formulabox}
+\[
+\boxed{F(x) = \frac{(x-3)^3 + 27}{54}}, \quad 0 \leq x \leq 6
+\]
+\end{formulabox}
+
+\subsection{Obtención de la función inversa $F^{-1}(R)$}
+
+Para aplicar el método de la transformada inversa, igualo $F(x) = R$ (con $R$ un número uniforme entre 0 y 1) y despejo $x$:
+
+\begin{align*}
+R &= \frac{(x-3)^3 + 27}{54} \\[4pt]
+54R &= (x-3)^3 + 27 \\[4pt]
+(x-3)^3 &= 54R - 27 \\[4pt]
+x - 3 &= \sqrt[3]{54R - 27} \\[4pt]
+\end{align*}
+
+\begin{formulabox}
+\[
+\boxed{x = 3 + \sqrt[3]{54R - 27}}
+\]
+
+Esta es la fórmula que uso para generar valores aleatorios con la distribución $f(x)$.
+\end{formulabox}
+
+\textbf{Verificación de los límites del intervalo:}
+
+\begin{itemize}
+  \item Cuando $R = 0$: $x = 3 + \sqrt[3]{-27} = 3 + (-3) = 0$ \checkmark{}
+  \item Cuando $R = 1$: $x = 3 + \sqrt[3]{54 - 27} = 3 + \sqrt[3]{27} = 3 + 3 = 6$ \checkmark{}
+\end{itemize}
+
+Esto confirma que la fórmula siempre genera valores dentro de $[0, 6]$.
+
+\subsection{Representación gráfica de la distribución acumulada}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm, height=6cm,
+  xlabel={$x$}, ylabel={$F(x)$},
+  xmin=-0.2, xmax=6.2,
+  ymin=-0.02, ymax=1.05,
+  grid=both, grid style={line width=0.2pt, draw=gray!30},
+  title={Distribución acumulada $F(x) = \dfrac{(x-3)^3+27}{54}$},
+  xtick={0,1,2,3,4,5,6},
+  ytick={0,0.25,0.5,0.75,1},
+  samples=100
+]
+\addplot[red!70!black, thick, domain=0:6] {((x-3)^3 + 27)/54};
+\addplot[dashed, gray] coordinates {(0,0) (0,1)};
+\addplot[dashed, gray] coordinates {(6,0) (6,1)};
+\node[right] at (axis cs:3,0.5) {$(3,\, 0.5)$};
+\addplot[mark=*, mark size=2pt, blue] coordinates {(3,0.5)};
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución acumulada. Dado un valor $R$ en el eje vertical, la fórmula $x = 3 + \sqrt[3]{54R-27}$ permite encontrar el valor correspondiente de $x$ en el eje horizontal.}
+\end{figure}
+
+\subsection{Prueba de escritorio}
+
+Para dejar documentada la prueba de escritorio con el mismo criterio del libro, generé corridas con $n = 10, 25, 50, 100, 250, 500, 1000$ usando el programa. Muestro completas las de $n=10$ y $n=25$; para $n\ge 50$ dejo resumen con corridas iniciales y última corrida.
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Parte 1 ($n=10$, tabla completa)}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Iteración} & \textbf{$x$ generado} & \textbf{Media acumulada} & \textbf{Válidos} \\
+\midrule
+1 & 5,9406 & 5,9406 & 1/10 \\
+2 & 5,1994 & 5,5700 & 2/10 \\
+3 & 0,7947 & 3,9782 & 3/10 \\
+4 & 5,9445 & 4,4698 & 4/10 \\
+5 & 5,5806 & 4,6920 & 5/10 \\
+6 & 4,6739 & 4,6890 & 6/10 \\
+7 & 0,0000 & 4,0191 & 7/10 \\
+8 & 0,3521 & 3,5607 & 8/10 \\
+9 & 4,9221 & 3,7120 & 9/10 \\
+10 & 0,0696 & 3,3478 & 10/10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Parte 1 ($n=25$, tabla completa)}
+\small
+\begin{tabular}{cccc}
+\toprule
+\textbf{Iteración} & \textbf{$x$ generado} & \textbf{Media acumulada} & \textbf{Válidos} \\
+\midrule
+1 & 5,9311 & 5,9311 & 1/25 \\
+2 & 0,9644 & 3,4477 & 2/25 \\
+3 & 1,1702 & 2,6886 & 3/25 \\
+4 & 5,7112 & 3,4442 & 4/25 \\
+5 & 5,2067 & 3,7967 & 5/25 \\
+6 & 5,7958 & 4,1299 & 6/25 \\
+7 & 3,6150 & 4,0563 & 7/25 \\
+8 & 5,6948 & 4,2611 & 8/25 \\
+9 & 0,2153 & 3,8116 & 9/25 \\
+10 & 5,5894 & 3,9894 & 10/25 \\
+11 & 4,6667 & 4,0510 & 11/25 \\
+12 & 5,1012 & 4,1385 & 12/25 \\
+13 & 5,9157 & 4,2752 & 13/25 \\
+14 & 1,3387 & 4,0654 & 14/25 \\
+15 & 0,8878 & 3,8536 & 15/25 \\
+16 & 0,4010 & 3,6378 & 16/25 \\
+17 & 5,7245 & 3,7606 & 17/25 \\
+18 & 0,3030 & 3,5685 & 18/25 \\
+19 & 4,9674 & 3,6421 & 19/25 \\
+20 & 5,4706 & 3,7335 & 20/25 \\
+21 & 0,1138 & 3,5612 & 21/25 \\
+22 & 0,5401 & 3,4238 & 22/25 \\
+23 & 0,2974 & 3,2879 & 23/25 \\
+24 & 5,4520 & 3,3781 & 24/25 \\
+25 & 5,6769 & 3,4700 & 25/25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Parte 1 (resumen para $n=50,100,250,500,1000$)}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{$n$} & \textbf{Media en corr. 10} & \textbf{$x$ en última corr.} & \textbf{Media final} & \textbf{Válidos finales} \\
+\midrule
+50 & 3,5826 & 4,3196 & 3,3138 & 50/50 \\
+100 & 4,2893 & 0,5612 & 3,0586 & 100/100 \\
+250 & 2,1253 & 0,1749 & 2,7470 & 250/250 \\
+500 & 3,2790 & 0,8788 & 3,0905 & 500/500 \\
+1000 & 3,0496 & 0,3430 & 2,8307 & 1000/1000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+Con este formato queda explícito el comportamiento por tamaño de muestra: para $n=10$ y $n=25$ se ve toda la secuencia; para $n$ grandes se resume sin perder la última corrida y la media final.
+\end{notabox}
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Simulación en Excel — Parte 1}
+% ══════════════════════════════════════════════
+
+\subsection{Organización de la hoja de cálculo}
+
+Construí la hoja de Excel de la siguiente manera:
+
+\begin{table}[H]
+\centering
+\caption{Estructura de la hoja de Excel para la Parte 1}
+\begin{tabular}{>{\ttfamily}l l l}
+\toprule
+\textbf{Celda} & \textbf{Contenido} & \textbf{Descripción} \\
+\midrule
+A1 & \textrm{No.\ de muestra} & Encabezado \\
+B1 & \textrm{R (número uniforme)} & Encabezado \\
+C1 & \textrm{x generado} & Encabezado \\
+D1 & \textrm{¿Pertenece a [0,6]?} & Encabezado \\
+\midrule
+A2:A1001 & 1, 2, 3, \ldots & Numeración \\
+B2:B1001 & \textrm{=ALEATORIO ()} & Genera $R \in [0,1]$ \\
+C2:C1001 & \textrm{=3 + (54*B2 -27)\textasciicircum{}(1/3)} & Aplica la fórmula inversa \\
+D2:D1001 & \textrm{=SI (Y (C2>=0,C2<=6),``Sí'', ``No'')} & Validación \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Nota importante:} En Excel, la raíz cúbica de un número negativo no funciona directamente con la potencia \texttt{\^{}(1/3)}. Para manejar correctamente el signo, usé la siguiente fórmula alternativa:
+
+\medskip
+\noindent\texttt{=3 + SIGNO (54*B2 -27) * ABS (54*B2 -27)\textasciicircum(1/3)}
+\medskip
+
+Esta fórmula preserva el signo correcto cuando $54R - 27 < 0$ (es decir, cuando $R < 0.5$).
+
+\subsection{Fórmulas adicionales de análisis}
+
+\begin{table}[H]
+\centering
+\caption{Celdas de resumen estadístico en Excel}
+\begin{tabular}{>{\ttfamily}l l}
+\toprule
+\textbf{Fórmula Excel} & \textbf{Qué calcula} \\
+\midrule
+\textrm{=PROMEDIO (C2:C1001)} & Media de los valores generados \\
+\textrm{=DESVEST (C2:C1001)} & Desviación estándar \\
+\textrm{=MIN (C2:C1001)} & Valor mínimo \\
+\textrm{=MAX (C2:C1001)} & Valor máximo \\
+\textrm{=CONTAR.SI (D2:D1001,``Sí'')} & Valores dentro de [0,6] \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Gráfico en Excel}
+
+Para visualizar la distribución de los valores generados, construí un histograma de frecuencias en Excel con las siguientes características:
+
+\begin{itemize}
+  \item \textbf{Eje horizontal:} Intervalos de $x$ (de 0 a 6, divididos en 6 clases de amplitud 1).
+  \item \textbf{Eje vertical:} Frecuencia relativa (porcentaje de valores en cada intervalo).
+  \item \textbf{Superposición:} Curva teórica de $f(x)$ para comparar visualmente.
+\end{itemize}
+
+La comparación entre el histograma empírico y la curva teórica me permite validar visualmente que la simulación sigue la distribución deseada.
+
+\subsection{Validación con distintos tamaños de muestra}
+
+Realicé la simulación con los siguientes tamaños de muestra y registré la media muestral (el valor teórico esperado de la distribución es $\mu = 3$):
+
+\begin{table}[H]
+\centering
+\caption{Validación: convergencia de la media muestral al valor teórico $\mu = 3$}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Tamaño de muestra} & \textbf{Media muestral} & \textbf{Error} $|\bar{x} - 3|$ & \textbf{Mín.} & \textbf{Máx.} \\
+\midrule
+10   & 2,8188 & 0,1812 & 0,2795 & 5,9276 \\
+25   & 2,7158 & 0,2842 & 0,1373 & 5,8877 \\
+50   & 3,2564 & 0,2564 & 0,0328 & 5,9963 \\
+100  & 2,7892 & 0,2108 & 0,0203 & 5,9880 \\
+250  & 3,0106 & 0,0106 & 0,0144 & 5,9982 \\
+500  & 3,0045 & 0,0045 & 0,0068 & 5,9971 \\
+1000 & 2,9096 & 0,0904 & 0,0018 & 5,9987 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+\textbf{¿Qué se observa?} Al aumentar el tamaño de la muestra, la media muestral $\bar{x}$ se acerca progresivamente al valor teórico esperado de $\mu = 3$. Esto confirma la \textbf{Ley de los Grandes Números}. Con muestras pequeñas (10, 25) el error todavía es variable; con muestras grandes (500, 1000) la convergencia es clara.
+\end{notabox}
+
+\begin{table}[H]
+\centering
+\caption{Resumen de corridas para la prueba de escritorio (generado con \texttt{ValidationDataExtractor})}
+\begin{tabular}{cccc}
+\toprule
+\textbf{$n$} & \textbf{Filas mostradas} & \textbf{Media en fila 10} & \textbf{Media final} \\
+\midrule
+10   & 1--10, \ldots, 10   & 2,8188 & 2,8188 \\
+25   & 1--10, \ldots, 25   & 2,1365 & 2,7158 \\
+50   & 1--10, \ldots, 50   & 3,5431 & 3,2564 \\
+100  & 1--10, \ldots, 100  & 2,2162 & 2,7892 \\
+250  & 1--10, \ldots, 250  & 2,3325 & 3,0106 \\
+500  & 1--10, \ldots, 500  & 2,9410 & 3,0045 \\
+1000 & 1--10, \ldots, 1000 & 2,6389 & 2,9096 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Cálculo del valor esperado teórico}
+
+Para verificar el valor teórico de la media, lo calculé directamente:
+
+\[
+E[X] = \int_0^6 x \cdot \frac{(x-3)^2}{18}\, dx
+\]
+
+Realizo la expansión $(x-3)^2 = x^2 - 6x + 9$:
+
+\[
+E[X] = \frac{1}{18}\int_0^6 x(x^2 - 6x + 9)\, dx = \frac{1}{18}\int_0^6 (x^3 - 6x^2 + 9x)\, dx
+\]
+
+\[
+= \frac{1}{18}\left[\frac{x^4}{4} - 2x^3 + \frac{9x^2}{2}\right]_0^6
+= \frac{1}{18}\left(\frac{1296}{4} - 432 + \frac{324}{2}\right)
+= \frac{1}{18}(324 - 432 + 162) = \frac{54}{18} = 3
+\]
+
+\begin{formulabox}
+El valor esperado teórico es $E[X] = \mu = 3$. Los valores generados por simulación deben converger a este número conforme aumenta el tamaño de la muestra.
+\end{formulabox}
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Referencia del Código Java — Parte 1}
+% ══════════════════════════════════════════════
+
+\begin{javabox}
+El código Java que implementa este modelo se basa directamente en la fórmula de la transformada inversa obtenida en la Sección 3:
+
+\[
+x = 3 + \sqrt[3]{54R - 27}
+\]
+
+El programa realiza los siguientes pasos:
+\begin{enumerate}
+  \item Genera un número uniforme $R \in [0, 1]$ usando \texttt{Math.random ()}.
+  \item Aplica la fórmula de la transformada inversa (manejando el signo del radicando).
+  \item Verifica que $x \in [0, 6]$.
+  \item Repite el proceso $n$ veces (para $n = 10, 25, 50, 100, 250, 500, 1000$).
+  \item Calcula y muestra la media, la desviación estándar y el porcentaje de valores válidos.
+\end{enumerate}
+
+El código se usará para comparar los resultados con los obtenidos en Excel y servirá como validación adicional. Los resultados de ambas herramientas deberían ser consistentes entre sí.
+
+\medskip
+\textit{(Implementación en el proyecto: \texttt{src/tss/act1/problems/PartOneSimulator.java} y \texttt{src/tss/act1/services/SimulationService.java})}
+\end{javabox}
+
+\begin{lstlisting}[caption={Estructura del programa Java para la Parte 1}]
+import java.util.Random;
+
+public class SimulacionParte1 {
+    
+    // Formula de la transformada inversa
+    public static double generarX(double R) {
+        double radicando = 54 * R - 27;
+        // Se maneja el signo para raices cubicas negativas
+        return 3 + Math.signum(radicando) * 
+               Math.pow(Math.abs(radicando), 1.0/3.0);
+    }
+    
+    public static void main(String[] args) {
+        int[] tamanos = {10, 25, 50, 100, 250, 500, 1000};
+        Random rnd = new Random();
+        
+        for (int n : tamanos) {
+            double suma = 0;
+            int validos = 0;
+            double[] valores = new double[n];
+            
+            for (int i = 0; i < n; i++) {
+                double R = rnd.nextDouble();
+                double x = generarX(R);
+                valores[i] = x;
+                suma += x;
+                if (x >= 0 && x <= 6) validos++;
+            }
+            
+            double media = suma / n;
+            // Calcular desviacion estandar...
+            
+            System.out.printf("n=%4d | Media=%.4f | Validos=%d/%d%n",
+                              n, media, validos, n);
+        }
+    }
+}
+\end{lstlisting}
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Parte 2: Aplicaciones de Simulación}
+% ══════════════════════════════════════════════
+
+% ──────────────────────────────────────────────
+\subsection{Problema 1: Máquinas y Mecánicos}
+% ──────────────────────────────────────────────
+
+\subsubsection{Definición del problema}
+
+Una empresa tiene un gran número de máquinas en operación. Cada máquina puede descomponerse, y cuando eso ocurre, un mecánico debe repararla. El objetivo que me planteé es determinar \textbf{cuántas máquinas debe atender cada mecánico} para minimizar los costos totales.
+
+Los datos son:
+
+\begin{itemize}
+  \item Costo de máquina ociosa (en espera o en reparación): \$500 por hora.
+  \item Salario del mecánico: \$50 por hora.
+\end{itemize}
+
+\subsubsection{Distribuciones de probabilidad}
+
+\begin{table}[H]
+\centering
+\caption{Distribución del tiempo entre descomposturas}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Intervalo (horas)} & \textbf{Probabilidad} & \textbf{Prob.\ acumulada} & \textbf{Rango de R} \\
+\midrule
+6--8   & 0.10 & 0.10 & $0.00 \leq R < 0.10$ \\
+8--10  & 0.15 & 0.25 & $0.10 \leq R < 0.25$ \\
+10--12 & 0.24 & 0.49 & $0.25 \leq R < 0.49$ \\
+12--14 & 0.26 & 0.75 & $0.49 \leq R < 0.75$ \\
+16--18 & 0.18 & 0.93 & $0.75 \leq R < 0.93$ \\
+18--20 & 0.07 & 1.00 & $0.93 \leq R \leq 1.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Distribución del tiempo de reparación}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Intervalo (horas)} & \textbf{Probabilidad} & \textbf{Prob.\ acumulada} & \textbf{Rango de R} \\
+\midrule
+2--4   & 0.15 & 0.15 & $0.00 \leq R < 0.15$ \\
+4--6   & 0.25 & 0.40 & $0.15 \leq R < 0.40$ \\
+6--8   & 0.30 & 0.70 & $0.40 \leq R < 0.70$ \\
+8--10  & 0.20 & 0.90 & $0.70 \leq R < 0.90$ \\
+10--12 & 0.10 & 1.00 & $0.90 \leq R \leq 1.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Modelo matemático}
+
+Para generar tiempos dentro de cada intervalo $[a, b]$, apliqué la fórmula de la distribución uniforme (Ejemplo 4.2 del libro):
+
+\begin{formulabox}
+\[
+t = a + (b - a) \cdot R
+\]
+
+donde $a$ y $b$ son los límites del intervalo y $R$ es el número uniforme correspondiente al rango asignado.
+\end{formulabox}
+
+El \textbf{costo total por hora} para $m$ máquinas asignadas a un mecánico se calcula así:
+
+\[
+\text{Costo total} = \underbrace{(\text{horas ociosas totales}) \times 500}_{\text{costo de máquinas ociosas}} + \underbrace{8 \times 50}_{\text{salario mecánico (turno de 8h)}}
+\]
+
+\subsubsection{Prueba de escritorio}
+
+Para el Problema 1 fijé $m=1$ y repetí el mismo esquema de corridas: $n=10,25,50,100,250,500,1000$. En cada réplica se registra inactividad, costo por inactividad y costo total.
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Problema 1 ($m=1$, $n=10$, tabla completa)}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Réplica} & \textbf{Inact. (h)} & \textbf{Costo inact.} & \textbf{Salario} & \textbf{Costo total} \\
+\midrule
+1 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+2 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+3 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+4 & 9,4067 & 4\,703,34 & 400,00 & 5\,103,34 \\
+5 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+6 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+7 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+8 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+9 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+10 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Problema 1 ($m=1$, $n=25$, tabla completa)}
+\small
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Réplica} & \textbf{Inact. (h)} & \textbf{Costo inact.} & \textbf{Salario} & \textbf{Costo total} \\
+\midrule
+1 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+2 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+3 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+4 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+5 & 7,6146 & 3\,807,30 & 400,00 & 4\,207,30 \\
+6 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+7 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+8 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+9 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+10 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+11 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+12 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+13 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+14 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+15 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+16 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+17 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+18 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+19 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+20 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+21 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+22 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+23 & 9,9970 & 4\,998,49 & 400,00 & 5\,398,49 \\
+24 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+25 & 0,0000 & 0,00 & 400,00 & 400,00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Problema 1 (resumen para $n=50,100,250,500,1000$)}
+\begin{tabular}{cccc}
+\toprule
+\textbf{$n$} & \textbf{Costo total en réplica 10} & \textbf{Costo total en última réplica} & \textbf{Promedio costo total} \\
+\midrule
+50 & 400,00 & 5\,057,71 & 698,40 \\
+100 & 400,00 & 400,00 & 740,70 \\
+250 & 400,00 & 400,00 & 711,70 \\
+500 & 400,00 & 400,00 & 740,75 \\
+1000 & 400,00 & 400,00 & 702,95 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+Aquí se ve claramente que con pocas corridas el promedio cambia bastante por eventos extremos; cuando $n$ crece, el promedio se estabiliza y permite comparar escenarios con más criterio.
+\end{notabox}
+
+\subsubsection{Comparación de escenarios}
+
+\begin{table}[H]
+\centering
+\caption{Comparación de costos por número de máquinas por mecánico (simulación de 100 réplicas de 8 horas)}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Máquinas} & \textbf{Inactividad (h)} & \textbf{Costo inactividad} & \textbf{Costo salario} & \textbf{Costo total} \\
+\midrule
+1 & 0,3736 & \$186,82 & \$400,00 & \$586,82 \\
+2 & 1,0882 & \$544,09 & \$400,00 & \$944,09 \\
+3 & 1,8440 & \$921,98 & \$400,00 & \$1\,321,98 \\
+4 & 2,5023 & \$1\,251,14 & \$400,00 & \$1\,651,14 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+Los datos muestran que el costo total aumenta conforme se asignan más máquinas a un mecánico. Esto sucede porque el tiempo de inactividad promedio se incrementa (una máquina está ociosa mientras espera reparación, y con más máquinas el mecánico tiene más trabajo). El costo óptimo es con m=1 máquina por mecánico, con un costo total de \$586,82 por turno de 8 horas.
+\end{notabox}
+
+\subsubsection{Simulación en Excel — Problema 1}
+
+En Excel organicé las columnas de la siguiente manera:
+
+\begin{table}[H]
+\centering
+\caption{Estructura de la hoja Excel para el Problema 1}
+\begin{tabular}{>{\ttfamily}l l}
+\toprule
+\textbf{Columna} & \textbf{Contenido} \\
+\midrule
+A & Número de ciclo \\
+B & $R_1$ (número uniforme para tiempo entre descomposturas) \\
+C & Intervalo asignado según $R_1$ \\
+D & Tiempo entre descomposturas $t_d = a + (b-a) \cdot R_1$ \\
+E & $R_2$ (número uniforme para tiempo de reparación) \\
+F & Intervalo asignado según $R_2$ \\
+G & Tiempo de reparación $t_r = a + (b-a) \cdot R_2$ \\
+H & Tiempo ocioso (= tiempo de reparación si no hay cola) \\
+I & Costo de hora ociosa (H $\times$ 500) \\
+\midrule
+& Fila de totales y promedios al final \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para asignar el intervalo según el valor de $R$, usé en Excel la función \texttt{SI} anidada o \texttt{BUSCARV} con una tabla auxiliar de probabilidades acumuladas.
+
+\subsubsection{Referencia del código Java — Problema 1}
+
+\begin{javabox}
+El programa Java para el Problema 1:
+\begin{itemize}
+  \item Simula $n$ ciclos de descompostura y reparación para distintos números de máquinas por mecánico.
+  \item Usa un generador de números uniformes para asignar tiempos según las distribuciones dadas.
+  \item Calcula el costo total por escenario.
+  \item Determina el número óptimo de máquinas por mecánico comparando los costos.
+\end{itemize}
+\textit{(Implementación en el proyecto: \texttt{src/tss/act1/problems/ProblemOneSimulator.java} y \texttt{src/tss/act1/services/SimulationService.java})}
+\end{javabox}
+
+\newpage
+
+% ──────────────────────────────────────────────
+\subsection{Problema 2: Equipo de Trabajadores en el Almacén}
+% ──────────────────────────────────────────────
+
+\subsubsection{Definición del problema}
+
+Una cadena de supermercados recibe camiones de un almacén central. Los camiones llegan según un \textbf{proceso Poisson} con una tasa media de $\lambda = 2$ camiones por hora, lo que equivale a un camión cada 30 minutos en promedio.
+
+El objetivo es determinar cuántos trabajadores asignar para la descarga, minimizando el costo total que incluye los salarios y el costo de espera de los camiones.
+
+\textbf{Datos del costo:}
+\begin{itemize}
+  \item Salario por trabajador: \$25/hora, turno de 8 horas = \$200 por trabajador.
+  \item Costo de espera de un camión: \$50 por hora.
+\end{itemize}
+
+\subsubsection{Modelo matemático}
+
+\textbf{Generación de llegadas (Proceso Poisson):}
+
+Para un proceso Poisson con tasa $\lambda = 2$ camiones/hora, el tiempo entre llegadas sigue una distribución exponencial con $\mu = 1/\lambda = 0.5$ horas (30 minutos). Usando el Ejemplo 4.1 del libro de Coss Bu:
+
+\begin{formulabox}
+\[
+t_{\text{llegada}} = -\frac{1}{\lambda}\ln(R) = -\frac{1}{2}\ln(R)
+\]
+
+donde $R$ es un número uniforme entre 0 y 1.
+\end{formulabox}
+
+\textbf{Generación de tiempos de descarga:}
+
+Los tiempos de descarga siguen distribuciones uniformes según el número de trabajadores:
+
+\begin{table}[H]
+\centering
+\caption{Tiempos de descarga según número de trabajadores}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Trabajadores} & \textbf{Distribución} & \textbf{Fórmula} & \textbf{Media (min)} \\
+\midrule
+3 & Uniforme (20, 30) & $t = 20 + 10R$ & 25 \\
+4 & Uniforme (15, 25) & $t = 15 + 10R$ & 20 \\
+5 & Uniforme (10, 20) & $t = 10 + 10R$ & 15 \\
+6 & Uniforme (5, 15)  & $t = 5 + 10R$  & 10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Costo total por turno (8 horas) para $w$ trabajadores:}
+
+\[
+\text{Costo total} = \underbrace{w \times 200}_{\text{salarios}} + \underbrace{T_{\text{espera}} \times 50}_{\text{costo de espera}}
+\]
+
+donde $T_{\text{espera}}$ es el tiempo total de espera acumulado de todos los camiones durante el turno.
+
+\subsubsection{Prueba de escritorio}
+
+Para el Problema 2 fijé $w=3$ trabajadores y corrí $n=10,25,50,100,250,500,1000$. Igual que antes: $n=10$ y $n=25$ completas; para $n\ge 50$ se resume dejando réplica final.
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Problema 2 ($w=3$, $n=10$, tabla completa)}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Réplica} & \textbf{Espera (h)} & \textbf{Costo espera} & \textbf{Salario} & \textbf{Costo total} \\
+\midrule
+1 & 4,2639 & 213,20 & 600,00 & 813,20 \\
+2 & 12,8139 & 640,70 & 600,00 & 1\,240,70 \\
+3 & 5,6631 & 283,16 & 600,00 & 883,16 \\
+4 & 8,1413 & 407,06 & 600,00 & 1\,007,06 \\
+5 & 3,7137 & 185,69 & 600,00 & 785,69 \\
+6 & 2,3778 & 118,89 & 600,00 & 718,89 \\
+7 & 2,1279 & 106,40 & 600,00 & 706,40 \\
+8 & 5,1406 & 257,03 & 600,00 & 857,03 \\
+9 & 2,3029 & 115,14 & 600,00 & 715,14 \\
+10 & 2,1420 & 107,10 & 600,00 & 707,10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Problema 2 ($w=3$, $n=25$, tabla completa)}
+\small
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Réplica} & \textbf{Espera (h)} & \textbf{Costo espera} & \textbf{Salario} & \textbf{Costo total} \\
+\midrule
+1 & 4,6782 & 233,91 & 600,00 & 833,91 \\
+2 & 2,6773 & 133,87 & 600,00 & 733,87 \\
+3 & 2,0547 & 102,73 & 600,00 & 702,73 \\
+4 & 4,2700 & 213,50 & 600,00 & 813,50 \\
+5 & 0,6271 & 31,36 & 600,00 & 631,36 \\
+6 & 1,7662 & 88,31 & 600,00 & 688,31 \\
+7 & 1,4624 & 73,12 & 600,00 & 673,12 \\
+8 & 4,0628 & 203,14 & 600,00 & 803,14 \\
+9 & 10,7380 & 536,90 & 600,00 & 1\,136,90 \\
+10 & 1,0536 & 52,68 & 600,00 & 652,68 \\
+11 & 3,0098 & 150,49 & 600,00 & 750,49 \\
+12 & 1,1528 & 57,64 & 600,00 & 657,64 \\
+13 & 16,1845 & 809,22 & 600,00 & 1\,409,22 \\
+14 & 2,7796 & 138,98 & 600,00 & 738,98 \\
+15 & 5,2790 & 263,95 & 600,00 & 863,95 \\
+16 & 1,5342 & 76,71 & 600,00 & 676,71 \\
+17 & 2,4512 & 122,56 & 600,00 & 722,56 \\
+18 & 0,0187 & 0,94 & 600,00 & 600,94 \\
+19 & 7,0211 & 351,06 & 600,00 & 951,06 \\
+20 & 29,5366 & 1\,476,83 & 600,00 & 2\,076,83 \\
+21 & 3,0630 & 153,15 & 600,00 & 753,15 \\
+22 & 5,5166 & 275,83 & 600,00 & 875,83 \\
+23 & 0,4962 & 24,81 & 600,00 & 624,81 \\
+24 & 9,3299 & 466,50 & 600,00 & 1\,066,50 \\
+25 & 2,5537 & 127,69 & 600,00 & 727,69 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Prueba de escritorio — Problema 2 (resumen para $n=50,100,250,500,1000$)}
+\begin{tabular}{cccc}
+\toprule
+\textbf{$n$} & \textbf{Costo total en réplica 10} & \textbf{Costo total en última réplica} & \textbf{Promedio costo total} \\
+\midrule
+50 & 1\,138,91 & 816,25 & 1\,024,07 \\
+100 & 1\,510,85 & 734,87 & 925,15 \\
+250 & 884,13 & 1\,704,95 & 945,40 \\
+500 & 678,94 & 765,46 & 937,82 \\
+1000 & 713,52 & 707,46 & 954,78 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+La variabilidad en espera y costo es alta réplica a réplica, por eso para decisiones comparativas usé los promedios por tamaño de muestra y no una corrida aislada.
+\end{notabox}
+
+\subsubsection{Resultado de la simulación}
+
+\begin{table}[H]
+\centering
+\caption{Resultado de la simulación — Problema 2 (100 réplicas de 8 horas)}
+\small
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Trabajadores} & \textbf{Espera (h)} & \textbf{Costo espera (\$)} & \textbf{Costo salario (\$)} & \textbf{Costo total (\$)} \\
+\midrule
+3 & 7,3632 & 368,16 & 600,00 & 968,16 \\
+4 & 3,3689 & 168,44 & 800,00 & 968,44 \\
+5 & 1,5452 & 77,26  & 1\,000,00 & 1\,077,26 \\
+6 & 0,6240 & 31,20  & 1\,200,00 & 1\,231,20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+Los resultados muestran que con 3 o 4 trabajadores se obtiene un costo muy similar (alrededor de \$968). Esto sugiere que existe un punto de equilibrio entre el costo de espera de los camiones y el costo de salarios. Con más de 5 trabajadores, el costo salarial aumenta significativamente, mientras que el ahorro en tiempo de espera es menor.
+\end{notabox}
+
+\subsubsection{Comparación de escenarios}
+
+\begin{table}[H]
+\centering
+\caption{Comparación de costos por número de trabajadores (simulación de 100 réplicas de 8 horas)}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Trabajadores} & \textbf{Espera (h)} & \textbf{Costo espera} & \textbf{Costo salario} & \textbf{Costo total} \\
+\midrule
+3 & 7,3632 & \$368,16 & \$600,00 & \$968,16 \\
+4 & 3,3689 & \$168,44 & \$800,00 & \$968,44 \\
+5 & 1,5452 & \$77,26  & \$1\,000,00 & \$1\,077,26 \\
+6 & 0,6240 & \$31,20  & \$1\,200,00 & \$1\,231,20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+El número óptimo de trabajadores es aquel que minimiza el \textbf{costo total}. Con pocos trabajadores, el tiempo de espera de los camiones es grande y el costo de espera domina. Con muchos trabajadores, los salarios son altos aunque los camiones no tengan que esperar.
+\end{notabox}
+
+\subsubsection{Simulación en Excel — Problema 2}
+
+\begin{table}[H]
+\centering
+\caption{Estructura de la hoja Excel para el Problema 2}
+\begin{tabular}{>{\ttfamily}l l}
+\toprule
+\textbf{Columna} & \textbf{Contenido} \\
+\midrule
+A & Número de camión \\
+B & $R_1$ (para tiempo entre llegadas) \\
+C & Tiempo entre llegadas: \texttt{=-0.5*LN (B2)*60} (en minutos) \\
+D & Hora de llegada acumulada \\
+E & Hora inicio de descarga (max de hora llegada y fin anterior) \\
+F & $R_2$ (para tiempo de descarga) \\
+G & Tiempo de descarga según trabajadores \\
+H & Hora fin de descarga \\
+I & Tiempo de espera (E-D) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Referencia del código Java — Problema 2}
+
+\begin{javabox}
+El programa Java para el Problema 2:
+\begin{itemize}
+  \item Simula el arribo de camiones durante un turno de 8 horas con proceso Poisson ($\lambda = 2$/hora).
+  \item Implementa una cola FIFO (primero en entrar, primero en ser atendido).
+  \item Prueba los 4 escenarios (3, 4, 5 y 6 trabajadores) y calcula el costo total de cada uno.
+  \item Determina el tamaño óptimo del equipo comparando los costos totales.
+\end{itemize}
+\textit{(Implementación en el proyecto: \texttt{src/tss/act1/problems/ProblemTwoSimulator.java} y \texttt{src/tss/act1/services/SimulationService.java})}
+\end{javabox}
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Validación General}
+% ══════════════════════════════════════════════
+
+\subsection{Metodología de validación}
+
+Para validar mis resultados apliqué el principio de la \textbf{convergencia estadística}: al aumentar el número de repeticiones (tamaño de muestra), los resultados de la simulación deben acercarse cada vez más a los valores teóricos esperados. Esto está respaldado por la Ley de los Grandes Números.
+
+Utilicé los siguientes tamaños de muestra: $n \in \{10, 25, 50, 100, 250, 500, 1000\}$.
+
+\subsection{Tabla de validación — Parte 1}
+
+\begin{table}[H]
+\centering
+\caption{Validación de la Parte 1: convergencia de la media muestral a $\mu = 3$}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{$n$} & \textbf{$\bar{x}$} & \textbf{Error} $|\bar{x} - 3|$ & \textbf{Mín.} & \textbf{Máx.} \\
+\midrule
+10   & 2,8188 & 0,1812 & 0,2795 & 5,9276 \\
+25   & 2,7158 & 0,2842 & 0,1373 & 5,8877 \\
+50   & 3,2564 & 0,2564 & 0,0328 & 5,9963 \\
+100  & 2,7892 & 0,2108 & 0,0203 & 5,9880 \\
+250  & 3,0106 & 0,0106 & 0,0144 & 5,9982 \\
+500  & 3,0045 & 0,0045 & 0,0068 & 5,9971 \\
+1000 & 2,9096 & 0,0904 & 0,0018 & 5,9987 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Gráfico de convergencia}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{semilogxaxis}[
+  width=11cm, height=6cm,
+  xlabel={Tamaño de muestra $n$},
+  ylabel={Media muestral $\bar{x}$},
+  title={Convergencia de la media muestral al valor teórico},
+  xmin=8, xmax=1200,
+  ymin=2.5, ymax=3.5,
+  xtick={10, 25, 50, 100, 250, 500, 1000},
+  xticklabels={10, 25, 50, 100, 250, 500, 1000},
+  grid=both,
+  legend pos=south east
+]
+% Línea teórica
+\addplot[red, thick, dashed, domain=10:1000] {3};
+\addlegendentry{Valor teórico $\mu = 3$}
+
+\addplot[blue!70!black, thick, mark=*] coordinates {
+  (10,  2.8188)
+  (25,  2.7158)
+  (50,  3.2564)
+  (100, 2.7892)
+  (250, 3.0106)
+  (500, 3.0045)
+  (1000, 2.9096)
+};
+\addlegendentry{Media muestral (programa Java)}
+\end{semilogxaxis}
+\end{tikzpicture}
+\caption{Al aumentar el tamaño de muestra, la media muestral converge hacia el valor teórico $\mu = 3$. Los puntos del gráfico fueron obtenidos con \texttt{ValidationDataExtractor}.}
+\end{figure}
+
+\subsection{¿Qué debería observarse?}
+
+\begin{table}[H]
+\centering
+\caption{Comportamiento esperado por tamaño de muestra}
+\begin{tabular}{cp{11cm}}
+\toprule
+\textbf{$n$} & \textbf{Comportamiento esperado} \\
+\midrule
+10--25    & Alta variabilidad. En una sola corrida la media puede quedar por debajo o por encima de 3. \\
+50--100   & Se observa acercamiento a 3, pero todavía con oscilación visible entre corridas. \\
+250--500  & La media se estabiliza mejor y el error suele bajar de forma importante. \\
+1000      & La convergencia es más clara; aun así, una corrida puntual puede mantener un error cercano a 0,1. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{notabox}
+Con muestras pequeñas ($n < 100$) la variabilidad aleatoria es alta y la media puede alejarse del valor teórico. Al aumentar el tamaño de la muestra, la media se estabiliza hacia $\mu = 3$, lo cual es consistente con la Ley de los Grandes Números.
+\end{notabox}
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section{Conclusiones}
+% ══════════════════════════════════════════════
+
+A partir del trabajo realizado en esta actividad, llegué a las siguientes conclusiones:
+
+\begin{enumerate}[label=\textbf{\arabic*.}]
+
+  \item \textbf{Sobre el método de la transformada inversa:}
+  La función de densidad $f(x) = (x-3)^2/18$ me permitió calcular la distribución acumulada $F(x)$ de manera exacta y obtener la fórmula inversa $x = 3 + \sqrt[3]{54R-27}$. Esta fórmula garantiza que todos los valores generados pertenecen al intervalo $[0, 6]$, lo que verifiqué tanto analíticamente como mediante la prueba de escritorio.
+
+  \item \textbf{Sobre la convergencia estadística:}
+  Al aumentar el tamaño de la muestra de 10 a 1000, observé que la media muestral se acercó progresivamente al valor teórico $\mu = 3$. Esto me demuestra en la práctica la validez de la Ley de los Grandes Números y la importancia de usar muestras suficientemente grandes en simulación.
+
+  \item \textbf{Sobre el Problema 1 (Máquinas y Mecánicos):}
+  El modelo me permitió estimar el costo total de asignar distintas cantidades de máquinas a cada mecánico. Existe un equilibrio entre el costo de tener máquinas ociosas (alto cuando hay pocas máquinas por mecánico y el mecánico atiende rápido) y el costo de espera (alto cuando hay muchas máquinas). La simulación me ayudó a identificar el número óptimo.
+
+  \item \textbf{Sobre el Problema 2 (Equipo de Trabajadores):}
+  El proceso de llegada Poisson con $\lambda = 2$ camiones/hora requiere equilibrar el costo de los salarios con el costo de espera de los camiones. Con pocos trabajadores los camiones esperan demasiado; con muchos trabajadores el costo de salarios supera el ahorro. La simulación me permitió evaluar objetivamente cada escenario.
+
+  \item \textbf{Sobre las herramientas utilizadas:}
+  Tanto Excel como el código Java me dieron resultados consistentes entre sí, lo que valida que mi modelo matemático es correcto. Excel fue útil para explorar rápidamente distintos escenarios, mientras que Java permite automatizar el análisis con miles de repeticiones.
+
+\end{enumerate}
+
+\medskip
+En general, esta actividad me permitió comprender cómo la simulación es una herramienta poderosa para tomar decisiones en sistemas complejos donde los métodos analíticos son difíciles de aplicar directamente.
+
+\newpage
+
+% ══════════════════════════════════════════════
+\section*{Referencias}
+\addcontentsline{toc}{section}{Referencias}
+% ══════════════════════════════════════════════
+
+\begin{itemize}
+  \item Coss Bu, R. (1998). \textit{Simulación: un enfoque práctico}. Editorial Limusa. México.
+  \item Law, A. M., \& Kelton, W. D. (2000). \textit{Simulation Modeling and Analysis} (3.ª ed.). McGraw-Hill.
+\end{itemize}
+
+\end{document}

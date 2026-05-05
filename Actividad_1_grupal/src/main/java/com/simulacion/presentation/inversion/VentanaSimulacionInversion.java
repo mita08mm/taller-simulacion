@@ -95,7 +95,7 @@ public class VentanaSimulacionInversion extends JFrame {
         txtImpuestos = new JTextField("50", 10);
         txtTREMA = new JTextField("15", 10);
         txtVida = new JTextField("5", 10);
-        cmbModo = new JComboBox<>(new String[]{"Aleatorio triangular", "Caso pesimista fijo"});
+        cmbModo = new JComboBox<>(new String[] { "Aleatorio triangular", "Caso pesimista fijo" });
 
         int y = 0;
         agregarCampo(panel, gbc, y++, "Num. corridas:", txtNumCorridas);
@@ -146,20 +146,19 @@ public class VentanaSimulacionInversion extends JFrame {
         txtResumen.setEditable(false);
         txtResumen.setFont(new Font("Monospaced", Font.PLAIN, 12));
         txtResumen.setText(
-            "Configure parametros y ejecute la simulacion.\n\n" +
-            "La logica de negocio esta en:\n" +
-            "- application/usecases/ProyectoInversion\n" +
-            "- domain/model/ConfiguracionInversion\n" +
-            "- domain/model/ResultadoSimulacionInversion\n\n" +
-            "Criterio de decision: ACEPTAR si Prob(TIR > TREMA) >= 0.90"
-        );
+                "Configure parametros y ejecute la simulacion.\n\n" +
+                        "La logica de negocio esta en:\n" +
+                        "- application/usecases/ProyectoInversion\n" +
+                        "- domain/model/ConfiguracionInversion\n" +
+                        "- domain/model/ResultadoSimulacionInversion\n\n" +
+                        "Criterio de decision: ACEPTAR si Prob(TIR > TREMA) >= 0.90");
         panel.add(new JScrollPane(txtResumen), BorderLayout.CENTER);
         return panel;
     }
 
     private JPanel crearPanelTabla() {
         JPanel panel = new JPanel(new BorderLayout());
-        String[] columnas = {"#", "AF", "AC", "Flujo", "VPN", "TIR (%)", "TIR>TREMA", "Decision"};
+        String[] columnas = { "#", "AF", "AC", "Flujo", "VPN", "TIR (%)", "TIR>TREMA" };
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -174,10 +173,10 @@ public class VentanaSimulacionInversion extends JFrame {
     private JPanel crearPanelTablaDistribucion() {
         JPanel panel = new JPanel(new BorderLayout());
         String[] columnas = {
-            "Limite inferior TIR (%)",
-            "Limite superior TIR (%)",
-            "Fraccion",
-            "Fraccion acumulada"
+                "Limite inferior TIR (%)",
+                "Limite superior TIR (%)",
+                "Fraccion",
+                "Fraccion acumulada"
         };
         modeloTablaDistribucion = new DefaultTableModel(columnas, 0) {
             @Override
@@ -209,11 +208,10 @@ public class VentanaSimulacionInversion extends JFrame {
                     mostrarResultados(resultado);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(
-                        VentanaSimulacionInversion.this,
-                        "Error ejecutando simulacion: " + ex.getMessage(),
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
-                    );
+                            VentanaSimulacionInversion.this,
+                            "Error ejecutando simulacion: " + ex.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 } finally {
                     btnSimular.setEnabled(true);
                     btnSimular.setText("Ejecutar Simulacion");
@@ -226,72 +224,69 @@ public class VentanaSimulacionInversion extends JFrame {
 
     private ConfiguracionInversion leerConfiguracion() {
         return new ConfiguracionInversion(
-            entInt(txtNumCorridas, 1000),
-            entInt(txtVida, 5),
-            modoSeleccionado(),
-            entDbl(txtAFPes, -100000),
-            entDbl(txtAFProb, -70000),
-            entDbl(txtAFOpt, -60000),
-            entDbl(txtACPes, -40000),
-            entDbl(txtACProb, -30000),
-            entDbl(txtACOpt, -25000),
-            entDbl(txtFlujoPes, 30000),
-            entDbl(txtFlujoProb, 40000),
-            entDbl(txtFlujoOpt, 45000),
-            entDbl(txtImpuestos, 50) / 100.0,
-            entDbl(txtTREMA, 15)
-        );
+                entInt(txtNumCorridas, 1000),
+                entInt(txtVida, 5),
+                modoSeleccionado(),
+                entDbl(txtAFPes, -100000),
+                entDbl(txtAFProb, -70000),
+                entDbl(txtAFOpt, -60000),
+                entDbl(txtACPes, -40000),
+                entDbl(txtACProb, -30000),
+                entDbl(txtACOpt, -25000),
+                entDbl(txtFlujoPes, 30000),
+                entDbl(txtFlujoProb, 40000),
+                entDbl(txtFlujoOpt, 45000),
+                entDbl(txtImpuestos, 50) / 100.0,
+                entDbl(txtTREMA, 15));
     }
 
     private ModoSimulacion modoSeleccionado() {
         return cmbModo.getSelectedIndex() == 1
-            ? ModoSimulacion.PESIMISTA_FIJO
-            : ModoSimulacion.ALEATORIO_TRIANGULAR;
+                ? ModoSimulacion.PESIMISTA_FIJO
+                : ModoSimulacion.ALEATORIO_TRIANGULAR;
     }
 
     private void mostrarResultados(ResultadoSimulacionInversion resultado) {
         modeloTabla.setRowCount(0);
         for (ResultadoCorridaInversion corrida : resultado.getCorridas()) {
-            modeloTabla.addRow(new Object[]{
-                corrida.getNumeroCorrida(),
-                String.format("%,.0f", corrida.getActivoFijo()),
-                String.format("%,.0f", corrida.getActivoCirculante()),
-                String.format("%,.0f", corrida.getFlujoAntesImpuestos()),
-                String.format("%,.2f", corrida.getVpn()),
-                String.format("%.2f", corrida.getTirPorcentaje()),
-                corrida.isSuperaTrema() ? "Si" : "No",
-                corrida.isSuperaTrema() ? "ACEPTAR" : "RECHAZAR"
+            modeloTabla.addRow(new Object[] {
+                    corrida.getNumeroCorrida(),
+                    String.format("%,.0f", corrida.getActivoFijo()),
+                    String.format("%,.0f", corrida.getActivoCirculante()),
+                    String.format("%,.0f", corrida.getFlujoAntesImpuestos()),
+                    String.format("%,.2f", corrida.getVpn()),
+                    String.format("%.2f", corrida.getTirPorcentaje()),
+                    corrida.isSuperaTrema() ? "Si" : "No"
             });
         }
 
         String resumen = String.format(
-            "Corridas: %,d\n" +
-            "TIR min: %.2f %%\n" +
-            "TIR max: %.2f %%\n" +
-            "TIR media: %.2f %%\n" +
-            "Desv. estandar: %.2f %%\n" +
-            "TREMA: %.2f %%\n" +
-            "Corridas con TIR > TREMA: %,d\n" +
-            "Prob(TIR > TREMA): %.4f (%.2f %%)\n\n" +
-            "Percentiles:\n" +
-            "P10: %.2f %%\n" +
-            "P50: %.2f %%\n" +
-            "P90: %.2f %%\n\n" +
-            "Regla: ACEPTAR si Prob(TIR > TREMA) >= 0.90\n" +
-            "(Se genero Tabla 5.6 e histogramas para sustento en presentacion)",
-            resultado.getTotalCorridas(),
-            resultado.getTirMinima(),
-            resultado.getTirMaxima(),
-            resultado.getTirMedia(),
-            resultado.getDesviacionEstandar(),
-            resultado.getConfiguracion().getTrema(),
-            resultado.getCorridasExitosas(),
-            resultado.getProbabilidadExito(),
-            resultado.getProbabilidadExito() * 100,
-            resultado.getPercentil(0.10),
-            resultado.getPercentil(0.50),
-            resultado.getPercentil(0.90)
-        );
+                "Corridas: %,d\n" +
+                        "TIR min: %.2f %%\n" +
+                        "TIR max: %.2f %%\n" +
+                        "TIR media: %.2f %%\n" +
+                        "Desv. estandar: %.2f %%\n" +
+                        "TREMA: %.2f %%\n" +
+                        "Corridas con TIR > TREMA: %,d\n" +
+                        "Prob(TIR > TREMA): %.4f (%.2f %%)\n\n" +
+                        "Percentiles:\n" +
+                        "P10: %.2f %%\n" +
+                        "P50: %.2f %%\n" +
+                        "P90: %.2f %%\n\n" +
+                        "Regla: ACEPTAR si Prob(TIR > TREMA) >= 0.90\n" +
+                        "(Se genero Tabla 5.6 e histogramas para sustento en presentacion)",
+                resultado.getTotalCorridas(),
+                resultado.getTirMinima(),
+                resultado.getTirMaxima(),
+                resultado.getTirMedia(),
+                resultado.getDesviacionEstandar(),
+                resultado.getConfiguracion().getTrema(),
+                resultado.getCorridasExitosas(),
+                resultado.getProbabilidadExito(),
+                resultado.getProbabilidadExito() * 100,
+                resultado.getPercentil(0.10),
+                resultado.getPercentil(0.50),
+                resultado.getPercentil(0.90));
 
         txtResumen.setText(resumen);
 
@@ -311,11 +306,11 @@ public class VentanaSimulacionInversion extends JFrame {
 
         modeloTablaDistribucion.setRowCount(0);
         for (IntervaloDistribucion intervalo : intervalos) {
-            modeloTablaDistribucion.addRow(new Object[]{
-                String.format("%.2f", intervalo.limiteInferior),
-                String.format("%.2f", intervalo.limiteSuperior),
-                String.format("%.3f", intervalo.fraccion),
-                String.format("%.3f", intervalo.fraccionAcumulada)
+            modeloTablaDistribucion.addRow(new Object[] {
+                    String.format("%.2f", intervalo.limiteInferior),
+                    String.format("%.2f", intervalo.limiteSuperior),
+                    String.format("%.3f", intervalo.fraccion),
+                    String.format("%.3f", intervalo.fraccionAcumulada)
             });
         }
 
@@ -323,10 +318,11 @@ public class VentanaSimulacionInversion extends JFrame {
         actualizarFiguraAcumulada(intervalos, resultado.getConfiguracion().getTrema());
     }
 
-    private List<IntervaloDistribucion> construirDistribucion(ResultadoSimulacionInversion resultado, int numeroIntervalos) {
+    private List<IntervaloDistribucion> construirDistribucion(ResultadoSimulacionInversion resultado,
+            int numeroIntervalos) {
         List<Double> tires = resultado.getCorridas().stream()
-            .map(ResultadoCorridaInversion::getTirPorcentaje)
-            .toList();
+                .map(ResultadoCorridaInversion::getTirPorcentaje)
+                .toList();
 
         double minimo = resultado.getTirMinima();
         double maximo = resultado.getTirMaxima();
@@ -369,19 +365,17 @@ public class VentanaSimulacionInversion extends JFrame {
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-            "Histograma de TIR (Tabla 5.6)",
-            "Intervalos de TIR (%)",
-            "Fraccion",
-            dataset,
-            PlotOrientation.VERTICAL,
-            false,
-            true,
-            false
-        );
+                "Histograma de TIR (Tabla 5.6)",
+                "Intervalos de TIR (%)",
+                "Fraccion",
+                dataset,
+                PlotOrientation.VERTICAL,
+                false,
+                true,
+                false);
 
         chart.addSubtitle(new org.jfree.chart.title.TextTitle(
-            String.format("TREMA = %.2f%%", trema)
-        ));
+                String.format("TREMA = %.2f%%", trema)));
 
         panelHistograma.setChart(chart);
     }
@@ -396,15 +390,14 @@ public class VentanaSimulacionInversion extends JFrame {
         dataset.addSeries(serieAcumulada);
 
         JFreeChart chart = ChartFactory.createXYLineChart(
-            "Distribucion acumulada de la TIR (Figura 5.1)",
-            "TIR (%)",
-            "Fraccion acumulada",
-            dataset,
-            PlotOrientation.VERTICAL,
-            false,
-            true,
-            false
-        );
+                "Distribucion acumulada de la TIR (Figura 5.1)",
+                "TIR (%)",
+                "Fraccion acumulada",
+                dataset,
+                PlotOrientation.VERTICAL,
+                false,
+                true,
+                false);
 
         XYPlot plot = chart.getXYPlot();
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, true);
@@ -424,7 +417,8 @@ public class VentanaSimulacionInversion extends JFrame {
         private final double fraccion;
         private final double fraccionAcumulada;
 
-        private IntervaloDistribucion(double limiteInferior, double limiteSuperior, double fraccion, double fraccionAcumulada) {
+        private IntervaloDistribucion(double limiteInferior, double limiteSuperior, double fraccion,
+                double fraccionAcumulada) {
             this.limiteInferior = limiteInferior;
             this.limiteSuperior = limiteSuperior;
             this.fraccion = fraccion;

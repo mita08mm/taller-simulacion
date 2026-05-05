@@ -1,0 +1,319 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\geometry{margin=2.5cm}
+
+\title{Guia Completa de Defensa Matematica\\
+Actividad 1 -- Simulacion por Transformada Inversa}
+\author{Basada en Teorema.tex e Informe.tex}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Objetivo de esta guia}
+Esta guia resume \textbf{todo el sustento matematico y de simulacion} de la actividad, con enfoque de defensa oral en clase. Incluye:
+\begin{itemize}
+  \item Teorema utilizado y su interpretacion.
+  \item Desarrollo paso a paso de la Parte 1.
+  \item Desarrollo matematico y de costos de Parte 2, Problema 1.
+  \item Desarrollo matematico y de costos de Parte 2, Problema 2.
+  \item Significado de cada variable y respuesta corta para preguntas del docente.
+\end{itemize}
+
+\section{Base teorica: metodo de la transformada inversa}
+
+\subsection{Idea central del teorema}
+El metodo de la transformada inversa (capitulo de Coss Bu) establece que, si una variable aleatoria continua $X$ tiene distribucion acumulada $F(x)$ y si $R\sim U(0,1)$, entonces:
+\[
+X = F^{-1}(R)
+\]
+genera valores con la distribucion de $X$.
+
+\subsection{Pasos generales del metodo}
+\begin{enumerate}
+  \item Definir la densidad $f(x)$ y su dominio.
+  \item Calcular la acumulada: $F(x)=\int f(x)\,dx$ en el dominio correcto.
+  \item Igualar $F(x)=R$, con $R\in[0,1]$ uniforme.
+  \item Despejar $x$ para obtener $F^{-1}(R)$.
+  \item Verificar extremos ($R=0$ y $R=1$) para validar el intervalo de salida.
+\end{enumerate}
+
+\subsection{Ejemplos de Teorema.tex que sustentan la actividad}
+\begin{itemize}
+  \item \textbf{Exponencial:} 
+  \[
+  f(x)=\lambda e^{-\lambda x},\ x\ge 0,\quad x=-\frac{1}{\lambda}\ln(R)
+  \]
+  (Usado directamente en Problema 2 para tiempos entre llegadas).
+
+  \item \textbf{Uniforme en intervalo $[a,b]$:}
+  \[
+  x=a+(b-a)R
+  \]
+  (Usado en Problema 1 y en tiempos de descarga del Problema 2).
+
+  \item \textbf{Distribucion por tramos/discreta:}
+  se construye acumulada y se asigna el valor segun el rango de $R$.
+\end{itemize}
+
+\section{Parte 1: transformada inversa para la densidad dada}
+
+\subsection{Definicion de la densidad}
+La funcion objetivo es:
+\[
+f(x)=
+\begin{cases}
+\dfrac{(x-3)^2}{18}, & 0\le x\le 6,\\
+0, & \text{en otro caso.}
+\end{cases}
+\]
+
+\subsection{Validacion de densidad}
+Para que sea una densidad valida debe cumplirse:
+\[
+\int_0^6 f(x)\,dx = 1
+\]
+Desarrollo:
+\[
+\int_0^6 \frac{(x-3)^2}{18}\,dx
+=\frac{1}{18}\left[\frac{(x-3)^3}{3}\right]_0^6
+=\frac{1}{18}\left(\frac{27}{3}-\frac{-27}{3}\right)
+=\frac{18}{18}=1.
+\]
+Conclusiones:
+\begin{itemize}
+  \item $f(x)\ge 0$ en $[0,6]$.
+  \item El area total es 1.
+  \item Entonces $f(x)$ es una funcion de densidad valida.
+\end{itemize}
+
+\subsection{Acumulada $F(x)$ paso a paso}
+\[
+F(x)=\int_0^x \frac{(t-3)^2}{18}\,dt
+\]
+\begin{align*}
+F(x)
+&=\frac{1}{18}\int_0^x (t-3)^2\,dt \\
+&=\frac{1}{18}\left[\frac{(t-3)^3}{3}\right]_0^x \\
+&=\frac{1}{18}\left(\frac{(x-3)^3}{3}-\frac{(0-3)^3}{3}\right) \\
+&=\frac{1}{18}\left(\frac{(x-3)^3}{3}+\frac{27}{3}\right) \\
+&=\frac{(x-3)^3+27}{54}.
+\end{align*}
+Por tanto:
+\[
+\boxed{F(x)=\frac{(x-3)^3+27}{54}},\quad 0\le x\le 6.
+\]
+
+\subsection{Inversa $F^{-1}(R)$ paso a paso}
+\[
+R=\frac{(x-3)^3+27}{54}
+\]
+\begin{align*}
+54R&=(x-3)^3+27 \\
+(x-3)^3&=54R-27 \\
+x-3&=\sqrt[3]{54R-27} \\
+\boxed{x=3+\sqrt[3]{54R-27}}
+\end{align*}
+Esta formula es la que se programa para generar los valores de la Parte 1.
+
+\subsection{Verificacion del intervalo de salida}
+\begin{itemize}
+  \item Si $R=0$: $x=3+\sqrt[3]{-27}=0$.
+  \item Si $R=1$: $x=3+\sqrt[3]{27}=6$.
+\end{itemize}
+Como $R\in[0,1]$, entonces $x\in[0,6]$.
+
+\subsection{Valor esperado teorico}
+\[
+E[X]=\int_0^6 x\cdot\frac{(x-3)^2}{18}\,dx
+\]
+Expandiendo $(x-3)^2=x^2-6x+9$:
+\[
+E[X]=\frac{1}{18}\int_0^6 (x^3-6x^2+9x)\,dx
+\]
+\[
+=\frac{1}{18}\left[\frac{x^4}{4}-2x^3+\frac{9x^2}{2}\right]_0^6
+=\frac{1}{18}(324-432+162)=\frac{54}{18}=3.
+\]
+\[
+\boxed{\mu=E[X]=3}
+\]
+
+\subsection{Interpretacion de la validacion por simulacion}
+La media muestral $\bar x$ obtenida para $n=10,25,50,100,250,500,1000$ debe acercarse a 3 al crecer $n$ (Ley de los Grandes Numeros). La prueba de escritorio documenta esa convergencia.
+
+\section{Parte 2, Problema 1: maquinas y mecanicos}
+
+\subsection{Enunciado matematico del sistema}
+Se evalua el costo total por turno de 8 horas segun cuantas maquinas ($m$) atiende un mecanico.
+
+Datos de costo:
+\begin{itemize}
+  \item Costo de maquina ociosa: \$500 por hora.
+  \item Salario del mecanico: \$50 por hora.
+  \item Turno: 8 horas $\Rightarrow$ salario fijo por turno = $8\times 50=\$400$.
+\end{itemize}
+
+\subsection{Variables que debes saber explicar}
+\begin{itemize}
+  \item $R_1$: uniforme para seleccionar tiempo entre descomposturas.
+  \item $t_d$: tiempo entre descomposturas.
+  \item $R_2$: uniforme para seleccionar tiempo de reparacion.
+  \item $t_r$: tiempo de reparacion.
+  \item $H_{\text{inact}}$: horas ociosas acumuladas.
+  \item $m$: numero de maquinas por mecanico.
+\end{itemize}
+
+\subsection{Modelo de generacion de tiempos}
+Para cada intervalo $[a,b]$ asignado por la acumulada, se usa uniforme:
+\[
+t=a+(b-a)R
+\]
+Esto aplica tanto para $t_d$ como para $t_r$, cambiando el intervalo segun la tabla de probabilidades.
+
+\subsection{Funcion de costo del problema 1}
+El costo total por turno para un escenario $m$ es:
+\[
+\text{Costo total}(m)=\underbrace{500\cdot H_{\text{inact}}(m)}_{\text{costo por inactividad}}+\underbrace{400}_{\text{salario fijo del mecanico}}.
+\]
+
+\subsection{Interpretacion economica}
+\begin{itemize}
+  \item Si aumenta $m$, el mecanico atiende mas carga y puede crecer inactividad.
+  \item El salario fijo no cambia (siempre un mecanico).
+  \item El escenario optimo es el de menor costo total promedio simulado.
+\end{itemize}
+
+\subsection{Como defender la prueba de escritorio}
+En tus tablas:
+\begin{itemize}
+  \item Para $n=10$ y $n=25$: se muestran todas las replicas.
+  \item Para $n\ge 50$: se resume (corridas iniciales + ultima + promedio).
+\end{itemize}
+Argumento clave: con pocas replicas hay alta variabilidad por eventos extremos; con $n$ grande se estabiliza el promedio, lo que permite tomar decision robusta.
+
+\section{Parte 2, Problema 2: equipo de trabajadores en almacen}
+
+\subsection{Enunciado matematico}
+Llegan camiones con proceso Poisson de tasa:
+\[
+\lambda=2\ \text{camiones/hora}
+\]
+Se comparan escenarios de $w\in\{3,4,5,6\}$ trabajadores para minimizar costo total por turno de 8 horas.
+
+\subsection{Variables que debes saber explicar}
+\begin{itemize}
+  \item $\lambda$: tasa de llegadas del proceso Poisson.
+  \item $R$: uniforme para transformar a tiempo entre llegadas.
+  \item $t_{\text{llegada}}$: tiempo entre llegadas de camiones.
+  \item $w$: numero de trabajadores.
+  \item $T_{\text{espera}}$: tiempo total de espera acumulado de camiones.
+\end{itemize}
+
+\subsection{Transformada usada (Teorema.tex, ejemplo exponencial)}
+Si llegadas son Poisson, los tiempos entre llegadas son exponenciales:
+\[
+t_{\text{llegada}}=-\frac{1}{\lambda}\ln(R)=-\frac{1}{2}\ln(R).
+\]
+Esto se obtiene por transformada inversa de la exponencial.
+
+\subsection{Tiempos de descarga por escenario}
+Se modelan con uniformes:
+\begin{itemize}
+  \item $w=3$: $t=20+10R$ (min).
+  \item $w=4$: $t=15+10R$ (min).
+  \item $w=5$: $t=10+10R$ (min).
+  \item $w=6$: $t=5+10R$ (min).
+\end{itemize}
+
+\subsection{Funcion de costo del problema 2}
+Con salario de \$25/h por trabajador y costo de espera de \$50/h:
+\[
+\text{Costo total}(w)=\underbrace{200w}_{\text{salarios en 8h}}+\underbrace{50\,T_{\text{espera}}(w)}_{\text{espera de camiones}}.
+\]
+
+\subsection{Interpretacion economica}
+\begin{itemize}
+  \item Si $w$ es bajo, sube espera (colas), baja salario.
+  \item Si $w$ es alto, baja espera, pero sube salario.
+  \item El optimo aparece en el equilibrio entre ambos componentes.
+\end{itemize}
+
+\section{Relacion exacta entre teoria y codigo}
+
+\subsection{Parte 1}
+Codigo implementa:
+\[
+x=3+\sqrt[3]{54R-27}
+\]
+Cada corrida toma un $R$ uniforme y transforma a $x$.
+
+\subsection{Problema 1}
+Codigo implementa:
+\begin{enumerate}
+  \item Seleccion de intervalos via acumulada para descompostura y reparacion.
+  \item Generacion de tiempos via $t=a+(b-a)R$.
+  \item Acumulacion de inactividad y costo.
+  \item Comparacion de escenarios por promedio.
+\end{enumerate}
+
+\subsection{Problema 2}
+Codigo implementa:
+\begin{enumerate}
+  \item Llegadas via $t=-\ln(R)/\lambda$.
+  \item Descargas via uniformes por escenario de $w$.
+  \item Calculo de espera por cola (FIFO) y costo total.
+  \item Comparacion de escenarios por promedio.
+\end{enumerate}
+
+\section{Preguntas de defensa (respuestas cortas)}
+
+\subsection*{Pregunta 1: por que funciona $F^{-1}(R)$?}
+Porque transforma una uniforme en la distribucion objetivo usando la acumulada de esa variable.
+
+\subsection*{Pregunta 2: por que verificas integral igual a 1?}
+Porque es condicion necesaria para que $f(x)$ sea una densidad valida.
+
+\subsection*{Pregunta 3: por que la media teorica en Parte 1 es 3?}
+Porque al integrar $x f(x)$ en $[0,6]$ el resultado exacto es $E[X]=3$.
+
+\subsection*{Pregunta 4: por que no decidir con una sola corrida?}
+Porque una corrida aislada puede tener alta variabilidad; el promedio de muchas replicas reduce sesgo por azar.
+
+\subsection*{Pregunta 5: que representa $\lambda=2$?}
+Tasa media de 2 camiones por hora; su inversa es 0.5 horas entre llegadas en promedio.
+
+\subsection*{Pregunta 6: por que usar uniforme por intervalos en Problema 1?}
+Porque el enunciado da rangos con probabilidades; primero se escoge intervalo con acumulada y luego valor interno con uniforme.
+
+\section{Checklist de exposicion oral}
+\begin{enumerate}
+  \item Explicar el teorema en 20 segundos.
+  \item Derivar en pizarra $F(x)$ y $F^{-1}(R)$ de Parte 1.
+  \item Verificar extremos $R=0$ y $R=1$.
+  \item Mostrar que $E[X]=3$ teorico.
+  \item Explicar funciones de costo de Problema 1 y Problema 2.
+  \item Explicar por que se comparan promedios con multiples replicas.
+  \item Cerrar con criterio de decision: minimizar costo total esperado.
+\end{enumerate}
+
+\section{Conclusion tecnica}
+La actividad aplica correctamente el marco de Coss Bu:
+\begin{itemize}
+  \item Transformada inversa para distribuciones continuas.
+  \item Acumuladas para seleccion por intervalos.
+  \item Simulacion Monte Carlo para estimar costos esperados.
+\end{itemize}
+En consecuencia, cada decision (escenario optimo) se fundamenta en un modelo probabilistico, una funcion de costo y evidencia por replicas suficientes.
+
+\end{document}

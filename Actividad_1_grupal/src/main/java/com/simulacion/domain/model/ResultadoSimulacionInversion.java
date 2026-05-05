@@ -15,9 +15,8 @@ public class ResultadoSimulacionInversion {
     private final int corridasExitosas;
 
     public ResultadoSimulacionInversion(
-        ConfiguracionInversion configuracion,
-        List<ResultadoCorridaInversion> corridas
-    ) {
+            ConfiguracionInversion configuracion,
+            List<ResultadoCorridaInversion> corridas) {
         this.configuracion = configuracion;
         this.corridas = new ArrayList<>(corridas);
         this.corridasExitosas = (int) corridas.stream().filter(ResultadoCorridaInversion::isSuperaTrema).count();
@@ -63,9 +62,9 @@ public class ResultadoSimulacionInversion {
     public double getDesviacionEstandar() {
         double media = getTirMedia();
         double var = corridas.stream()
-            .mapToDouble(c -> Math.pow(c.getTirPorcentaje() - media, 2))
-            .average()
-            .orElse(0);
+                .mapToDouble(c -> Math.pow(c.getTirPorcentaje() - media, 2))
+                .average()
+                .orElse(0);
         return Math.sqrt(var);
     }
 
@@ -74,10 +73,20 @@ public class ResultadoSimulacionInversion {
             throw new IllegalArgumentException("El percentil debe estar entre 0 y 1");
         }
         List<Double> ordenados = corridas.stream()
-            .map(ResultadoCorridaInversion::getTirPorcentaje)
-            .sorted(Comparator.naturalOrder())
-            .toList();
-        int index = Math.min(ordenados.size() - 1, (int) (p * ordenados.size()));
+                .map(ResultadoCorridaInversion::getTirPorcentaje)
+                .sorted(Comparator.naturalOrder())
+                .toList();
+        if (ordenados.isEmpty()) {
+            return 0;
+        }
+
+        int index = (int) Math.ceil(p * ordenados.size()) - 1;
+        if (index < 0) {
+            index = 0;
+        }
+        if (index >= ordenados.size()) {
+            index = ordenados.size() - 1;
+        }
         return ordenados.get(index);
     }
 }

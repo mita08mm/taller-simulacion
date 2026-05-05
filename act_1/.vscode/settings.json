@@ -3,5 +3,14 @@
     "src/main/java"
   ],
   "java.project.outputPath": "out",
-  "java.configuration.updateBuildConfiguration": "automatic"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "cSpell.language": "es",
+  "cSpell.words": [
+    "tikzpicture",
+    "javac"
+  ]
+  ,
+  "[latex]": {
+    "cSpell.enabled": false
+  }
 }

@@ -1,0 +1,122 @@
+\documentclass[12pt]{article}
+
+% chktex-file 1
+% chktex-file 3
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{booktabs}
+
+\geometry{margin=2.5cm}
+\begin{document}
+
+\section{Parte 1: Por transformada inversa}
+
+La función de densidad proporcionada es:
+
+\[
+f(x)=
+\begin{cases}
+\dfrac{(x-3)^2}{18}{}, & 0 \leq x \leq 6 \\
+0, & x < 0 \text{ o } x > 6
+\end{cases}
+\]
+
+El objetivo consiste en generar valores aleatorios mediante el método de transformada inversa y verificar que los valores obtenidos pertenezcan al intervalo $[0,6]$.
+
+\subsection{Representación gráfica referencial}
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2]
+
+% Ejes
+\draw[->] (0,0) -- (8,0) node[right] {$x$};
+\draw[->] (0,0) -- (0,4) node[above] {$f(x)$};
+
+% Triángulo
+\draw (1.5,0) -- (4,3) -- (6.5,0);
+
+% Línea punteada
+\draw[dashed] (4,0) -- (4,3);
+
+% Etiquetas
+\node[below] at (1.5,0) {$a$};
+\node[below] at (4,0) {$b$};
+\node[below] at (6.5,0) {$c$};
+
+\end{tikzpicture}
+\end{center}
+
+\section{Parte 2: Aplicaciones de Simulación}
+
+\subsection{Problema 1}
+
+Una cierta compañía posee un gran número de máquinas en uso.
+
+El tiempo que dura en operación cada máquina sigue la siguiente distribución:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Tiempo entre descomposturas (horas) & Probabilidad \\
+\midrule
+6--8   & 0.10 \\
+8--10  & 0.15 \\
+10--12 & 0.24 \\
+12--14 & 0.26 \\
+16--18 & 0.18 \\
+18--20 & 0.07 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+El tiempo de reparación sigue:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Tiempo de reparación (horas) & Probabilidad \\
+\midrule
+2--4   & 0.15 \\
+4--6   & 0.25 \\
+6--8   & 0.30 \\
+8--10  & 0.20 \\
+10--12 & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Si el costo de tener una máquina ociosa es de \$500 por hora y el salario del operario es de \$50 por hora, se debe determinar cuántas máquinas asignar a cada mecánico.
+
+\subsection{Problema 2}
+
+Una cadena de supermercados es abastecida por un almacén central.
+
+Los camiones llegan según un proceso Poisson con razón media de 2 camiones por hora.
+
+Los tiempos de descarga dependen del número de trabajadores:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Número de trabajadores & Tiempo de descarga (min) \\
+\midrule
+3 & Uniforme (20,30) \\
+4 & Uniforme (15,25) \\
+5 & Uniforme (10,20) \\
+6 & Uniforme (5,15) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Cada trabajador recibe \$25 por hora durante un turno nocturno de 8 horas.
+
+El costo de espera de un camión es de \$50 por hora.
+
+El objetivo es determinar el tamaño óptimo del equipo.
+
+\end{document}
