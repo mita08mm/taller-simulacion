@@ -1,0 +1,59 @@
+{
+  "cSpell.language": "es",
+  "cSpell.words": [
+    "tikzpicture"
+  ],
+  "[latex]": {
+    "cSpell.enabled": false
+  },
+  "chat.tools.terminal.autoApprove": {
+    "latexmk": true
+  },
+  "latex-workshop.linting.chktex.enabled": false,
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.latex.outDir": "%DIR%/pdf",
+  "latex-workshop.latex.auxDir": "%DIR%/build",
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk-pdf-build",
+      "command": "latexmk",
+      "args": [
+        "-pdf",
+        "-interaction=nonstopmode",
+        "-synctex=0",
+        "-outdir=%DIR%/pdf",
+        "-auxdir=%DIR%/build",
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (pdf/build)",
+      "tools": [
+        "latexmk-pdf-build"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.view.pdf.viewer": "tab",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/tex/*.aux": true,
+    "**/tex/*.log": true,
+    "**/tex/*.gz": true,
+    "**/tex/*.out": true,
+    "**/tex/*.fls": true,
+    "**/tex/*.fdb_latexmk": true,
+    "**/tex/*.toc": true,
+    "**/tex/*.pdf": true,
+    "**/Informe.aux": true,
+    "**/Informe.log": true,
+    "**/Informe.gz": true,
+    "**/Informe.out": true
+  }
+}

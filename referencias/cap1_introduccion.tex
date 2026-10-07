@@ -1,0 +1,365 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,provide=*]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{enumitem}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\linespread{1.3}\selectfont 1. INTRODUCCIÓN\par}
+\end{center}
+\vspace{0.5cm}
+
+\setcounter{chapter}{1}
+\setcounter{page}{11}
+
+%==========================================================
+Con el advenimiento de la computadora, una de las más importantes
+herramientas para analizar el diseño y operación de sistemas o procesos
+complejos es la simulación.
+
+Aunque la construcción de modelos arranca desde el Renacimiento, el uso
+moderno de la palabra simulación data de 1940, cuando los científicos
+Von Neuman y Ulam que trabajaban en el proyecto Monte Carlo, durante la
+Segunda Guerra Mundial, resolvieron problemas de reacciones nucleares
+cuya solución experimental sería muy cara y el análisis matemático
+demasiado complicado.
+
+Con la utilización de la computadora en los experimentos de simulación,
+surgieron incontables aplicaciones y con ello, una cantidad mayor de
+problemas teóricos y prácticos. En este libro se intenta por
+consiguiente, investigar y analizar cierto número de aplicaciones
+importantes de simulación de las áreas de economía, administración de
+negocios e investigación de operaciones, así como también sugerir
+algunos métodos alternativos para resolver algunos problemas teóricos y
+prácticos que surgen al efectuar simulaciones reales.
+
+%==========================================================
+\section*{1.1. Definición de Simulación}
+
+Se ha empezado a utilizar la palabra simulación sin haber dado
+previamente una definición de ella. Por consiguiente, antes de proseguir
+con la discusión de este tema, sería conveniente describir algunas de
+las definiciones más aceptadas y difundidas de la palabra simulación.
+Thomas H. Naylor la define así:
+
+\begin{quote}
+\emph{Simulación es una técnica numérica para conducir experimentos en
+una computadora digital. Estos experimentos comprenden ciertos tipos de
+relaciones matemáticas y lógicas, las cuales son necesarias para
+describir el comportamiento y la estructura de sistemas complejos del
+mundo real a través de largos períodos de tiempo.}
+\end{quote}
+
+La definición anterior está en un sentido muy amplio, pues puede incluir
+desde una maqueta, hasta un sofisticado programa de computadora. En
+sentido más estricto, H. Maisel y G. Gnugnoli, definen simulación como:
+
+\begin{quote}
+\emph{Simulación es una técnica numérica para realizar experimentos en
+una computadora digital. Estos experimentos involucran ciertos tipos de
+modelos matemáticos y lógicos que describen el comportamiento de
+sistemas de negocios, económicos, sociales, biológicos, físicos o
+químicos a través de largos períodos de tiempo.}
+\end{quote}
+
+Otros estudiosos del tema como Robert E. Shannon, definen simulación
+como:
+
+\begin{quote}
+\emph{Simulación es el proceso de diseñar y desarrollar un modelo
+computarizado de un sistema o proceso y conducir experimentos con este
+modelo con el propósito de entender el comportamiento del sistema o
+evaluar varias estrategias con las cuales se puede operar el sistema.}
+\end{quote}
+
+Las definiciones anteriores no especifican si los sistemas modelados son
+continuos o discretos. Sin embargo, es necesario señalar que el grueso
+de este libro está dedicado al diseño, análisis y validación de sistemas
+dinámicos discretos. Algunos autores de este tema como Geoffrey Gordon
+en su libro \emph{System Simulation}, tratan a fondo el Análisis y
+estudio de sistemas dinámicos continuos.
+
+%==========================================================
+\section*{1.2. Etapas para realizar un estudio de Simulación}
+
+Se ha escrito mucho acerca de los pasos necesarios para realizar un
+estudio de simulación. Sin embargo, la mayoría de los autores opinan que
+los pasos necesarios para llevar a cabo un experimento de simulación
+son:
+
+\begin{itemize}[leftmargin=*]
+\item \emph{Definición del sistema.} Para tener una definición exacta
+del sistema que se desea simular, es necesario hacer primeramente un
+análisis preliminar del mismo, con el fin de determinar la interacción
+del sistema con otros sistemas, las restricciones del sistema, las
+variables que interactúan dentro del sistema y sus interrelaciones, las
+medidas de efectividad que se van a utilizar para definir y estudiar el
+sistema y los resultados que se esperan obtener del estudio.
+
+\item \emph{Formulación del modelo.} Una vez que están definidos con
+exactitud los resultados que se esperan obtener del estudio, el
+siguiente paso es definir y construir el modelo con el cual se
+obtendrán los resultados deseados. En la formulación del modelo es
+necesario definir todas las variables que forman parte de él, sus
+relaciones lógicas y los diagramas de flujo que describan en forma
+completa al modelo.
+
+\item \emph{Colección de datos.} Es posible que la facilidad de
+obtención de algunos datos o la dificultad de conseguir otros, pueda
+influenciar el desarrollo y formulación del modelo. Por consiguiente, es
+muy importante que se definan con claridad y exactitud los datos que el
+modelo va a requerir para producir los resultados deseados. Normalmente,
+la información requerida por un modelo se puede obtener de registros
+contables, de órdenes de trabajo, de órdenes de compra, de opiniones de
+expertos y si no hay otro remedio por experimentación.
+
+\item \emph{Implementación del modelo en la computadora.} Con el modelo
+definido, el siguiente paso es decidir si se utiliza algún lenguaje como
+fortran, basic, algol, etc., o se utiliza algún paquete como GPSS,
+simula, simscript, etc., para procesarlo en la computadora y obtener los
+resultados deseados.
+
+\item \emph{Validación.} Una de las principales etapas de un estudio de
+simulación es la validación. A través de esta etapa es posible detallar
+deficiencias en la formulación del modelo o en los datos alimentados al
+modelo. Las formas más comunes de validar un modelo son:
+
+\begin{enumerate}
+\item La opinión de expertos sobre los resultados de la simulación.
+\item La exactitud con que se predicen datos históricos.
+\item La exactitud en la predicción del futuro.
+\item La comprobación de falla del modelo de simulación al utilizar
+datos que hacen fallar al sistema real.
+\item La aceptación y confianza en el modelo de la persona que hará
+uso de los resultados que arroje el experimento de simulación.
+\end{enumerate}
+
+\item \emph{Experimentación.} La experimentación con el modelo se
+realiza después de que éste ha sido validado. La experimentación
+consiste en generar los datos deseados y en realizar análisis de
+sensibilidad de los índices requeridos.
+
+\item \emph{Interpretación.} En esta etapa del estudio, se interpretan
+los resultados que arroja la simulación y en base a esto se toma una
+decisión. Es obvio que los resultados que se obtienen de un estudio de
+simulación ayudan a soportar decisiones del tipo semi-estructurado, es
+decir, la computadora en sí no toma la decisión, sino que la información
+que proporciona ayuda a tomar mejores decisiones y por consiguiente a
+sistemáticamente obtener mejores resultados.
+
+\item \emph{Documentación.} Dos tipos de documentación son requeridos
+para hacer un mejor uso del modelo de simulación. La primera se refiere
+a la documentación de tipo técnico, es decir, a la documentación que el
+departamento de Procesamiento de Datos debe tener del modelo. La segunda
+se refiere al manual del usuario, con el cual se facilita la interacción
+y el uso del modelo desarrollado, a través de una terminal de
+computadora.
+\end{itemize}
+
+%==========================================================
+\section*{1.3. Factores a considerar en el desarrollo del modelo de Simulación}
+
+Puesto que la simulación está basada fuertemente en la teoría de
+probabilidad y estadística, en matemáticas, en ciencias computacionales,
+etc., es conveniente decir algunas ideas de cómo intervienen estas áreas
+en el desarrollo y formulación del modelo de simulación.
+
+\subsection*{1.3.1. Generación de variables aleatorias no-uniformes}
+
+Si el modelo de simulación es estocástico, la simulación debe ser capaz
+de generar variables aleatorias no-uniformes de distribuciones de
+probabilidad teóricas o empíricas. Lo anterior puede ser obtenido si se
+cuenta con un generador de números uniformes y una función que
+transforme estos números en valores de la distribución de probabilidad
+deseada. A este respecto, se han desarrollado una gran cantidad de
+generadores para las distribuciones de probabilidad más comunes como: La
+distribución normal, la distribución exponencial, la distribución
+poisson, la distribución erlang, la distribución binomial, la
+distribución gamma, la distribución beta, la distribución F, la
+distribución t, etc.
+
+\subsection*{1.3.2. Lenguajes de programación}
+
+Las primeras etapas de un estudio de simulación se refieren a la
+definición del sistema a ser modelado y a la descripción del sistema en
+términos de relaciones lógicas de sus variables y diagramas de flujo.
+Sin embargo, llega el momento de describir el modelo en un lenguaje que
+sea aceptado por la computadora que se va a usar. En esta etapa se
+tienen dos cursos de acción a seguir si no se tiene nada de software
+sobre simulación: 1) Desarrollar el software requerido para estudios de
+simulación, ó 2) Comprar software (lenguajes de programación de
+propósito especial). Para esta alternativa es necesario analizar y
+evaluar varios paquetes de simulación (GPSS, GASP, etc.) antes de tomar
+la decisión final.
+
+\subsection*{1.3.3. Condiciones iniciales}
+
+La mayoría de los modelos de simulación estocástica se corren con la
+idea de estudiar al sistema en una situación de estado estable. Sin
+embargo, la mayoría de estos modelos presentan en su etapa inicial
+estados transientes los cuales no son típicos del estado estable. Por
+consiguiente es necesario establecer claramente las alternativas o
+cursos de acción que existen para resolver este problema. Algunos
+autores piensan que la forma de atacar este problema sería a través de:
+
+\begin{itemize}[leftmargin=*]
+\item Usar un tiempo de corrida lo suficientemente grande de modo que
+los períodos transientes sean relativamente insignificantes con
+respecto a la condición de estado estable.
+\item Excluir una parte apropiada de la parte inicial de la corrida.
+\item Utilizar simulación regenerativa.
+\end{itemize}
+
+Obviamente, de las tres alternativas presentadas, la que presenta menos
+desventajas es el uso de simulación regenerativa. Las otras alternativas
+presentan las desventajas de ser prohibitivamente excesivas en costo.
+
+\subsection*{1.3.4. Tamaño de la muestra}
+
+Uno de los factores principales a considerar en un estudio de simulación
+es el tamaño de la muestra (número de corridas en la computadora). La
+selección de un tamaño de muestra apropiado que asegure un nivel deseado
+de precisión y a la vez minimice el costo de operación del modelo, es un
+problema algo difícil pero muy importante. Puesto que la información
+proporcionada por el experimento de simulación sería la base para
+decidir con respecto a la operación del sistema real, esta información
+deberá ser tan exacta y precisa como sea posible o al menos el grado de
+imprecisión presente en la información proporcionada por el modelo debe
+ser conocida. Por consiguiente, es necesario que un análisis estadístico
+sea realizado para determinar el tamaño de muestra requerido.
+
+El tamaño de la muestra puede ser obtenido de dos maneras:
+
+\begin{enumerate}
+\item Previa e independientemente de la operación del modelo, o
+\item Durante la operación del modelo y basado en los resultados
+arrojados por el modelo. Para la última alternativa se utiliza la
+técnica estadística de intervalos de confianza.
+\end{enumerate}
+
+\subsection*{1.3.5. Diseño de experimentos}
+
+El diseño de experimentos es un tópico cuya relevancia en experimentos
+de simulación ha sido reconocida pero raramente aplicada. El diseño de
+experimentos en estudios de simulación puede ser de varios tipos,
+dependiendo de los propósitos específicos que se hayan planteado.
+Existen varios tipos de análisis que pueden ser requeridos. Entre los
+más comunes e importantes se pueden mencionar los siguientes:
+
+\begin{itemize}[leftmargin=*]
+\item Comparación de las medias y varianzas de las alternativas
+analizadas.
+\item Determinación de la importancia y el efecto de diferentes
+variables en los resultados de la simulación.
+\item Búsqueda de los valores óptimos de un conjunto de variables.
+\end{itemize}
+
+Para realizar el primer tipo de análisis, al cual se le denomina
+comúnmente diseño de experimentos de un factor simple, es necesario
+tomar muy en cuenta el tamaño de la muestra, las condiciones iniciales y
+la presencia o ausencia de autocorrelación. Para el segundo tipo de
+análisis, existe una gran cantidad de literatura, puesto que la gran
+mayoría de los libros de texto de diseño de experimentos, explican o
+tratan el tema de análisis de varianza y técnicas de regresión como
+medios para evaluar la importancia y el efecto de varias variables en
+los resultados de operación de un sistema. Para el tercer tipo de
+análisis, generalmente se requiere utilizar algoritmos heurísticos de
+búsqueda como por ejemplo el algoritmo de Hooke y Jeeves.
+
+%==========================================================
+\section*{1.4. Ventajas y desventajas en el uso de Simulación}
+
+Aunque la técnica de simulación generalmente se ve como un método de
+último recurso, recientes avances en las metodologías de simulación y la
+gran disponibilidad de software que actualmente existe en el mercado,
+han hecho que la técnica de simulación sea una de las herramientas más
+ampliamente usadas en el análisis de sistemas. Además de las razones
+antes mencionadas, Thomas H. Naylor ha sugerido que un estudio de
+simulación es muy recomendable porque presenta las siguientes ventajas:
+
+\begin{itemize}[leftmargin=*]
+\item A través de un estudio de simulación, se puede estudiar el efecto
+de cambios internos y externos del sistema, al hacer alteraciones en el
+modelo del sistema y observando los efectos de esas alteraciones en el
+comportamiento del sistema.
+\item Una observación detallada del sistema que se está simulando puede
+conducir a un mejor entendimiento del sistema y por consiguiente a
+sugerir estrategias que mejoren la operación y eficiencia del sistema.
+\item La técnica de simulación puede ser utilizada como un instrumento
+pedagógico para enseñar a estudiantes habilidades básicas en análisis
+estadístico, análisis teórico, etc.
+\item La simulación de sistemas complejos puede ayudar a entender mejor
+la operación del sistema, a detectar las variables más importantes que
+interactúan en el sistema y a entender mejor las interrelaciones entre
+estas variables.
+\item La técnica de simulación puede ser usada para experimentar con
+nuevas situaciones, sobre las cuales se tiene poca o ninguna información.
+A través de esta experimentación se puede anticipar mejor a posibles
+resultados no previstos.
+\item La técnica de simulación se puede utilizar también para
+entrenamiento de personal. En algunas ocasiones se puede tener una buena
+representación de un sistema (como por ejemplo los juegos de negocios),
+y entonces a través de él es posible entrenar y dar experiencia a cierto
+tipo de personal.
+\item Cuando nuevos elementos son introducidos en un sistema, la
+simulación puede ser usada para anticipar cuellos de botella o algún
+otro problema que puede surgir en el comportamiento del sistema.
+\end{itemize}
+
+A diferencia de las ventajas mencionadas, la técnica de simulación
+presenta el problema de requerir equipo computacional y recursos humanos
+costosos. Además, generalmente se requiere bastante tiempo para que un
+modelo de simulación sea desarrollado y perfeccionado. Finalmente, es
+posible que la alta administración de una organización no entienda esta
+técnica y esto crea dificultad en vender la idea.
+
+%==========================================================
+\section*{1.5. Ejemplos de usos de Simulación}
+
+Existe una gran cantidad de áreas donde la técnica de simulación puede
+ser aplicada. Algunos ejemplos podrían ser los siguientes:
+
+\begin{itemize}[leftmargin=*]
+\item \emph{Simulación de un sistema de colas.} Con la técnica de
+simulación es posible estudiar y analizar sistemas de colas cuya
+representación matemática sería demasiado complicada de analizar.
+Ejemplos de estos sistemas serían aquellos donde es posible la llegada
+al sistema en grupo, la salida de la cola del sistema, el rehusar entrar
+al sistema cuando la cola es excesivamente grande, etc.
+\item \emph{Simulación de un sistema de inventarios.} A través de
+simulación se pueden analizar más fácilmente sistemas de inventarios
+donde todos sus parámetros (tiempo de entrega, demanda, costo de llevar
+inventario, etc.), son estocásticos.
+\item \emph{Simulación de un proyecto de inversión.} Existen en la
+práctica una gran cantidad de proyectos de inversión donde la
+incertidumbre con respecto a los flujos de efectivo que el proyecto
+genera a las tasas de interés, a las tasas de inflación, etc., hacen
+difícil y a veces imposible manejar analíticamente este tipo de
+problemas. Para este tipo de situaciones el uso de simulación es
+ampliamente recomendado.
+\item \emph{Simulación de sistemas económicos.} La técnica de
+simulación puede ser utilizada para evaluar el efecto de cierto tipo de
+decisiones (devaluación de la moneda, el impuesto al valor agregado,
+etc.), en las demás variables macroeconómicas como: producto nacional
+bruto, balanza comercial, inflación, oferta monetaria, circulante, etc.
+\item \emph{Simulación de estados financieros.} La expansión y
+diversificación de una organización a través de la adquisición y
+establecimiento de nuevas empresas, repercuten significativamente en su
+posición y estructura financiera. Por consiguiente, el uso de simulación
+permite analizar cuál de las estrategias de crecimiento son las que
+llevarán a la organización al logro de sus objetivos y metas de corto,
+mediano y largo plazos.
+\end{itemize}
+
+\end{document}

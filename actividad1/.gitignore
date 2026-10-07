@@ -1,0 +1,19 @@
+# Sistema
+.DS_Store
+
+# Java compilado
+*.class
+
+# LaTeX: solo .tex y pdf/*.pdf deben quedar visibles;
+# todo lo demás (aux, log, fls, fdb_latexmk, toc, out, synctex) va a build/ y se ignora
+tex/build/
+tex/**/*.aux
+tex/**/*.log
+tex/**/*.fls
+tex/**/*.fdb_latexmk
+tex/**/*.out
+tex/**/*.toc
+tex/**/*.synctex.gz
+
+# Sobrantes sueltos
+texput.log

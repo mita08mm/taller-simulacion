@@ -1,0 +1,578 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,provide=*]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{enumitem}
+
+\newcommand{\Prob}{\operatorname{Prob.}}
+\renewcommand{\arraystretch}{1.15}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\linespread{1.3}\selectfont 6. ANÁLISIS DE LOS RESULTADOS DE LA SIMULACIÓN\par}
+\end{center}
+\vspace{0.5cm}
+
+\setcounter{chapter}{6}
+\setcounter{page}{107}
+
+%==========================================================
+Los resultados de una simulación evalúan la eficiencia u operación de un
+sistema. Sin embargo, la confiabilidad de estos resultados dependen del
+número de observaciones que se tienen, es decir, la confiabilidad de los
+resultados obtenidos en un estudio de simulación, depende de la longitud
+de la corrida y del número de corridas. Por consiguiente, es necesario
+determinar intervalos de confianza para las variables del sistema que se
+están analizando.
+
+La determinación de intervalos de confianza depende de si los resultados
+de la simulación son independientes o están correlacionados. Por
+ejemplo, en la simulación de un sistema de colas, el tiempo de espera de
+un cliente en el sistema, depende del número de clientes que este último
+cliente encontró al llegar al sistema (correlación entre $t_i$ y
+$t_{i-1}$). También, la obtención de intervalos de confianza depende de
+si el sistema se analiza en estado transiente o en estado estable. Por
+consiguiente, el objetivo de este capítulo en analizar la determinación
+de intervalos de confianza para las dos situaciones mencionadas, es
+decir, para: 1) Sistemas cuyos resultados son independientes uno del
+otro y 2) Sistemas transientes con alta correlación en sus resultados.
+Para el primer caso se utilizan los métodos tradicionales de intervalos
+de confianza. Para el segundo caso se utiliza simulación regenerativa.
+
+%==========================================================
+\section*{6.1. Métodos de estimación}
+
+Cuando los sistemas que se analizan se encuentran en estado estable, y
+además los valores que toman las variables que interactúan en el
+sistema son independientes, entonces es posible utilizar los
+procedimientos tradicionales de intervalos de confianza. En la
+determinación de estos intervalos de confianza se utiliza el teorema
+del límite central. Este teorema establece que la suma de $n$ variables
+aleatorias independientes, obtenidas de un universo con media $\mu$ y
+varianza $\sigma^2$, es aproximadamente una distribución normal con
+media $n\mu$ y varianza $n\sigma^2$. También, es obvio que a partir de
+este teorema la distribución de:
+
+\begin{equation}
+\bar{x} = \frac{1}{n}X_1 + \frac{1}{n}X_2 + \ldots + \frac{1}{n}X_n
+\end{equation}
+
+es una distribución normal con media $\mu$ y varianza $\sigma^2/n$ y
+por consiguiente:
+
+\begin{equation}
+\frac{\bar{x} - \mu}{\sigma/\sqrt{n}}
+\end{equation}
+
+sigue una distribución normal estándar con media 0 y varianza 1. De
+acuerdo a esta última expresión, y suponiendo un nivel de significado
+$\alpha$, el intervalo de confianza del parámetro $\mu$ sería:
+
+\[
+\Prob\left\{ -Z_{\alpha/2} \le \frac{\bar{x}-\mu}{\sigma/\sqrt{n}} \le Z_{\alpha/2} \right\} = 1-\alpha
+\]
+
+\begin{equation}
+\Prob\left\{ \bar{x} - \frac{\sigma}{\sqrt{n}}Z_{\alpha/2} \le \mu \le \bar{x} + \frac{\sigma}{\sqrt{n}}Z_{\alpha/2} \right\} = 1-\alpha
+\end{equation}
+
+La expresión anterior establece que el ancho del intervalo de confianza
+es:
+
+\begin{equation}
+\frac{2\sigma Z_{\alpha/2}}{\sqrt{n}}
+\end{equation}
+
+lo cual significa que el tamaño del intervalo sería más pequeño entre
+mayor sea el número de observaciones que se tienen de la variable
+aleatoria $X$. Por ejemplo, para reducir el intervalo de confianza a la
+mitad, es necesario de acuerdo a la expresión anterior, aumentar cuatro
+veces el número de observaciones.
+
+En las expresiones anteriores se asume que la varianza es conocida. Sin
+embargo, en muchos problemas reales la varianza generalmente se
+desconoce. Para este tipo de situaciones, es posible utilizar el
+siguiente estimador de la varianza:
+
+\begin{equation}
+S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{x})^2
+\end{equation}
+
+Ahora, si esta identidad se sustituye en la expresión de $Z$, lo que
+resulta es:
+
+\begin{equation}
+\frac{\bar{x} - \mu}{S/\sqrt{n}}
+\end{equation}
+
+lo cual sigue una distribución $t$ con $n-1$ grados de libertad. De
+acuerdo a esta nueva distribución y suponiendo un nivel de significado
+$\alpha$, el intervalo de confianza del parámetro $\mu$ sería:
+
+\begin{equation}
+\Prob\left\{ \bar{x} - \frac{S}{\sqrt{n}}t_{n-1,\alpha/2} \le \mu \le \bar{x} + \frac{S}{\sqrt{n}}t_{n-1,\alpha/2} \right\} = 1 - \alpha
+\end{equation}
+
+el cual define un ancho del intervalo de confianza de:
+
+\begin{equation}
+\frac{2S\,t_{n-1,\alpha/2}}{\sqrt{n}}
+\end{equation}
+
+\subsection*{Ejemplo 6.1}
+
+Suponga que la simulación de un proyecto de inversión arrojó los
+resultados que se muestran en la tabla 6.1. Para estos resultados se
+desea determinar un intervalo de confianza del 95\% ($\alpha=5\%$) para
+la tasa interna de rendimiento (TIR).
+
+Puesto que la varianza del universo de donde procede la muestra se
+desconoce, entonces el intervalo de confianza para la TIR, se determina
+a partir de la expresión anterior, esto es:
+
+\[
+13.37\% \pm \frac{6.71}{\sqrt{100}}(1.99)\%
+\]
+
+\[
+13.37\% \pm 1.34\%
+\]
+
+lo cual define el intervalo $(12.03\%;14.71\%)$ cuyo ancho es de
+2.68\%.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tabla 6.1} Resultados (TIR's) de la simulación de un proyecto de inversión (\%)}
+\begin{tabular}{cccccccccc}
+\toprule
+12 & 8 & 5 & 3 & 7 & 5 & 3 & 29 & 27 & 9 \\
+15 & 22 & 7 & 21 & 3 & 15 & 26 & 17 & 8 & 13 \\
+18 & 13 & 18 & 17 & 5 & 3 & 4 & 7 & 13 & 19 \\
+11 & 16 & 13 & 13 & 9 & 8 & 7 & 13 & 15 & 12 \\
+13 & 12 & 14 & 14 & 20 & 22 & 11 & 12 & 18 & 11 \\
+17 & 4 & 23 & 8 & 15 & 7 & 18 & 19 & 24 & 15 \\
+19 & 24 & 12 & 7 & 18 & 15 & 13 & 8 & 21 & 4 \\
+9 & 17 & 11 & 15 & 21 & 18 & 15 & 28 & 13 & 3 \\
+14 & 19 & 19 & 18 & 4 & 27 & 21 & 4 & 5 & 8 \\
+10 & 21 & 25 & 21 & 7 & 2 & 8 & 9 & 7 & 11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Finalmente, conviene señalar que si el ancho del intervalo se quisiera
+reducir a 1.34\%, entonces se necesitaría aumentar a 400 el número de
+simulaciones de la TIR.
+
+%==========================================================
+\section*{6.2. Simulación regenerativa}
+
+La simulación de un sistema estocástico puede ser visto como un
+experimento estadístico, donde primero se construye el modelo del
+sistema, el cual captura la esencia del problema y describe su
+estructura fundamental en términos de relaciones causa-efecto. Enseguida,
+con la ayuda de una computadora se realizan experimentos y se analizan
+los resultados de la simulación con el propósito de hacer inferencias
+sobre el comportamiento del sistema. Por consiguiente, los experimentos
+de simulación son experimentos estadísticos, y como tales, están basados
+en procedimientos estadísticos profundos. En particular, las técnicas de
+estimación son muy útiles en estudios de simulación, pues permiten hacer
+inferencias estadísticas sobre las variables estocásticas analizadas en
+el modelo.
+
+Recientemente, una nueva metodología estadística ha sido desarrollada
+para analizar los resultados de una simulación. A esta nueva técnica se
+le conoce con el nombre de ``Simulación regenerativa''. Este nuevo
+enfoque se basa en el hecho de que muchos sistemas estocásticos se
+regeneran (empiezan en el mismo punto de partida) a intervalos regulares
+de tiempo. Esta particularidad permite al analista observar y estudiar
+durante el curso de la simulación, bloques de datos independientes e
+idénticamente distribuidos. Más generalmente, la simulación regenerativa
+resuelve los problemas de: 1) ¿Cómo empezar la simulación? 2) ¿Cuándo
+empezar a colectar datos? 3) Tamaño de la corrida y número de corridas y
+4) ¿Cómo manejar los resultados cuando estos están correlacionados?
+
+\subsection*{6.2.1. Simulación de un sistema de colas de un servidor}
+
+La representación de un sistema de colas de un servidor aparece en la
+figura 6.1. En esta figura se puede apreciar que los clientes son
+generados por una fuente alimentadora, la cual genera $X$ número de
+clientes por unidad de tiempo. Si un cliente que llega al sistema
+encuentra desocupado al servidor, entonces este cliente empieza a ser
+inmediatamente servido y su salida del sistema empieza inmediatamente
+después de que su servicio ha terminado. Por el contrario, si un
+cliente al arribar encuentra al servidor ocupado, entonces este cliente
+pasa a un salón de espera donde esperará su turno para ser servido.
+Finalmente, los clientes que permanecen en la cola, son servidos en base
+a atender primero a los que llegaron primero a la cola.
+
+\begin{figure}[H]
+\centering
+\caption*{\textbf{Figura 6.1} Sistema de colas de un servidor}
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{1.5cm}
+[Figura: Fuente alimentadora $\to$ Clientes $\to$ (Sistema de colas: Salón de espera $\to$ Servidor) $\to$ Clientes servidos]
+\vspace{1.5cm}}}
+\end{figure}
+
+Para el sistema particular que se está analizando, suponga que la
+fuente alimentadora genera un nuevo cliente cada 2 minutos. También,
+suponga que el tiempo de servicio es una variable aleatoria
+uniformemente distribuida entre 1 y 2 minutos. Además, suponga que la
+forma de evaluar el funcionamiento y operación del sistema, es en base
+al valor esperado del tiempo que un cliente permanece en la cola
+$E(W)$, cuando el sistema se encuentra en una situación de estado
+estable. Para este sistema en particular, no existen procedimientos
+analíticos capaces de obtener $E(W)$. Por consiguiente, la única forma
+de evaluar y analizar este sistema es a través de simulación.
+
+Por consiguiente, el objetivo de la simulación de este sistema, es
+analizar los resultados obtenidos con el propósito de estimar $E(W)$.
+Más generalmente, se desea que la estimación de $E(W)$ sea confiable, es
+decir, se requiere que el valor de $E(W)$ pertenezca a un intervalo con
+un cierto nivel de confianza, por ejemplo del 95\% ($\alpha=5\%$).
+
+Una forma razonable de estimar $E(W)$ sería: sea $W_1$ el tiempo de
+espera en la cola del cliente 1, $W_2$ el tiempo de espera en la cola
+del cliente 2, y así sucesivamente. Por consiguiente, si durante la
+simulación del sistema entraron a éste $N$ clientes, entonces el
+promedio muestral sería:
+
+\begin{equation}
+\frac{W_1 + W_2 + \ldots + W_n}{N}
+\end{equation}
+
+el cual representa a un estimador consistente de $E(W)$. Sin embargo, el
+promedio muestral sería en general un estimador sesgado de $E(W)$ debido
+a las condiciones iniciales. Por ejemplo, si $W_1$ tiene un valor de
+cero, entonces los tiempos de espera de los primeros clientes tienden a
+ser pequeños.
+
+La forma tradicional de tratar el sesgo del estimador debido a
+condiciones iniciales, es correr el modelo de simulación durante algún
+tiempo sin colectar ningún dato, hasta que el sistema de colas haya
+alcanzado la condición de estado estable. A partir de este instante, se
+empieza a colectar la información. Por ejemplo, se puede simular el
+sistema para 1000 clientes y sólo considerar los tiempos de espera de
+los últimos 500, y entonces usar:
+
+\begin{equation}
+\frac{W_{501} + W_{502} + \ldots + W_{1000}}{500}
+\end{equation}
+
+como un estimador de $E(W)$. Sin embargo, esta solución no es muy
+recomendable por las siguientes razones: 1) Es muy difícil determinar la
+longitud del período de estabilización y 2) Una gran cantidad de tiempo
+de computadora es desperdiciado.
+
+Otra de las desventajas que se le atribuyen al procedimiento anterior,
+es la alta correlación que existe entre $W_i$ y $W_{i+1}$
+independientemente de que el sistema se encuentre o no en estado
+estable. Por consiguiente, si $W_1, W_2, \ldots, W_n$ no son
+independientes, la teoría estadística clásica sería de poca utilidad en
+la determinación del intervalo de confianza del tiempo promedio de
+espera en la cola.
+
+Se puede observar de los comentarios anteriores, que el sesgo debido a
+condiciones iniciales transientes y a la alta correlación de los datos,
+ofrecen serios obstáculos en la determinación de $E(W)$. Por
+consiguiente, es necesario buscar y proponer un nuevo procedimiento que
+elimine y resuelva los problemas antes mencionados. Afortunadamente, sí
+existe tal procedimiento al cual se le llama simulación regenerativa.
+
+Para entender la lógica de esta nueva técnica, suponga que al empezar la
+simulación se establece $W_1=0$. En seguida, se empieza a correr el
+modelo de simulación y valores del tiempo de espera en la cola empiezan
+a ser colectados. La obtención de tales datos suponga que son tal y como
+se muestran en la tabla 6.2. En esta tabla se puede observar que los
+clientes 1, 4, 8, 9, 14, 17 y 20 fueron muy afortunados, puesto que
+encontraron desocupado al servidor al momento de arribar al sistema.
+También, en esta tabla se puede apreciar que el servidor está
+constantemente ocupado desde que llega el cliente 1 hasta que se va el
+cliente 3, en seguida se encuentra ocioso hasta que llega el cliente 4,
+y así sucesivamente. Si más de 20 clientes son servidos, entonces el
+sistema simulado mostrará este mismo comportamiento, es decir, servidor
+ocupado, servidor ocioso, servidor ocupado, servidor ocioso, y así
+sucesivamente. Por consiguiente, si al tiempo que transcurre entre
+empezar a servir y quedar ocioso, se le considera como un ciclo,
+entonces para la corta simulación mostrada en la tabla 6.2, existen 6
+ciclos, donde el primer ciclo comprende a los clientes 1, 2 y 3, el
+segundo ciclo comprende a los clientes 4, 5, 6 y 7 y así sucesivamente.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tabla 6.2} Tiempo de espera en la cola}
+\begin{tabular}{ccc ccc ccc}
+\toprule
+No. Cliente & $W$ & Ciclo & No. Cliente & $W$ & Ciclo & No. Cliente & $W$ & Ciclo \\
+\midrule
+1 & 0 & & 8 & 0 & & 14 & 0 & \\
+2 & 10 & 1 & 9 & 0 & 3 & 15 & 16 & 5 \\
+3 & 5 & & 10 & 18 & & 16 & 12 & \\
+4 & 0 & & 11 & 20 & & 17 & 0 & \\
+5 & 25 & 2 & 12 & 30 & 4 & 18 & 25 & 6 \\
+6 & 15 & & 13 & 40 & & 19 & 30 & \\
+7 & 20 & & & & & 20 & 0 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El séptimo ciclo empieza con el arribo del cliente número 20. Por
+consiguiente, un nuevo ciclo es iniciado cuando un cliente llega al
+sistema y encuentra al servidor ocioso.
+
+Puesto que cada vez que un cliente llega al sistema y encuentra al
+servidor ocioso, es equivalente y está gobernado por la misma estructura
+probabilística que cuando llega el primer cliente al sistema, entonces
+sería razonable agrupar los resultados de la simulación en bloques de
+datos, donde el primer bloque contendrá los tiempos de espera en la
+cola de los clientes que forman parte del primer ciclo, el segundo
+bloque contendrá los tiempos de espera en la cola de los clientes que
+forman parte del segundo ciclo, y así sucesivamente. Para la corta
+simulación mostrada en la tabla 6.2, los bloques serían:
+
+\[
+(W_1,W_2,W_3),\ (W_4,W_5,W_6,W_7),\ (W_8),\ (W_9,W_{10},W_{11},W_{12},W_{13}),\ (W_{14},W_{15},W_{16}),\ (W_{17},W_{18},W_{19})
+\]
+
+De este modo, puesto que cada ciclo es iniciado en las mismas
+condiciones, los bloques de datos de ciclos sucesivos son
+estadísticamente independientes e idénticamente distribuidos. Por
+consiguiente, si se define $E_k$ como la suma de los tiempos de espera
+de los clientes servidos en el ciclo $k$, y $C_k$ como el número de
+clientes servidos en el ciclo $k$, entonces los pares $(E_1,C_1),
+(E_2,C_2), (E_3,C_3), (E_4,C_4), (E_5,C_5)$ y $(E_6,C_6)$ son
+estadísticamente independientes e idénticamente distribuidos, a pesar de
+la alta correlación que existe entre $E_k$ y $C_k$. De la tabla 6.2, los
+valores de $(E_k,C_k)$ que se obtienen son los siguientes:
+
+\begin{align*}
+(E_1,C_1) &= (15,3) & (E_4,C_4) &= (108,5) \\
+(E_2,C_2) &= (60,4) & (E_5,C_5) &= (28,3) \\
+(E_3,C_3) &= (0,1) & (E_6,C_6) &= (55,3)
+\end{align*}
+
+Por consiguiente, la alta correlación entre $W_k$ y $W_{k+1}$ ha sido
+eliminada y los datos han sido agrupados en bloques estadísticamente
+independientes e idénticamente distribuidos.
+
+De acuerdo a la agrupación anterior, y suponiendo que $N$ clientes
+fueron servidos durante la simulación, a partir de la cual se formaron
+$n$ bloques, la estimación del tiempo de espera en la cola se puede
+determinar por medio de la siguiente expresión:
+
+\begin{equation}
+E(W) = \frac{W_1+W_2+\ldots+W_N}{N} = \frac{E_1+E_2+\ldots+E_n}{C_1+C_2+\ldots+C_n}
+\end{equation}
+
+Sin embargo, la segunda parte de la expresión anterior puede ser escrita
+de la siguiente forma:
+
+\begin{equation}
+E(W) = \frac{(E_1+E_2+\ldots+E_n)/n}{(C_1+C_2+\ldots+C_n)/n}
+\end{equation}
+
+Puesto que $(E_1,E_2,\ldots,E_n)$ y $(C_1,C_2,\ldots,C_n)$ son grupos de
+variables aleatorias independientes e idénticamente distribuidas,
+entonces por el teorema del límite central, la expresión anterior
+converge a:
+
+\begin{equation}
+\lim_{n \to \infty} E(W) = E(E)/E(C)
+\end{equation}
+
+Por consiguiente, el problema de estimar $E(W)$ se traduce a estimar
+$E(E)/E(C)$. Y puesto que $E(E)/E(C)$ puede ser estimado a partir de
+$(E_1,C_1), (E_2,C_2), \ldots, (E_n,C_n)$, la estadística clásica puede
+ser utilizada para hacer inferencias acerca del valor verdadero de
+$E(W)$. Además, a través de la estadística clásica se puede determinar
+un intervalo de confianza para $E(W)$.
+
+\bigskip
+\noindent\emph{Nota sobre esta transcripción:} en el PDF de origen
+consultado (páginas 115--116 del libro), faltan las páginas donde Coss
+Bu desarrolla la varianza muestral del cociente $\hat{t}=\bar{E}/\bar{C}$
+(términos $S_E^2$, $S_C^2$, $S_{EC}$, la expresión general de $S^2$ y
+las ecuaciones 6.14 a 6.27) antes de llegar a la ecuación (6.28) del
+ancho del intervalo. Esas dos páginas del libro no están en el PDF
+subido a \texttt{referencias/}; si se necesitan para el informe, hay
+que volver a escanear/subir esas dos páginas.
+
+el cual define un intervalo cuyo ancho es de:
+
+\begin{equation}
+\frac{2S\,Z_{\alpha/2}}{\bar{C}\sqrt{n}}
+\end{equation}
+
+Finalmente, conviene mencionar que aunque la variable aleatoria
+$E(E)/E(C)$ sigue una distribución de probabilidad $t$ puesto que
+$\sigma^2$ se desconoce, la expresión del ancho del intervalo sigue
+siendo válida ya que para valores de $n$ muy grandes, la distribución
+$t$ se aproxima a la distribución normal.
+
+\subsection*{Ejemplo 6.2}
+
+Para los tiempos de espera en la cola mostrados en la tabla 6.2,
+determine un intervalo de confianza del 90\% ($\alpha=10\%$) para
+$E(W)$.
+
+Para los tiempos de espera mostrados en la tabla 6.2, los bloques de
+datos son:
+
+\begin{align*}
+(E_1,C_1) &= (15,3) & (E_4,C_4) &= (108,5) \\
+(E_2,C_2) &= (60,4) & (E_5,C_5) &= (28,3) \\
+(E_3,C_3) &= (0,1) & (E_6,C_6) &= (55,3)
+\end{align*}
+
+De acuerdo a estos bloques de datos, los promedios muestrales $\bar{E}$
+y $\bar{C}$ y el parámetro $\hat{t}$ serían:
+
+\begin{align*}
+\bar{E} &= \frac{15+60+0+108+28+55}{6} = 44.33 \\
+\bar{C} &= \frac{3+4+1+5+3+3}{6} = 3.16 \\
+\hat{t} &= \frac{\bar{E}}{\bar{C}} = \frac{44.33}{3.16} = 14.03
+\end{align*}
+
+Por otra parte, el valor correspondiente de $S_E^2$ sería:
+
+\begin{align*}
+S_E^2 &= \frac{1}{5}\Big( (15-44.33)^2 + (60-44.33)^2 + (44.33)^2 \\
+&\qquad + (108-44.33)^2 + (28-44.33)^2 + (55-44.33)^2 \Big) \\
+S_E^2 &= 1501.06
+\end{align*}
+
+(los valores de $S_C^2$, $S_{EC}$ y $S^2$ requeridos para completar el
+intervalo de confianza dependen de las ecuaciones de las páginas
+faltantes señaladas arriba).
+
+%==========================================================
+\section*{PROBLEMAS}
+
+\begin{enumerate}
+\item[6.1.] Para el sistema de colas descrito en el ejemplo de este
+capítulo, si se simula la llegada de 50 clientes y se obtienen los
+tiempos de espera correspondientes, determine un intervalo de confianza
+del 95\% para $E(W)$ utilizando el método de simulación regenerativa.
+
+\item[6.2.] Para los datos de interferencia (probabilidad de
+interferencia) que se muestran a continuación, determine un intervalo
+de confianza del 95\% para la probabilidad de interferencia.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccccccccc}
+0.30 & 0.22 & 0.25 & 0.33 & 0.30 & 0.38 & 0.29 & 0.31 & 0.32 & 0.34 \\
+0.28 & 0.34 & 0.27 & 0.31 & 0.35 & 0.37 & 0.39 & 0.35 & 0.43 & 0.28 \\
+0.29 & 0.33 & 0.23 & 0.36 & 0.25 & 0.35 & 0.30 & 0.27 & 0.28 & 0.24 \\
+0.33 & 0.31 & 0.28 & 0.24 & 0.29 & 0.36 & 0.41 & 0.38 & 0.34 & 0.29 \\
+0.35 & 0.34 & 0.24 & 0.29 & 0.24 & 0.33 & 0.38 & 0.36 & 0.38 & 0.32 \\
+0.37 & 0.29 & 0.37 & 0.22 & 0.32 & 0.28 & 0.42 & 0.41 & 0.37 & 0.33 \\
+0.35 & 0.26 & 0.36 & 0.39 & 0.31 & 0.26 & 0.43 & 0.44 & 0.39 & 0.39 \\
+0.34 & 0.27 & 0.35 & 0.34 & 0.34 & 0.29 & 0.38 & 0.29 & 0.40 & 0.42 \\
+0.28 & 0.31 & 0.31 & 0.33 & 0.35 & 0.34 & 0.39 & 0.30 & 0.42 & 0.31 \\
+0.39 & 0.34 & 0.34 & 0.30 & 0.34 & 0.36 & 0.43 & 0.33 & 0.44 & 0.25 \\
+\end{tabular}
+\end{table}
+
+\item[6.3.] Determine un intervalo de confianza del 95\% para el valor
+presente neto del problema 8 del capítulo anterior.
+
+\item[6.4.] Para el problema 9 del capítulo anterior, simule 100 TIR's
+y determine un intervalo de confianza del 90\% para la tasa interna de
+rendimiento.
+
+\item[6.5.] Para los tiempos de espera en la cola mostrados a
+continuación, determine un intervalo de confianza del 90\% para
+$E(W)$.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ccc ccc ccc}
+\toprule
+No. Cliente & $W$ & & No. Cliente & $W$ & & No. Cliente & $W$ & \\
+\midrule
+1 & 0 & & 11 & 0 & & 21 & 15 & \\
+2 & 10 & & 12 & 15 & & 22 & 20 & \\
+3 & 12 & & 13 & 0 & & 23 & 0 & \\
+4 & 8 & & 14 & 0 & & 24 & 10 & \\
+5 & 0 & & 15 & 18 & & 25 & 18 & \\
+6 & 0 & & 16 & 14 & & 26 & 0 & \\
+7 & 18 & & 17 & 0 & & 27 & 0 & \\
+8 & 24 & & 18 & 19 & & 28 & 15 & \\
+9 & 30 & & 19 & 23 & & 29 & 18 & \\
+10 & 28 & & 20 & 25 & & 30 & 0 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\item[6.6.] Si se simula la llegada de 100 clientes a la primera
+estación de servicio del sistema de colas descrito en el problema 12
+del capítulo anterior, determine un intervalo de confianza del 90\%
+para $E(W)$.
+
+\item[6.7.] Si se simula la llegada de 100 clientes al sistema de colas
+descrito en el problema 13 del capítulo anterior, determine un
+intervalo de confianza del 95\% para $E(W)$.
+
+\item[6.8.] Suponga que en el problema 16 del capítulo anterior, 5
+máquinas son asignadas a un mecánico. Si se simula el sistema durante
+1000 horas, determine un intervalo de confianza del 90\% para el tiempo
+que una máquina permanece ociosa esperando ser reparada.
+
+\item[6.9.] Si se simula la llegada de 100 camiones al sistema de colas
+descrito en el problema 17 capítulo anterior, determine un intervalo de
+confianza del 99\% para $E(W)$.
+
+\item[6.10.] a) La demanda diaria de un cierto artículo está regida por
+una distribución binomial con parámetros $n=9$ y $\theta=1/3$. El
+tiempo de entrega es instantáneo. El costo de mantener una unidad en
+inventario es de \$25 por día y el costo de faltante es de \$100 por
+unidad. Además, el gerente de producción ha establecido como política,
+colocar una orden cada vez que el inventario sea menor o igual a 3
+unidades. La cantidad ordenada deberá elevar el nivel de inventario a 7
+unidades. Para esta política, determine el costo promedio diario en
+condiciones de estado estable (Suponga un inventario inicial de 7
+unidades y que un ciclo se inicia cada vez que existen 7 unidades al
+principio del día).
+
+Sugerencia: El costo promedio diario para este problema se puede
+determinar de acuerdo a la siguiente expresión:
+
+\begin{equation}
+CT = 25\,E\{(x-D)^+\} + 100\,E\{(D-x)^+\}
+\end{equation}
+
+donde:
+\begin{align*}
+CT &= \text{Costo total diario.} \\
+x &= \text{Nivel de inventario al final del día.} \\
+D &= \text{Demanda diaria.}
+\end{align*}
+
+y puesto que:
+\begin{align*}
+a^+ &= \max(a,0) \\
+(a-b)^+ &= a - \min(a,b)
+\end{align*}
+
+entonces, la expresión anterior se transforma en:
+
+\begin{equation}
+CT = 25\,E\{x\} + 100\,E\{D\} - 125\,E\{\min(x,D)\}
+\end{equation}
+
+b) Si se simulan 30 días y se obtienen los resultados que se muestran a
+continuación, determine un intervalo de confianza del 90\% para el
+costo promedio diario.
+\end{enumerate}
+
+\end{document}

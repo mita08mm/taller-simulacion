@@ -1,0 +1,522 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,provide=*]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\linespread{1.3}\selectfont 2. GENERACIÓN DE NÚMEROS RECTANGULARES\par}
+\end{center}
+\vspace{0.5cm}
+
+\setcounter{chapter}{2}
+\setcounter{page}{19}
+
+%==========================================================
+En todos los experimentos de simulación existe la necesidad de generar
+valores de variables aleatorias que representan a una cierta
+distribución de probabilidad. Durante un experimento de simulación, el
+proceso de generar un valor de la variable aleatoria de una distribución
+particular, puede repetirse tantas veces como se desee y tantas veces
+como distribuciones de probabilidad existan en el experimento de
+simulación. Sin embargo, es conveniente señalar que el proceso de
+generación de variables aleatorias no uniformes se hace a partir de la
+generación de números rectangulares. Por consiguiente, el objetivo de
+este capítulo es mostrar un panorama general de las diferentes técnicas
+que existen para generar números rectangulares.
+
+La importancia de los números rectangulares (distribución uniforme)
+radica en su uso para la generación de variables aleatorias más
+complicadas que son requeridas en los experimentos de simulación.
+Algunos autores como Tocher, han sugerido tres formas para obtener los
+números rectangulares: La provisión externa, la generación interna a
+partir de un proceso físico al azar y la generación interna de
+sucesiones de dígitos por medio de una relación de recurrencia. El
+primer método implica tener los números aleatorios, como por ejemplo las
+tablas de la Rand, en una cinta magnética o en un disco y tratar a estos
+números como datos de entrada para el problema que se está simulando.
+El segundo método implica utilizar algún aditamento especial de la
+computadora digital capaz de registrar los resultados de un proceso
+aleatorio y además, reduzca esos resultados a sucesiones de dígitos. El
+tercer método, y uno de los más aceptados, implica la generación de
+estos números rectangulares a través de una relación de recurrencia.
+
+Independientemente del proceso o procedimiento que se utilice para la
+generación de los números rectangulares, estos deben de poseer ciertas
+características deseables que aseguren o aumenten la confiabilidad de
+los resultados obtenidos de la simulación. Tales características son:
+
+\begin{enumerate}
+\item Uniformemente distribuidos.
+\item Estadísticamente independientes.
+\item Reproducibles.
+\item Período largo (sin repetición dentro de una longitud determinada
+de la sucesión).
+\item Generados a través de un método rápido.
+\item Generados a través de un método que no requiera mucha capacidad
+de almacenamiento de la computadora.
+\end{enumerate}
+
+Finalmente, es necesario señalar que algunos autores califican a los
+números rectangulares generados a través de relaciones de recurrencia
+con números \emph{pseudoaleatorios}, por ser una sucesión de dígitos
+generada mediante una regla puramente determinística. Sin embargo, esta
+objeción puede superarse, al menos parcialmente, al tomar el punto de
+vista un tanto pragmático de que una sucesión puede considerarse
+aleatoria si satisface un cierto conjunto de pruebas estadísticas de
+aleatoriedad.
+
+%==========================================================
+\section*{2.1. Generadores congruenciales lineales}
+
+Varios esquemas han sido propuestos para la generación de los números
+pseudoaleatorios a través de relaciones matemáticas de recurrencia.
+Estos números se consideran pseudoaleatorios, porque aunque pasan todas
+las pruebas estadísticas de aleatoriedad, ellos son de hecho
+\textcolor{BurntOrange}{completamente determinísticos}. Actualmente, casi todas las computadoras
+incluyen en sus programas de biblioteca alguna variante de los métodos
+congruenciales sugeridos por Lehmer. Los dos métodos congruenciales más
+populares son: congruencial mixto y congruencial multiplicativo.
+
+\subsection*{2.1.1. Congruencial mixto}
+
+Los generadores congruenciales lineales generan una secuencia de números
+pseudoaleatorios en la cual el próximo número pseudoaleatorio es
+determinado a partir del último número generado, es decir, el número
+pseudoaleatorio $X_{n+1}$ es derivado a partir del número pseudoaleatorio
+$X_n$. Para el caso particular del generador congruencial mixto, la
+relación de recurrencia es la siguiente:
+
+\begin{equation}
+X_{n+1} = (aX_n + c) \bmod m
+\end{equation}
+
+donde:
+\begin{align*}
+X_0 &= \text{la semilla } (X_0 > 0) \\
+a &= \text{el multiplicador } (a > 0) \\
+c &= \text{constante aditiva } (c > 0) \\
+m &= \text{el módulo } (m > X_0,\ m > a\ \text{y}\ m > c)
+\end{align*}
+
+Esta relación de recurrencia nos dice que $X_{n+1}$ es el residuo de
+dividir $aX_n + c$ entre el módulo. Lo anterior significa que los
+valores posibles de $X_{n+1}$ son $0, 1, 2, 3, \ldots, m-1$, es decir,
+$m$ representa el número posible de valores diferentes que pueden ser
+generados.
+
+Con el propósito de ilustrar la generación de números pseudoaleatorios a
+través de este método, suponga que se tiene un generador en el cual los
+valores de sus parámetros son: $a=5$, $c=7$, $X_0=4$ y $m=8$. Para estos
+valores, la secuencia de números pseudoaleatorios y números uniformes
+$(X_{n+1}/m)$ son mostrados en la tabla 2.1. Como se puede apreciar en
+esta tabla, el período del generador es 8.
+
+Después de haber analizado este ejemplo, podría pensarse que el período
+de todo generador es siempre igual a $m$. Sin embargo, esto es falso
+porque el período depende de los valores asignados a los parámetros $a$,
+$c$, $X_0$ y $m$, es decir, se requiere seleccionar valores adecuados
+para estos parámetros con el fin de que el generador tenga período
+completo.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tabla 2.1} Números pseudoaleatorios del generador $X_{n+1} = (5X_n + 7) \bmod 8$}
+\begin{tabular}{ccccc}
+\toprule
+$n$ & $X_n$ & $(5X_n+7)/8$ & $X_{n+1}$ & Números uniformes \\
+\midrule
+0 & 4 & $3 + 3/8$ & 3 & $3/8$ \\
+1 & 3 & $2 + 6/8$ & 6 & $6/8$ \\
+2 & 6 & $4 + 5/8$ & 5 & $5/8$ \\
+3 & 5 & $4 + 0/8$ & 0 & $0$ \\
+4 & 0 & $0 + 7/8$ & 7 & $7/8$ \\
+5 & 7 & $5 + 2/8$ & 2 & $2/8$ \\
+6 & 2 & $2 + 1/8$ & 1 & $1/8$ \\
+7 & 1 & $1 + 4/8$ & 4 & $4/8$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para ilustrar el caso que se presenta cuando el período $< m$, suponga
+que se tiene un generador en el cual los valores de sus parámetros son:
+$a = X_0 = c = 7$ y $m = 10$. Para estos valores, la secuencia de
+números pseudoaleatorios y números uniformes son mostrados en la tabla
+2.2. Como puede apreciarse en esta tabla, el período del generador es 4.
+Esto demuestra que una selección inadecuada de los valores de los
+parámetros del generador, puede conducirnos a obtener resultados
+indeseables y poco confiables del experimento de simulación.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tabla 2.2} Números pseudoaleatorios del generador $X_{n+1} = (7X_n + 7) \bmod 10$}
+\begin{tabular}{ccccc}
+\toprule
+$n$ & $X_n$ & $(7X_n+7)/10$ & $X_{n+1}$ & Números uniformes \\
+\midrule
+0 & 7 & $5 + 6/10$ & 6 & $6/10$ \\
+1 & 6 & $4 + 9/10$ & 9 & $9/10$ \\
+2 & 9 & $7 + 0/10$ & 0 & $0$ \\
+3 & 0 & $0 + 7/10$ & 7 & $7/10$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+De los ejemplos anteriores, se advierte la necesidad de establecer
+algunas reglas que puedan ser utilizadas en la selección de los valores
+de los parámetros, para que el generador resultante tenga período
+completo. Algunas de estas reglas se mencionan a continuación:
+
+\subsubsection*{a) Selección de $m$}
+
+Existen dos opciones para seleccionar el valor apropiado del módulo:
+
+\begin{enumerate}
+\item Seleccionar $m$ de modo que sea el número primo más grande
+posible y a la vez sea menor que $p^d$, donde $p$ es la base del sistema
+(binario, decimal, hexadecimal, etc.) que se está utilizando y $d$ es el
+número de bits que tiene una palabra de computadora en ese sistema. Por
+ejemplo, si se tiene una computadora IBM 370 que trabaja en sistema
+binario, entonces $p=2$ y $d=32$.
+\item Seleccionar $m$ como $p^d$. Cuando $m$ toma este valor se facilita
+el cálculo del número rectangular ($U_n = X_n/m$), ya que sólo se corre
+el punto binario o decimal a la izquierda del número. Sin embargo, se ha
+comprobado que cuando el módulo toma este valor, los últimos dígitos del
+número pseudoaleatorio generado no se comportan en forma aleatoria.
+\end{enumerate}
+
+Para ilustrar el problema que se presenta cuando se utiliza el criterio
+2, suponga que se tiene un generador cuyos parámetros son: $a=81$,
+$c=89$, $X_0=5$ y $m=10^2$. Para estos valores, la secuencia de números
+pseudoaleatorios son mostrados en la tabla 2.3. En esta tabla se puede
+apreciar que el último dígito del número pseudoaleatorio tiene un
+período de 10. Esto significa que el último dígito puede ser determinado
+a partir de la siguiente relación de recurrencia:
+
+\begin{equation}
+Y_{n+1} = (Y_n + 9) \bmod 10
+\end{equation}
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tabla 2.3} Números pseudoaleatorios del generador $X_{n+1} = (81X_n + 89) \bmod 100$}
+\begin{tabular}{cccccccccc}
+\toprule
+$n$ & $X_n$ & $n$ & $X_n$ & $n$ & $X_n$ & $n$ & $X_n$ & $n$ & $X_n$ \\
+\midrule
+1 & 94 & 21 & 74 & 41 & 54 & 61 & 34 & 81 & 14 \\
+2 & 03 & 22 & 83 & 42 & 63 & 62 & 43 & 82 & 23 \\
+3 & 32 & 23 & 12 & 43 & 92 & 63 & 72 & 83 & 52 \\
+4 & 81 & 24 & 61 & 44 & 41 & 64 & 21 & 84 & 01 \\
+5 & 50 & 25 & 30 & 45 & 10 & 65 & 90 & 85 & 70 \\
+6 & 39 & 26 & 19 & 46 & 99 & 66 & 79 & 86 & 59 \\
+7 & 48 & 27 & 28 & 47 & 08 & 67 & 88 & 87 & 68 \\
+8 & 77 & 28 & 57 & 48 & 37 & 68 & 17 & 88 & 97 \\
+9 & 26 & 29 & 06 & 49 & 86 & 69 & 66 & 89 & 46 \\
+10 & 95 & 30 & 75 & 50 & 55 & 70 & 35 & 90 & 15 \\
+11 & 84 & 31 & 64 & 51 & 44 & 71 & 24 & 91 & 04 \\
+12 & 93 & 32 & 73 & 52 & 53 & 72 & 33 & 92 & 13 \\
+13 & 22 & 33 & 02 & 53 & 82 & 73 & 62 & 93 & 42 \\
+14 & 71 & 34 & 51 & 54 & 31 & 74 & 11 & 94 & 91 \\
+15 & 40 & 35 & 20 & 55 & 00 & 75 & 80 & 95 & 60 \\
+16 & 29 & 36 & 09 & 56 & 89 & 76 & 69 & 96 & 49 \\
+17 & 38 & 37 & 18 & 57 & 98 & 77 & 78 & 97 & 58 \\
+18 & 67 & 38 & 47 & 58 & 27 & 78 & 07 & 98 & 87 \\
+19 & 16 & 39 & 96 & 59 & 76 & 79 & 56 & 99 & 36 \\
+20 & 85 & 40 & 65 & 60 & 45 & 80 & 25 & 100 & 05 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Del ejemplo anterior, es posible generalizar una relación de recurrencia
+que relacione los últimos dígitos del número pseudoaleatorio generado.
+Si $m=p^d$, se ha encontrado que la relación de recurrencia de los
+últimos dígitos es la siguiente:
+
+\begin{equation}
+Y_{n+1,i} = X_{n+1} \bmod p^i, \qquad i < d
+\end{equation}
+
+donde:
+\begin{align*}
+Y_{n+1,i} &= \text{últimos } i \text{ dígitos del número pseudoaleatorio } X_{n+1}. \\
+i &= \text{últimos } i \text{ dígitos que se están considerando. El valor de } i \text{ puede ser } 1, 2, 3, \ldots, d-1.
+\end{align*}
+
+Por ejemplo, si $i=1$, la expresión anterior permite determinar el valor
+del último dígito del número pseudoaleatorio $X_{n+1}$, si $i=2$, se
+determina el valor de los dos últimos dígitos y así sucesivamente.
+
+La expresión anterior puede ser manipulada y expresada en función de los
+últimos dígitos del número pseudoaleatorio inmediato anterior, de
+acuerdo a lo siguiente:
+
+\[
+Y_{n+1,i} = X_{n+1} \bmod p^i
+\]
+
+sustituyendo en la expresión anterior la relación de recurrencia
+$X_{n+1} = (aX_n+c) \bmod m$ se obtiene:
+
+\[
+Y_{n+1,i} = (aX_n + c) \bmod p^d \bmod p^i
+\]
+
+pero si $q$ es la parte entera que resulta de dividir $(aX_n+c)/p^d$,
+entonces la expresión anterior se transforma en:
+
+\begin{align*}
+Y_{n+1,i} &= (aX_n + c - qp^d) \bmod p^i \\
+Y_{n+1,i} &= (aX_n + c) \bmod p^i \\
+Y_{n+1,i} &= aX_n \bmod p^i + c \bmod p^i
+\end{align*}
+
+y como $X \bmod m = (X \bmod m) \bmod m$, entonces la expresión anterior
+se transforma en:
+
+\[
+Y_{n+1,i} = (aX_n \bmod p^i) \bmod p^i + c \bmod p^i
+\]
+
+y haciendo uso de la identidad anterior, la expresión anterior se
+transforma finalmente en:
+
+\begin{equation}
+Y_{n+1,i} = (aY_{n,i} + c) \bmod p^i
+\end{equation}
+
+esta última expresión también tendrá período completo ($p^i$) si el
+generador tiene un período de $p^d$.
+
+\subsubsection*{b) Selección de $a$}
+
+El valor seleccionado de $a$ debe ser entero impar, y además no debe ser
+divisible por 3 ó 5. Sin embargo, si queremos asegurar que el generador
+tenga período completo, el valor de $a$ se debe de seleccionar de
+acuerdo al siguiente criterio:
+
+\begin{align*}
+(a-1) \bmod 4 &= 0 \quad \text{si } 4 \text{ es un factor de } m \\
+(a-1) \bmod b &= 0 \quad \text{si } b \text{ es un factor primo de } m
+\end{align*}
+
+Usualmente se selecciona $a$ como $2^k+1$ cuando se trabaja en sistema
+binario y $10^k+1$ cuando se trabaja en sistema decimal. En ambos casos
+el valor de $k$ debe ser mayor o igual a 2.
+
+\subsubsection*{c) Selección de $c$}
+
+El valor seleccionado para este parámetro puede ser cualquier constante.
+Sin embargo, si se desean asegurar buenos resultados el valor de $c$
+debe ser $c \bmod 8 = 5$ si se trabaja en sistema binario y $c \bmod
+200 = 21$ si se trabaja en sistema decimal. Más específicamente, el
+valor de $c$ debe ser un entero impar y relativamente primo a $m$.
+
+\subsubsection*{d) Selección de $X_0$}
+
+Para el generador congruencial mixto, se ha encontrado que el valor de
+la semilla es irrelevante, es decir, el valor de este parámetro resulta
+tener poca o ninguna influencia sobre las propiedades estadísticas de
+las sucesiones.
+
+Finalmente, antes de terminar la discusión de este generador, conviene
+señalar que existen otras formas matemáticas de representarlo. Tales
+formas son las siguientes:
+
+\begin{equation}
+X_n = \left\{ a^n X_0 + c \left\{ \frac{a^n - 1}{a-1} \right\} \right\} \bmod m
+\end{equation}
+
+\begin{equation}
+X_{n+k} = \left\{ a^n X_k + c \left\{ \frac{a^n - 1}{a-1} \right\} \right\} \bmod m
+\end{equation}
+
+Con la primera expresión el $n$-ésimo número pseudoaleatorio se obtiene
+a partir de la semilla. Con la segunda expresión el $n+k$-ésimo número
+pseudoaleatorio se obtiene a partir del $k$-ésimo número, es decir, si
+por ejemplo $n+k=10$ y $k=4$, entonces significa que el número
+pseudoaleatorio 10 se va a obtener a partir del número 4.
+
+\subsection*{2.1.2. Congruencial multiplicativo}
+
+Al igual que el generador congruencial mixto, el generador congruencial
+multiplicativo determina el próximo número pseudoaleatorio a partir del
+último número generado, de acuerdo a la siguiente relación de
+recurrencia:
+
+\begin{equation}
+X_{n+1} = aX_n \bmod m
+\end{equation}
+
+Para este generador se recomienda también seleccionar adecuadamente los
+valores de los parámetros $a$, $X_0$ y $m$, con el fin de asegurar un
+período máximo para las sucesiones generadas por este método. Los
+valores de estos parámetros dependerán del sistema en que se trabaje, es
+decir, estos parámetros tomarán valores distintos si se trabaja en
+sistema decimal, que si se trabaja en sistema binario. Por consiguiente,
+a continuación se describen las reglas que se recomiendan seguir para
+seleccionar los valores de $a$, $X_0$ y $m$ dependiendo de si el sistema
+en que se trabaja es binario o decimal.
+
+\subsubsection*{a) Sistema decimal}
+
+Si se trabaja en sistema decimal, los valores de los parámetros deben
+ser seleccionados de acuerdo a los siguientes criterios:
+
+\begin{enumerate}
+\item El valor de la semilla puede ser cualquier entero impar no
+divisible entre 2 ó 5 y debe ser relativamente primo a $m$.
+\item El valor seleccionado de $a$ debe ser obtenido de acuerdo a la
+siguiente identidad:
+\begin{equation}
+a = 200t \pm p
+\end{equation}
+donde $t$ es cualquier entero y $p$ es cualquiera de los siguientes
+valores: 3, 11, 13, 19, 21, 27, 29, 37, 53, 59, 61, 67, 69, 77, 83, 91.
+\item El valor seleccionado de $m$ puede ser $10^d$. Si $m=10^d$ y
+$d \ge 5$ el período del generador es $5 \times 10^{d-2}$.
+\end{enumerate}
+
+Por otra parte, si $m=10^d$ y $d<5$, entonces el período del generador
+se obtiene de acuerdo a la siguiente expresión:
+
+\begin{equation}
+\text{Período} = \text{Mínimo común múltiplo} \left\{ \lambda(P_1^{d_1}), \lambda(P_2^{d_2}), \ldots, \lambda(P_n^{d_n}) \right\}
+\end{equation}
+
+donde $P_i$ es un factor primo de $m$, y:
+
+\begin{align*}
+\lambda(2) = 1, \quad \lambda(4) = 2 \\
+\lambda(2^d) = 2^{d-2} \text{ si } d \ge 3 \\
+\lambda(p^d) = p^{d-1}(p-1) \text{ si } p \ge 2
+\end{align*}
+
+Con el propósito de ilustrar la obtención del período para este último
+caso, analicemos el siguiente generador:
+
+\[
+X_{n+1} = 3X_n \bmod 100 \quad \text{y} \quad X_0 = 17
+\]
+
+puesto que $m$ puede ser expresado como $10^2$ o bien como $(2^2)(5^2)$,
+entonces el período de este generador de acuerdo a la expresión anterior
+sería:
+
+\begin{align*}
+\text{Período} &= \text{Mínimo común múltiplo} \{ (2^2), (5^2) \} \\
+&= \text{Mínimo común múltiplo} \{2, 20\} \\
+&= 20
+\end{align*}
+
+La tabla 2.4 muestra la secuencia de números pseudoaleatorios de este
+generador. Como se puede apreciar en esta tabla, el período del
+generador es 20.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tabla 2.4} Números pseudoaleatorios del generador $X_{n+1} = 3X_n \bmod 100$}
+\begin{tabular}{cccccccc}
+\toprule
+$n$ & $X_n$ & $n$ & $X_n$ & $n$ & $X_n$ & $n$ & $X_n$ \\
+\midrule
+1 & 51 & 6 & 93 & 11 & 99 & 16 & 57 \\
+2 & 53 & 7 & 79 & 12 & 97 & 17 & 71 \\
+3 & 59 & 8 & 37 & 13 & 91 & 18 & 13 \\
+4 & 77 & 9 & 11 & 14 & 73 & 19 & 39 \\
+5 & 31 & 10 & 33 & 15 & 19 & 20 & 17 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{b) Sistema binario}
+
+Si se trabaja en sistema binario, los valores de los parámetros deben
+ser seleccionados de acuerdo a los siguientes criterios:
+
+\begin{enumerate}
+\item El valor de la semilla puede ser cualquier entero impar
+relativamente primo a $m$.
+\item El valor seleccionado de $a$ debe ser obtenido a partir de la
+siguiente expresión:
+\begin{equation}
+a = 8t \pm 3
+\end{equation}
+donde $t$ es cualquier entero.
+\item El valor seleccionado de $m$ puede ser $2^d$. Si $m=2^d$ el
+período del generador es $2^{d-2}$ ó $m/4$.
+\end{enumerate}
+
+Para ilustrar la obtención del período de un generador en sistema
+binario, suponga que se tiene un generador en el cual los valores de sus
+parámetros son: $a=5$, $X_0=5$ y $m=32$. Para estos valores, la
+secuencia de números pseudoaleatorios son mostrados en la tabla 2.5.
+Como se puede apreciar en esta tabla, el período del generador es 8.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tabla 2.5} Números pseudoaleatorios del generador $X_{n+1} = 5X_n \bmod 32$}
+\begin{tabular}{cccc}
+\toprule
+$n$ & $X_n$ & $n$ & $X_n$ \\
+\midrule
+1 & 25 & 5 & 9 \\
+2 & 29 & 6 & 13 \\
+3 & 17 & 7 & 1 \\
+4 & 21 & 8 & 5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%==========================================================
+\section*{PROBLEMAS}
+
+\begin{enumerate}
+\item[2.1.] Determine el período de los siguientes generadores
+congruenciales mixtos:
+\begin{align*}
+X_{n+1} &= (8X_n + 16) \bmod 100 \text{ y } X_0 = 15 \\
+X_{n+1} &= (50X_n + 17) \bmod 64 \text{ y } X_0 = 13 \\
+X_{n+1} &= (5X_n + 24) \bmod 32 \text{ y } X_0 = 7 \\
+X_{n+1} &= (5X_n + 21) \bmod 100 \text{ y } X_0 = 3 \\
+X_{n+1} &= (9X_n + 13) \bmod 32 \text{ y } X_0 = 8
+\end{align*}
+
+\item[2.2.] Determine el período de los siguientes generadores
+congruenciales multiplicativos:
+\begin{align*}
+X_{n+1} &= 203\,X_n \bmod 10^5 \text{ y } X_0 = 17 \\
+X_{n+1} &= 211\,X_n \bmod 10^8 \text{ y } X_0 = 19 \\
+X_{n+1} &= 221\,X_n \bmod 10^3 \text{ y } X_0 = 3 \\
+X_{n+1} &= 5\,X_n \bmod 64 \text{ y } X_0 = 7 \\
+X_{n+1} &= 11\,X_n \bmod 128 \text{ y } X_0 = 9
+\end{align*}
+
+\item[2.3.] Defina los parámetros $a$, $c$, $X_0$ y $m$ de un generador
+congruencial mixto que aseguren período completo.
+
+\item[2.4.] Defina los parámetros $a$, $X_0$ y $m$ de un generador
+congruencial multiplicativo que aseguren período completo.
+
+\item[2.5.] Defina la relación de recurrencia de los últimos $i$
+dígitos de los siguientes generadores congruenciales mixtos:
+\begin{align*}
+X_{n+1} &= (21X_n + 221) \bmod 100,\ X_0 = 7 \text{ e } i = 1 \\
+X_{n+1} &= (61X_n + 421) \bmod 1000,\ X_0 = 11 \text{ e } i = 2
+\end{align*}
+\end{enumerate}
+
+\end{document}

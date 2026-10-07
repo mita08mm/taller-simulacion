@@ -1,0 +1,767 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc} 
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amsthm, bm, mathrsfs, amssymb}
+\usepackage{cancel}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\usepackage[spanish]{babel}
+\usepackage{tikz}
+\usepackage[x11names]{xcolor}
+
+\lstnewenvironment{Algoritmo}[1]{
+    \lstset{
+        language=C,
+        frame=single,
+        basicstyle=\small\ttfamily,
+        caption={#1},
+        captionpos=t,
+        breaklines=true,
+        showstringspaces=false,
+        literate=
+            {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'\i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+            {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+            {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+    }
+}{}
+
+\begin{document}
+% Título 
+\title{Simulación de Sistemas}
+\author{Miguel Mita Choque}
+\maketitle
+% Fin del título 
+% Introducción 
+\section{Método de Transformada Inversa}
+\subsection{Variable Exponencial}
+Sea $f(x)$:
+$$f(x)=\begin{cases}\lambda e^{-\lambda x} &;\ x \geq 0 \\0 &;\ x < 0\end{cases}$$
+\begin{description}
+    \item[Paso 1: Contar con la funcion $f(x)$]
+    La función está dada por:
+    $$ f(x)=\lambda e^{-\lambda x} $$
+    \item[Paso 2: Determinar la funcion acumulada $F(x)$]
+    $$ F(x)=\int_0^x f(x)\,dx= \int_0^x \lambda e^{-\lambda x}\, dx $$
+    Aplicamos un cambio de variable: Sea $u = -\lambda x$, entonces $du = -\lambda\, dx$, lo que implica $dx = \frac{du}{-\lambda}$.
+    $$ F(x) = \int_0^{-\lambda x} \lambda e^u \left( \frac{du}{-\lambda} \right) = \int_0^{-\lambda x} -\lambda e^u \frac{1}{\lambda} \, du = \int_0^{-\lambda x} -e^u \, du $$
+    Aplicando la regla $\int e^u \, du = e^u$:
+    $$ F(x) = - \left[ e^u \right]_0^{-\lambda x} = - (e^{-\lambda x} - e^0) $$
+    Como $e^0 = 1$, obtenemos:
+    $$ F(x) = - (e^{-\lambda x} - 1) = 1 - e^{-\lambda x} $$
+    \item[Paso 3: Igualar la funcion acumulada $F(x)$ = $R$]
+    $$ 1 - e^{-\lambda x} = R $$
+    
+    \item[Paso 4: Aplicar la función inversa $x=F^{-1}$]
+    $$ -e^{-\lambda x} = R - 1 $$
+    Multiplicando ambos lados por $-1$:
+    $$ e^{-\lambda x} = 1 - R $$
+    Aplicando el logaritmo natural en ambos lados:
+    $$ \ln(e^{-\lambda x}) = \ln(1 - R) $$
+    Usando la propiedad $\ln(e^a) = a$:
+    $$ -\lambda x = \ln(1 - R) $$
+    Dividiendo entre $-\lambda$:
+    $$ x = \frac{\ln(1 - R)}{-\lambda} $$
+    $$ x = -\frac{1}{\lambda} \ln(1 - R) \qquad ; \qquad 0 < R < 1 $$
+    
+    \item[Paso 5: Propuesta algoritmica para la variable aleatoria:]
+    A continuación:
+    
+    \begin{Algoritmo}{}
+real funcion variableExponencial(real lambda, real R){
+    real x;
+    x = (-1.0 / lambda) * ln(1.0 - R);
+    return x;
+}
+    \end{Algoritmo}
+\end{description}
+
+\subsection{Variable Uniforme}
+Sea:
+$$f(x)=\begin{cases}\dfrac{1}{b-a} &;\ a \leq x \leq b \\ 0 &;\ a > x > b\end{cases}$$
+
+Aplicar método transformada inversa.\\
+\textbf{Solución:}
+
+\begin{description}
+    \item[Paso 1:] Contar con la función.
+
+    \item[Paso 2:] Determinar función acumulada $F(x)$:
+    $$ F(x) = \int_a^x \frac{1}{b-a}\,dx = \frac{1}{b-a}\int_a^x 1\,dx = \frac{1}{b-a}\Big[x\Big]_a^x $$
+    $$ = \frac{1}{b-a}\Big[x - a\Big] = \frac{x-a}{b-a} $$
+    $$F(x)\begin{cases}\dfrac{x-a}{b-a} &;\ a \leq x \leq b \\ 0 &;\ a > x > b\end{cases}$$
+
+    \item[Paso 3:] Igualar función acumulada a $R$:
+    $$ F(x) = R $$
+    $$ R = \frac{x-a}{b-a} $$
+
+    \item[Paso 4:] Aplicar función inversa:
+    $$ (b-a)R = x - a $$
+    $$ x = R(b-a) + a $$
+    
+    $$x = \begin{cases} a+(b-a)R &;\ 0 \leq R \leq 1 \\ 0 &;\ 0 > R > 1\end{cases}$$
+
+    \item[Paso 5:] Propuesta de algoritmo para la variable:
+    \begin{Algoritmo}{}
+real funcion variableUniforme(real a, real b){
+    real x, R;
+    R <- gcm()
+    x <- a + (b - a) * R
+    retornar x;
+}
+    \end{Algoritmo}
+\end{description}
+
+\subsection{Variable Empírica}
+Sea:
+$$f(x)=\begin{cases}x &;\ 0 \leq x \leq 1 \\ \dfrac{1}{2} &;\ 1 \leq x \leq 2\end{cases}$$
+
+\begin{description}
+    \item[Paso 1:] Contar con la función $f(x)$.
+
+    \item[Paso 2:] Determinar función acumulada $F(x)$.\\
+    Análisis 1ra parte:
+    $$ F^I = \int_0^x x\,dx = \left[\frac{x^2}{2}\right]_0^x = \frac{x^2}{2} - \frac{0^2}{2} = \frac{x^2}{2} $$
+    Análisis 2da parte:
+    $$ F^{II} = \int_0^1 x\,dx + \int_1^x \frac{1}{2}\,dx = \left[\frac{x^2}{2}\right]_0^1 + \left[\frac{x}{2}\right]_1^x = \frac{1^2}{2} + \frac{x}{2} - \frac{1}{2} $$
+    $$ F^{II} = \frac{x}{2} $$
+    $$F(x)=\begin{cases}\dfrac{x^2}{2} &;\ 0 \leq x \leq 1 \\ \dfrac{x}{2} &;\ 1 \leq x \leq 2\end{cases}$$
+
+    \item[Paso 3:] Igualar función acumulada y $R$.\\
+    Para 1ra parte:
+    $$ F(x) = R $$
+    
+    Para 2da parte:
+    $$ F(x) = R $$
+    
+
+    \item[Paso 4:] Aplicar función inversa $F^{-1}$.\\
+    Para 1ra parte:
+    $$ F(x) = R \implies \frac{x^2}{2} = R \implies x^2 = 2R \implies x = \sqrt{2R} $$
+
+    Para 2da parte:
+    $$ F(x) = R \implies \frac{x}{2} = R \implies x = 2R $$
+
+    $$x=\begin{cases}\sqrt{2R} &;\ 0 \leq R \leq \dfrac{1}{2} \\ 2R &;\ \dfrac{1}{2} \leq R \leq 1\end{cases}$$
+    
+    \begin{itemize}
+        \item $0 \leq R \leq \frac{1}{2}$: verificación en extremos $R=0 \Rightarrow x=0$ y $R=\frac{1}{2} \Rightarrow x=1$.
+        \item $\frac{1}{2} \leq R \leq 1$: verificación en extremos $R=\frac{1}{2} \Rightarrow x=1$ y $R=1 \Rightarrow x=2$.
+    \end{itemize}
+
+    \item[Paso 5:] Propuesta de algoritmo para la variable $x$:
+    \begin{Algoritmo}{}
+real funcion variableEmpirica(){
+    real x, R;
+    R <- gcm()
+    si (R < 1/2)
+        x <- raiz cuadrada(2*R)
+    sino
+        x <- 2*R
+    fin si
+    retornar x;
+}
+    \end{Algoritmo}
+\end{description}
+
+\section{Método de Rechazo}
+
+\begin{description}
+    \item[Paso 1:] Generar números aleatorios $R_1$ y $R_2$.
+    \item[Paso 2:] Definir $x$ uniforme en el intervalo $[a,b]$: $x = a+(b-a)*R_1$
+    \item[Paso 3:] Definir $f(x)$ en términos de $x$ uniforme.
+    \item[Paso 4:] Establecer la siguiente desigualdad:
+    $$ R_2 \leq f(x_{(R_1)}) * C \quad ; \quad C = \frac{1}{f_{\max}(x)} $$
+    \item[Paso 5:] Elija que si la relación se cumple, se acepta el valor $x$; 
+    caso contrario se rechaza.
+\end{description}
+
+Sea:
+$$f(x)=\begin{cases}2x &;\ 0 \leq x \leq 1 \\ 0 &;\ 0>x>1\end{cases}$$
+
+En este ejemplo de rechazo se trabaja con la densidad triangular normalizada en $[0,1]$.
+
+\textbf{Solución:}
+\begin{description}
+    \item[Paso 1:] Generar números aleatorios:
+    $$ R_1 \leftarrow \text{gcm}() $$
+    $$ R_2 \leftarrow \text{gcm}() $$
+
+    \item[Paso 2:] Determinar $x$ uniforme en el intervalo $[a, b]$:
+    $$ x \in [0, 1] $$
+    $$ x = a + (b-a) \cdot R_1 $$
+    $$ x = 0 + (1-0) \cdot R_1 $$
+    $$ x = R_1 $$
+
+    \item[Paso 3:] Definir $f(x)$ en términos de $x$ uniforme:
+    $$ f(x_{(R_1)}) = ? \quad ; \quad f(x) = ? $$
+    $$ f(x) = 2x \quad ; \quad 0 \leq x \leq 1 $$
+    $$ f(x = R_1) = 2R_1 $$
+
+    \item[Paso 4:] Establecer la siguiente relación:
+    $$ R_2 \leq f(x_{(R_1)}) \cdot C \quad ; \quad C = \frac{1}{f_{\max}(x)} $$
+    $$ R_2 \leq 2R_1 \cdot C $$
+    $$ R_2 \leq 2R_1 \cdot \frac{1}{2} $$
+    $$ R_2 \leq R_1 $$
+
+    \item[Paso 5:] Conclusión:\\
+    Si la relación se cumple se acepta el valor de $x$; caso contrario se rechaza. 
+    Repetir los pasos anteriores cuantas veces considere necesario.
+\end{description}
+
+\textbf{Consideración:}
+\begin{itemize}
+    \item Función estadísticamente válida.
+    \item Continuidad de la función (teoría de límites).
+    \item Acotada (es decir, fin $\rightarrow$ y inicio).
+\end{itemize}
+
+\section{Composición}
+
+Se trata de una función, se divide en partes, es decir subfunción.
+
+\begin{description}
+    \item[Paso 1:] Contar con la función $f(x)$ y dividirla en subáreas:
+    $$ f(x) = \sum_{i=1}^{n} f_i(x) \cdot A_i \quad ; \quad \sum_{i=1}^{n} A_i = 1 $$
+
+    \item[Paso 2:] Por cada subárea hay que definir las subfunciones 
+    $f_i(x)$ correspondientes.
+
+    \item[Paso 3:] Reexpresar la función $f(x)$ en términos de las 
+    subfunciones y las subáreas correspondientes:
+    $$ f(x) = \sum_{i=1}^{n} f_i(x) \cdot A_i \quad ; \quad \sum_{i=1}^{n} A_i = 1 $$
+
+    \item[Paso 4:] Generar Números Aleatorios $R_1$ y $R_2$.
+
+    \item[Paso 5:] Establecer relación gráfica entre acumuladas de área 
+    y subfunciones:
+    $$ R_1 \leftarrow \text{gcm}() $$
+    $$ R_2 \leftarrow \text{gcm}() $$
+
+    \item[Paso 6:] Con $R_1$ escoger una subfunción $f_i(x)$:
+    \begin{Algoritmo}{}
+si (R1 < A1)
+    escoger f1(x)
+sino si (R1 >= A1) && (R1 < (A1+A2))
+    escoger f2(x)
+sino
+    fin
+    \end{Algoritmo}
+
+    \item[Paso 7:] Aplicando Transformada Inversa (Rechazo) a la 
+    función escogida.
+
+    \item[Paso 8:] Se determinan valores de variables y se repiten 
+    los pasos anteriores en lo que se estime conveniente.
+\end{description}
+
+Sea: Aplicar método de composición.
+
+\shorthandoff{>} 
+\begin{tikzpicture}[scale=1.5]
+    \draw[->, thick] (-0.5,0) -- (5,0) node[right] {$x$};
+    \draw[->, thick] (0,-0.2) -- (0,2.5) node[above] {$f(x)$};
+
+    \coordinate (A) at (0.5, 0);
+    \coordinate (B) at (2.5, 2);
+    \coordinate (C) at (4.5, 0);
+
+    \draw[blue, thick] (A) -- (B) -- (C) -- cycle;
+
+    \node[below] at (A) {$a$};
+    \node[below] at (B) {$b$};
+    \node[below] at (C) {$c$};
+
+    \draw[dashed, gray] (B) -- (0,2);
+    \node[left] at (0,2) {$\frac{2}{c-a}$};
+\end{tikzpicture}
+\shorthandon{>} 
+
+$$f(x)=\begin{cases}
+\dfrac{2(x-a)}{(b-a)(c-a)} &;\ a \leq x \leq b \\[8pt]
+\dfrac{2(x-c)}{(c-a)(b-c)} &;\ b \leq x \leq c
+\end{cases}$$
+
+
+\textbf{Solución:}
+\begin{description}
+    \item[Paso 1:] Contar con la función $f(x)$ y dividirla en subáreas:
+    $$ A_1 + A_2 = 1 $$
+    $$ \frac{1}{2}(b-a) \cdot h + \frac{1}{2}(c-b) \cdot h = 1 $$
+    $$ \frac{1}{2}h\big((b-a)+(c-b)\big) = 1 $$
+    $$ \frac{h}{2}(-a+c) = 1 $$
+    $$ h = \frac{2}{c-a} $$
+
+    Determinando subárea $A_1$:
+    $$ A_1 = \frac{1}{2}(b-a) \cdot \frac{2}{c-a} = \frac{b-a}{c-a} $$
+
+    Determinando subárea $A_2$:
+    $$ A_2 = \frac{1}{2}(c-b) \cdot \frac{2}{c-a} = \frac{c-b}{c-a} $$
+
+\item[Paso 2:] Definir cada subfunción $f_i(x)$ por cada subárea $A_i$.
+
+    Análisis para la 1ra parte: $A_1'=1$. Definida por los puntos $(a, 0)$ y $(b, h_1)$.
+    La base es $(b-a)$ y la altura es $h_1$.
+    $$ A_1' = \frac{1}{2}(b-a)h_1 = 1 \implies h_1 = \frac{2}{b-a} $$
+    
+    Ecuación de la recta
+    $$ \frac{y - 0}{\frac{2}{b-a} - 0} = \frac{x - a}{b - a} $$
+    $$ f_1(x) = y = \frac{2}{b-a} \cdot \frac{x - a}{b - a} = \frac{2(x-a)}{(b-a)^2} \quad ; \quad a \leq x \leq b $$
+
+    Análisis para la 2da parte: $A_2'=1$. Definida por los puntos $(b, h_2)$ y $(c, 0)$.
+    La base es $(c-b)$ y la altura es $h_2$.
+    $$ A_2' = \frac{1}{2}(c-b)h_2 = 1 \implies h_2 = \frac{2}{c-b} $$
+    
+    Ecuación de la recta
+    $$ \frac{y - 0}{\frac{2}{c-b} - 0} = \frac{x - c}{b - c} $$
+    $$ f_2(x) = y = \left( \frac{2}{c-b} \right) \cdot \left( \frac{x - c}{-(c - b)} \right) = - \frac{2(x - c)}{(c - b)^2} $$
+
+    \begin{equation}
+    f_i(x) = \begin{cases} 
+    \dfrac{2(x-a)}{(b-a)^2} &;\ a \leq x \leq b \\[15pt]
+    \dfrac{-2(x-c)}{(c-b)^2} &;\ b \leq x \leq c 
+    \end{cases}
+    \end{equation}
+    
+    \item[Paso 3:] Reexpresar la función $f(x)$ en términos de $f_i(x)$ y las subáreas $A_i$:
+    $$ f(x) = \sum_{i=1}^{n} f_i(x) \cdot A_i $$
+    $$ f(x) = \frac{2(x-a)}{(b-a)^2} \cdot \frac{b-a}{c-a} + \frac{-2(x-c)}{(c-b)^2} \cdot \frac{c-b}{c-a} $$
+    $$ f(x) = \frac{2(x-a)}{(b-a)(c-a)} + \frac{-2(x-c)}{(c-b)(c-a)} $$
+    $$ f(x) = \frac{2(x-a)}{(b-a)(c-a)} - \frac{2(x-c)}{(c-b)(c-a)} $$
+    $$ A_1 + A_2 = 1 $$
+    $$ \frac{b-a}{c-a} + \frac{c-b}{c-a} = 1 $$
+    $$ \frac{b-a+c-b}{c-a} = 1 $$
+    $$ \frac{c-a}{c-a} = 1 $$
+    $$ 1 = 1 $$
+
+    \item[Paso 4:] Generar los números aleatorios $R_1$ y $R_2$:
+    $$ R_1 \leftarrow \text{gcm}() $$
+    $$ R_2 \leftarrow \text{gcm}() $$
+
+    \item[Paso 5:] Relación gráfica entre acumuladas de área y subfunciones $f_i(x)$.
+
+    
+    \shorthandoff{>} 
+    \begin{tikzpicture}[scale=1.5]
+    % Ejes
+    \draw[->, thick] (0,0) -- (4,0);
+    \draw[->, thick] (0,0) -- (0,3) node[left] {};
+
+    % Barra base A1 (f1)
+    \draw[very thick, red] (1,0) -- (1,1);    
+    \node[right] at (1, 0.5) {$f_1$};
+    
+    % Barra acumulada A2 (f2)
+    \draw[very thick, green!50!black] (2,1) -- (2,2.5);
+    \node[right] at (2, 1.75) {$f_2$};
+    
+    % Etiquetas ejes
+    \node[left] at (0,1) {$A_1=\frac{b-a}{c-a}$};
+    \node[left] at (0,2.5) {$A_1 + A_2=\frac{b-a}{c-a}+\frac{c-b}{c-a}=1$};
+    
+    \end{tikzpicture}
+    \shorthandon{>}
+    
+
+    \item[Paso 6:]Escoger la subfunción $f_i(x)$:
+    \begin{Algoritmo}{}
+si (R1 < (b-a)/(c-a))
+    escoger f1(x)
+sino
+    escoger f2(x)
+fin si
+    \end{Algoritmo}
+    \begin{Algoritmo}{}
+si (R1 < (b-a)/(c-a))
+    escoger f1(x)=x=a+(b-a)\sqrt{R_2}
+sino
+    escoger f2(x)=x=c-(c-b)\sqrt{1-R_2}
+fin si
+    \end{Algoritmo}
+
+    \item[Paso 7:] Aplicando Transformada Inversa (Rechazo) a la 
+    función escogida.\\
+    Aplicando TI a la subfunción $f_1(x)$:
+
+    \textbf{Paso 1.} Contar con la función $f_1(x)$: 
+    se encuentra previamente especificada y es:
+    $$ f_1(x) = \frac{2(x-a)}{(b-a)^2} \quad ; \quad a \leq x \leq b $$
+
+    \textbf{Paso 2.} Determinar la función acumulada $F(x)$:
+    $$ F(x) = \int_a^x \frac{2(x-a)}{(b-a)^2}\,dx = \frac{2}{(b-a)^2} \int_a^x (x-a)\,dx $$
+    Aplicando la regla de la potencia $\int u^n du = \frac{u^{n+1}}{n+1}$:
+    $$ F(x) = \frac{2}{(b-a)^2} \left[ \frac{(x-a)^2}{2} \right]_a^x = \frac{2}{(b-a)^2} \cdot \left( \frac{(x-a)^2}{2} - \frac{(a-a)^2}{2} \right) $$
+
+    $$ F(x) = \frac{2}{(b-a)^2} \cdot \left( \frac{(x-a)^2}{2} - \frac{0^2}{2} \right) = \frac{\cancel{2}}{(b-a)^2} \cdot \frac{(x-a)^2}{\cancel{2}} $$
+    $$ F(x) = \frac{(x-a)^2}{(b-a)^2} \quad ; \quad a \leq x \leq b $$
+
+    \textbf{Paso 3.} Igualar $F(x)$ y $R_2$:
+    $$ \frac{(x-a)^2}{(b-a)^2} = R_2 $$
+
+    \textbf{Paso 4.} Aplicar función inversa $F^{-1}$:
+    $$ \frac{(x-a)^2}{(b-a)^2} = R_2 $$
+    $$ \sqrt{(x-a)^2} = \sqrt{(b-a)^2 \cdot R_2} $$
+    $$ x - a = (b-a)\sqrt{R_2} $$
+    $$ \boxed{x = a + (b-a)\sqrt{R_2}} $$
+
+    \textbf{Paso 1.} Contar con la función $f_2(x)$:
+    $$ f_2(x) = \frac{-2(x-c)}{(c-b)^2} \quad ; \quad b \leq x \leq c $$
+
+    \textbf{Paso 2.} Determinar la función acumulada $F(x)$:
+    $$ F(x) = \int_b^x \frac{-2(x-c)}{(c-b)^2}\,dx = \frac{-2}{(c-b)^2} \int_b^x (x-c)\,dx $$
+    Aplicando la regla de la potencia:
+    $$ F(x) = \frac{-2}{(c-b)^2} \left[\frac{(x-c)^2}{2}\right]_b^x = \frac{-2}{(c-b)^2} \cdot \left(\frac{(x-c)^2}{2} - \frac{(b-c)^2}{2}\right) $$
+    Expandiendo $(b-c)^2 = (b-c)(b-c) = b^2 - 2bc + c^2 = (c-b)^2$:
+    $$ F(x) = \frac{-2}{(c-b)^2} \cdot \frac{(x-c)^2-(c-b)^2}{2} = \frac{-(x-c)^2+(c-b)^2}{(c-b)^2} = 1 - \frac{(x-c)^2}{(c-b)^2} \quad ; \quad b \leq x \leq c $$
+
+    \textbf{Paso 3.} Igualar $F(x) = R_2$:
+    $$ 1 - \frac{(x-c)^2}{(c-b)^2} = R_2 \implies \frac{(x-c)^2}{(c-b)^2} = 1 - R_2 $$
+
+    \textbf{Paso 4.} Aplicar función inversa:
+    $$ (x-c)^2 = (c-b)^2(1-R_2) $$
+    Como $b \leq x \leq c$ entonces $x-c \leq 0$, se toma la raíz negativa:
+    $$ x-c = -(c-b)\sqrt{1-R_2} $$
+    $$ \boxed{x = c-(c-b)\sqrt{1-R_2}} $$
+    
+    \item[Paso 8:] Repetir los pasos anteriores cuantas veces se 
+    estime conveniente.
+\end{description}
+
+\section{Aplicaciones de simulación}
+
+\subsection{Camión Transporte}
+El objetivo es simular los pesos de modo que la suma de los pesos no sobrepase los
+1000 kg que es la capacidad máxima del camión. Se sabe que el peso mínimo registrado
+es de 190 kg, el peso máximo de un producto fue de 230 kg y también se observó que el
+producto que más se ha registrado es de 210 kg.
+
+¿Cuál es la probabilidad de que al cargar 5 productos, la suma de los pesos exceda la capacidad de carga del camión?
+
+Se desea estimar: $P(P_1+P_2+P_3+P_4+P_5 > 1000)$ donde cada variable $P_i$ representa el peso de un producto.
+
+Este problema corresponde a una \textbf{distribución triangular} (vista en la sección de Composición) con parámetros $a=190$ kg (mínimo), $b=210$ kg (moda), $c=230$ kg (máximo).
+
+\textbf{Solución:} Aplicar método de Transformada Inversa.
+
+\begin{description}
+    \item[Paso 1: Contar con la función $f(x)$]
+    
+    De acuerdo a la sección de Composición, la densidad triangular está definida por:
+    \[
+    f(x)=
+    \begin{cases}
+    \dfrac{2(x-a)}{(b-a)(c-a)}
+    & ; \quad a \le x \le b \\[10pt]
+    
+    \dfrac{2(c-x)}{(c-a)(c-b)}
+    & ; \quad b \le x \le c
+    \end{cases}
+    \]
+    
+    Sustituyendo $a=190$, $b=210$, $c=230$:
+    \[
+    f(x)=
+    \begin{cases}
+    \dfrac{x-190}{400}
+    & ; \quad 190 \le x \le 210 \\[10pt]
+    
+    \dfrac{-(x-230)}{400}
+    & ; \quad 210 \le x \le 230
+    \end{cases}
+    \]
+
+    \item[Paso 2: Determinar la función acumulada $F(x)$]
+    
+    Para el intervalo $190 \le x \le 210$ (primer tramo):
+
+\[
+F(x)
+=
+\int_{190}^{x}
+\dfrac{t-190}{400}\,dx
+=
+\frac{1}{400}\int_{190}^{x}(t-190)\,dx
+\]
+
+\[
+F(x)
+=
+\frac{1}{400}\left[\frac{(t-190)^2}{2}\right]_{190}^{x}
+=
+\frac{1}{400} \cdot \frac{(x-190)^2}{2}
+=
+\frac{(x-190)^2}{800}
+\]
+
+Para el intervalo $210 \le x \le 230$ (segundo tramo):
+
+\[
+F(x)
+=
+\int_{190}^{210}\dfrac{t-190}{400}\,dx
++
+\int_{210}^{x}
+\dfrac{230-t}{400}\,dx
+\]
+
+\[
+F(x)
+=
+\frac{(210-190)^2}{800}
++
+\frac{1}{400}\int_{210}^{x}(230-t)\,dt
+\]
+
+\[
+F(x)
+=
+\frac{400}{800}
++
+\frac{1}{400}\left[-\frac{(230-t)^2}{2}\right]_{210}^{x}
+\]
+
+\[
+F(x)
+=
+\frac{1}{2}
++
+\frac{1}{400}\left(-\frac{(230-x)^2}{2}+\frac{(230-210)^2}{2}\right)
+\]
+    
+    \[
+    F(x)
+    =
+    \frac{1}{2}
+    +
+    \frac{1}{800}\left(400-(230-x)^2\right)
+    =
+    1-\frac{(230-x)^2}{800}
+    \]
+    
+    Por lo tanto:
+    \[
+    F(x)=
+    \begin{cases}
+    \dfrac{(x-190)^2}{800}
+    & ; \quad 190 \le x \le 210
+    \\[10pt]
+    
+    1-\dfrac{(230-x)^2}{800}
+    & ; \quad 210 \le x \le 230
+    \end{cases}
+    \]
+    
+    \item[Paso 3: Igualar la función acumulada $F(x) = R$]
+    
+    Igualar función acumulada y número aleatorio $R$ ($0 < R < 1$).
+    
+    \item[Paso 4: Aplicar función inversa $x = F^{-1}(R)$]
+
+\textbf{Primer tramo} ($190 \le x \le 210$):
+
+\[
+\frac{(x-190)^2}{800}=R
+\]
+
+\[
+(x-190)^2=800R
+\]
+
+\[
+x-190=\sqrt{800R}
+\]
+
+\[
+x=190+\sqrt{800R}
+\]
+
+Verificación de límites: cuando $R=0 \Rightarrow x=190$; cuando $R=\frac{1}{2} \Rightarrow x=190+\sqrt{400}=210$
+
+\textbf{Segundo tramo} ($210 \le x \le 230$):
+
+\[
+1-\frac{(230-x)^2}{800}=R
+\]
+
+\[
+\frac{(230-x)^2}{800}=1-R
+\]
+
+\[
+(230-x)^2=800(1-R)
+\]
+
+\[
+230-x=\sqrt{800(1-R)}
+\]
+
+\[
+x=230-\sqrt{800(1-R)}
+\]
+
+Verificación de límites: cuando $R=\frac{1}{2} \Rightarrow x=230-\sqrt{400}=210$; cuando $R=1 \Rightarrow x=230$
+    
+    Por consiguiente:
+    \[
+    x=
+    \begin{cases}
+    190+\sqrt{800R}
+    &
+    ;\quad 0\le R\le \dfrac{1}{2}
+    \\[10pt]
+    
+    230-\sqrt{800(1-R)}
+    &
+    ;\quad \dfrac{1}{2}< R\le 1
+    \end{cases}
+    \]
+    
+    \item[Paso 5: Propuesta algorítmica para la variable aleatoria]
+    
+    A continuación:
+    
+    \begin{Algoritmo}{}
+real funcion pesoProducto()
+{
+    real R, x;
+    R <- gcm();
+    si (R <= 0.5)
+        x <- 190 + sqrt(800*R);
+    sino
+        x <- 230 - sqrt(800*(1-R));
+    fin si
+    retornar x;
+}
+    \end{Algoritmo}
+\end{description}
+
+\subsubsection{Simulación del problema}
+
+Para estimar la probabilidad de que la suma de los pesos de 5 productos exceda la capacidad del camión:
+
+\begin{Algoritmo}{}
+entero e, n;
+real suma, p;
+
+e <- 0;
+n <- 10000;  // Número de corridas de simulación
+
+para i <- 1 hasta n hacer
+    suma <- 0;
+    
+    para j <- 1 hasta 5 hacer
+        suma <- suma + pesoProducto();
+    fin para
+    
+    si (suma > 1000)
+        e <- e + 1;
+    fin si
+fin para
+
+p <- e / n;
+mostrar "Probabilidad de exceder capacidad: ", p;
+\end{Algoritmo}
+
+donde:
+\begin{itemize}
+    \item $n$: número de corridas de simulación.
+    \item $e$: cantidad de veces que se excedió la capacidad de 1000 kg.
+    \item $p$: probabilidad estimada $p=\dfrac{e}{n}$
+\end{itemize}
+
+Mientras mayor sea el valor de $n$, mejor será la aproximación de la probabilidad buscada.
+
+\subsection{Juego de Apuestas}
+
+\textbf{Descripción del problema:}
+Una persona tiene la opción de ganar o perder 10 bolivianos en cada jugada, con límites de ganancia o pérdida de 50 Bs (también puede apostar todo el saldo restante). La estrategia aplicada es:
+\begin{itemize}
+    \item Si gana, sigue apostando 10 Bs.
+    \item Si pierde, apuesta el doble de la apuesta anterior (si no hay saldo suficiente, apuesta lo que queda).
+\end{itemize}
+
+\textbf{Condiciones iniciales:}
+Se distingue entre el periodo transiente y el periodo estable (o estacionario) de la simulación: en el periodo transiente los resultados todavía dependen fuertemente de las condiciones iniciales, mientras que en el periodo estable el tamaño de muestra (número de corridas) ya es suficiente para dar una opinión más certera sobre el comportamiento del sistema. Por eso conviene resolver el problema con varias corridas y comparar cómo cambian los resultados a medida que crece $n$.
+
+\textbf{Representación probabilística:}
+El juego tiene una probabilidad del 50\% para ganar (G) y 50\% para perder (P). Se representa mediante un número aleatorio $R \in [0,1)$:
+$$
+R = \begin{cases} 
+G \text{ (Gana)} &; 0 \leq R < 0.5 \\
+P \text{ (Pierde)} &; 0.5 \leq R < 1 
+\end{cases}
+$$
+
+\begin{table}[htbp]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Nro. de corridas} & \textbf{Apuesta inicial} & \textbf{Valor de la apuesta} & \textbf{Suerte (R=Random)} & \textbf{Saldo} & \textbf{¿Gano?} \\ \hline
+1 & 10 & 10 & 0.24 (Gano) & 10+10= 20 & \\ \hline
+ &  & 10 & 0.75 (Perdió) & 20-10=10 & \\ \hline
+ &  & 10 & 0.47 (Gano) & 10+10=20 & \\ \hline
+ &  & 10 & 0.38 (Gano) & 20+10=30 & \\ \hline
+ &  & 10 & 0.61 (Perdió) & 30-10=20 & \\ \hline
+ &  & 20 & 0.57 (Perdió) & 0 & No \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Nro. de corridas} & \textbf{Apuesta inicial} & \textbf{Valor de la apuesta} & \textbf{Suerte (R=Random)} & \textbf{Saldo} & \textbf{¿Gano?} \\ \hline
+2 & 10 & 10 & 0.24 (Gano) & 10+10= 20 & \\ \hline
+ &  & 10 & 0.35 (Gano) & 20+10=30 & \\ \hline
+ &  & 10 & 0.47 (Gano) & 30+10=40 & \\ \hline
+ &  & 10 & 0.68 (Perdió) & 40-10=30 & \\ \hline
+ &  & 20 & 0.05 (Gano) & 30+20=50 & Sí \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Nro. de corridas} & \textbf{Apuesta inicial} & \textbf{Valor de la apuesta} & \textbf{Suerte (R=Random)} & \textbf{Saldo} & \textbf{¿Gano?} \\ \hline
+3 & 10 & 10 & 0.34 (Gano) & 10+10= 20 & \\ \hline
+ &  & 10 & 0.35 (Gano) & 20+10=30 & \\ \hline
+ &  & 10 & 0.47 (Gano) & 30+10=40 & \\ \hline
+ &  & 10 & 0.68 (Perdió) & 40-10=30 & \\ \hline
+ &  & 20 & 0.85 (Perdió) & 30-20=10 & \\ \hline
+ &  & 10 & 0.51 (Perdió) & 10-10=0 & No \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Nro. de corridas} & \textbf{Apuesta inicial} & \textbf{Valor de la apuesta} & \textbf{Suerte (R=Random)} & \textbf{Saldo} & \textbf{¿Gano?} \\ \hline
+4 & 10 & 10 & 0.68 (Perdió) & 10-10=0 & No \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+\textbf{Resultados:}
+Se han realizado 4 corridas; al observar el comportamiento se puede estimar la probabilidad de que el jugador gane como:
+\[
+P(G) = \frac{1}{4} \approx 25\%
+\]
+ya que de las 4 corridas solo se ganó en 1.
+
+Para refinar esta estimación se puede repetir el proceso con $n = 10, 20, 50, 100, 200, 500, 1000$ corridas, y a partir de ahí analizar desde qué $n$ los valores se estabilizan, es decir, identificar el estado transiente (ET) y el estado estable (EE).
+
+
+\end{document}

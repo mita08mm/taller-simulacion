@@ -1,0 +1,718 @@
+\section{Control de Inventarios (con espera del cliente)}
+
+\subsection{Introducción}
+
+Este problema extiende el sistema de inventarios de p3 (política de lote constante $q$ y punto de reorden $R$) agregando una tercera variable aleatoria: el tiempo que un cliente está dispuesto a esperar cuando no hay stock disponible. Si el pedido en camino llega antes de que se cumpla ese plazo, la demanda pendiente se cubre (a un costo menor); si no, esa demanda se pierde definitivamente (a un costo mayor). Las tres variables (demanda diaria, tiempo de entrega, tiempo de espera) son discretas y se generan con Transformada Inversa, igual que en p3, sobre la misma lógica de simulación día a día del Ejemplo 5.5 (``Sistema de inventarios'') de Coss Bu.
+
+\subsection{Descripción del problema}
+
+La demanda diaria y el tiempo de entrega de un cierto producto, siguen las siguientes distribuciones de probabilidad:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Demanda diaria & Probabilidad \\
+\midrule
+25 & 0.02 \\
+26 & 0.04 \\
+27 & 0.06 \\
+28 & 0.12 \\
+29 & 0.20 \\
+30 & 0.24 \\
+31 & 0.15 \\
+32 & 0.10 \\
+33 & 0.05 \\
+34 & 0.02 \\
+\bottomrule
+\end{tabular}
+\qquad
+\begin{tabular}{cc}
+\toprule
+Tiempo de entrega (días) & Probabilidad \\
+\midrule
+1 & 0.20 \\
+2 & 0.30 \\
+3 & 0.25 \\
+4 & 0.25 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Si el producto no está disponible cuando es requerido, el cliente puede esperar la llegada de un nuevo lote por un tiempo limitado, es decir, si el cliente decide esperar 2 días y la mercancía no llega en ese tiempo, entonces, la demanda de este cliente se considera perdida. La distribución de probabilidad del tiempo que un cliente está dispuesto a esperar para que se le surta su pedido, es la siguiente:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Tiempo de espera (días) & Probabilidad \\
+\midrule
+0 & 0.40 \\
+1 & 0.20 \\
+2 & 0.15 \\
+3 & 0.15 \\
+4 & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La información con respecto a los costos relevantes es la siguiente:
+
+\begin{itemize}
+    \item Costo de ordenar: \$100/orden
+    \item Costo de inventario: \$52/unidad/año
+    \item Costo de faltante suponiendo que el cliente espera: \$20/unidad
+    \item Costo de faltante suponiendo que el cliente NO espera: \$50/unidad
+\end{itemize}
+
+Si el inventario inicial es de 100 unidades, ¿determine la cantidad óptima a ordenar (q) y el nivel óptimo de reorden (R)? (Asuma que se trabajan 260 días en el año.)
+
+\subsection{Propuesta de solución}
+
+\textbf{Demanda diaria}
+
+\begin{description}
+    \item[Paso 1: Encontrar la función $f(x)$]
+
+    \begin{center}
+    \begin{tabular}{cc}
+    \toprule
+    $x$ & $f(x)$ \\
+    \midrule
+    25 & 0.02 \\ 26 & 0.04 \\ 27 & 0.06 \\ 28 & 0.12 \\ 29 & 0.20 \\
+    30 & 0.24 \\ 31 & 0.15 \\ 32 & 0.10 \\ 33 & 0.05 \\ 34 & 0.02 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 2: Determinar la función acumulada $F(x)$]
+
+    \begin{align*}
+    F(25) &= f(25) = 0.02 \\
+    F(26) &= F(25)+f(26) = 0.06 \\
+    F(27) &= F(26)+f(27) = 0.12 \\
+    F(28) &= F(27)+f(28) = 0.24 \\
+    F(29) &= F(28)+f(29) = 0.44 \\
+    F(30) &= F(29)+f(30) = 0.68 \\
+    F(31) &= F(30)+f(31) = 0.83 \\
+    F(32) &= F(31)+f(32) = 0.93 \\
+    F(33) &= F(32)+f(33) = 0.98 \\
+    F(34) &= F(33)+f(34) = 1.00
+    \end{align*}
+
+    \item[Paso 3: Igualar la función acumulada $F(x) = R$]
+
+    $$ F(x)=R \qquad ; \qquad 0 < R < 1 $$
+
+    \item[Paso 4: Aplicar la función inversa $x=F^{-1}(R)$]
+
+    \begin{center}
+    \begin{tabular}{ll}
+    Si $0.00 \leq R < 0.02$, entonces $x=25$ & Si $0.44 \leq R < 0.68$, entonces $x=30$ \\
+    Si $0.02 \leq R < 0.06$, entonces $x=26$ & Si $0.68 \leq R < 0.83$, entonces $x=31$ \\
+    Si $0.06 \leq R < 0.12$, entonces $x=27$ & Si $0.83 \leq R < 0.93$, entonces $x=32$ \\
+    Si $0.12 \leq R < 0.24$, entonces $x=28$ & Si $0.93 \leq R < 0.98$, entonces $x=33$ \\
+    Si $0.24 \leq R < 0.44$, entonces $x=29$ & Si $0.98 \leq R \leq 1.00$, entonces $x=34$ \\
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 5: Propuesta algorítmica para la variable aleatoria]
+
+    \begin{lstlisting}[caption={demandaDiaria()}, language=Pascal]
+valores   <- [25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+acumulada <- [0.02, 0.06, 0.12, 0.24, 0.44, 0.68, 0.83, 0.93, 0.98, 1.00]
+
+entero funcion demandaDiaria(){
+    real R <- gcm();
+    para i <- 0 hasta longitud(acumulada)-1 hacer
+        si (R < acumulada[i]) entonces
+            retornar valores[i];
+        fin si
+    fin para
+}
+    \end{lstlisting}
+\end{description}
+
+\textbf{Tiempo de entrega}
+
+\begin{description}
+    \item[Paso 1: Encontrar la función $f(x)$]
+
+    \begin{center}
+    \begin{tabular}{cc}
+    \toprule
+    $x$ (días) & $f(x)$ \\
+    \midrule
+    1 & 0.20 \\ 2 & 0.30 \\ 3 & 0.25 \\ 4 & 0.25 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 2: Determinar la función acumulada $F(x)$]
+
+    \begin{align*}
+    F(1) &= f(1) = 0.20 \\
+    F(2) &= F(1)+f(2) = 0.50 \\
+    F(3) &= F(2)+f(3) = 0.75 \\
+    F(4) &= F(3)+f(4) = 1.00
+    \end{align*}
+
+    \item[Paso 3: Igualar la función acumulada $F(x) = R$]
+
+    $$ F(x)=R \qquad ; \qquad 0 < R < 1 $$
+
+    \item[Paso 4: Aplicar la función inversa $x=F^{-1}(R)$]
+
+    \begin{center}
+    \begin{tabular}{l}
+    Si $0.00 \leq R < 0.20$, entonces $x=1$ día \\
+    Si $0.20 \leq R < 0.50$, entonces $x=2$ días \\
+    Si $0.50 \leq R < 0.75$, entonces $x=3$ días \\
+    Si $0.75 \leq R \leq 1.00$, entonces $x=4$ días \\
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 5: Propuesta algorítmica para la variable aleatoria]
+
+    \begin{lstlisting}[caption={tiempoEntrega()}, language=Pascal]
+valores   <- [1, 2, 3, 4]
+acumulada <- [0.20, 0.50, 0.75, 1.00]
+
+entero funcion tiempoEntrega(){
+    real R <- gcm();
+    para i <- 0 hasta longitud(acumulada)-1 hacer
+        si (R < acumulada[i]) entonces
+            retornar valores[i];
+        fin si
+    fin para
+}
+    \end{lstlisting}
+\end{description}
+
+\textbf{Tiempo de espera del cliente (variable nueva respecto a p3)}
+
+\begin{description}
+    \item[Paso 1: Encontrar la función $f(x)$]
+
+    \begin{center}
+    \begin{tabular}{cc}
+    \toprule
+    $x$ (días) & $f(x)$ \\
+    \midrule
+    0 & 0.40 \\ 1 & 0.20 \\ 2 & 0.15 \\ 3 & 0.15 \\ 4 & 0.10 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 2: Determinar la función acumulada $F(x)$]
+
+    \begin{align*}
+    F(0) &= f(0) = 0.40 \\
+    F(1) &= F(0)+f(1) = 0.60 \\
+    F(2) &= F(1)+f(2) = 0.75 \\
+    F(3) &= F(2)+f(3) = 0.90 \\
+    F(4) &= F(3)+f(4) = 1.00
+    \end{align*}
+
+    \item[Paso 3: Igualar la función acumulada $F(x) = R$]
+
+    $$ F(x)=R \qquad ; \qquad 0 < R < 1 $$
+
+    \item[Paso 4: Aplicar la función inversa $x=F^{-1}(R)$]
+
+    \begin{center}
+    \begin{tabular}{l}
+    Si $0.00 \leq R < 0.40$, entonces $x=0$ días (no espera, se pierde de inmediato) \\
+    Si $0.40 \leq R < 0.60$, entonces $x=1$ día \\
+    Si $0.60 \leq R < 0.75$, entonces $x=2$ días \\
+    Si $0.75 \leq R < 0.90$, entonces $x=3$ días \\
+    Si $0.90 \leq R \leq 1.00$, entonces $x=4$ días \\
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 5: Propuesta algorítmica para la variable aleatoria]
+
+    \begin{lstlisting}[caption={tiempoEspera()}, language=Pascal]
+valores   <- [0, 1, 2, 3, 4]
+acumulada <- [0.40, 0.60, 0.75, 0.90, 1.00]
+
+entero funcion tiempoEspera(){
+    real R <- gcm();
+    para i <- 0 hasta longitud(acumulada)-1 hacer
+        si (R < acumulada[i]) entonces
+            retornar valores[i];
+        fin si
+    fin para
+}
+    \end{lstlisting}
+\end{description}
+
+\textbf{Lógica de simulación del inventario (con espera del cliente)}
+
+La diferencia respecto a p3 está en qué pasa cuando la demanda supera el inventario disponible. Cada día, en este orden:
+\begin{enumerate}
+    \item Se revisan los ``pedidos en espera'' (backorders) cuyo plazo límite ya venció sin haber sido cubiertos: esas unidades se dan por perdidas (costo \$50/unidad).
+    \item Si llega hoy un pedido, se suma $q$ al inventario, y ese inventario se usa primero para cubrir los pedidos en espera todavía vigentes (costo \$20/unidad cada una), antes de atender la demanda del día.
+    \item Se genera la demanda del día. Si el inventario alcanza, se resta normalmente. Si no alcanza, la diferencia queda como faltante: se genera su tiempo de espera; si es 0 (40\% de probabilidad), se pierde de inmediato (\$50/unidad); si es mayor que 0, se guarda como pedido en espera con su plazo límite (día actual + tiempo de espera).
+    \item Se registra el inventario promedio del día.
+    \item Si el inventario queda en $R$ o menos y no hay pedido pendiente, se coloca una nueva orden.
+\end{enumerate}
+
+Los costos se calculan igual que en p3, agregando las dos tarifas de faltante:
+\[
+\text{Costo de ordenar} = (\text{n\'umero de \'ordenes}) \times \$100
+\]
+\[
+\text{Costo de inventario} = \left(\sum \text{inventario promedio diario}\right) \times \frac{\$52}{260}
+\]
+\[
+\text{Costo de faltante} = (\text{unidades cubiertas tras esperar}) \times \$20 + (\text{unidades perdidas}) \times \$50
+\]
+El par $(q,R)$ óptimo se encuentra probando distintos pares candidatos, simulando el costo total anual de cada uno (promediado sobre muchos años) y comparando, igual que en p3.
+
+\subsection{Objetivos}
+
+\textbf{Objetivo general:} Aplicar Transformada Inversa discreta (sobre demanda, tiempo de entrega y tiempo de espera) junto con simulación de eventos día a día para determinar la cantidad óptima a ordenar ($q$) y el punto de reorden ($R$) que minimizan el costo total anual del sistema de inventarios, considerando que el cliente puede esperar antes de que su demanda se pierda.
+
+\textbf{Objetivos específicos:}
+\begin{enumerate}
+    \item Obtener las tablas de Transformada Inversa para la demanda diaria, el tiempo de entrega y el tiempo de espera del cliente.
+    \item Simular el sistema de inventarios para distintos pares $(q, R)$, incorporando la lógica de pedidos en espera, y comparar sus costos totales anuales para identificar el par óptimo.
+\end{enumerate}
+
+\subsection{Desarrollo de la solución}
+
+\subsubsection{Algoritmo}
+
+\begin{lstlisting}[caption={Simulación del sistema de inventarios con espera del cliente}, language=Pascal]
+real funcion simularInventario(entero q, entero R, entero dias){
+    entero inventario, ordenes, diaLlegada, hayPedido;
+    real sumaProm, costoEsperaOk, costoPerdida;
+    lista backorders;  // cada elemento: (cantidad, plazoLimite)
+
+    inventario <- 100;
+    ordenes <- 0;
+    sumaProm <- 0;
+    costoEsperaOk <- 0;
+    costoPerdida <- 0;
+    hayPedido <- falso;
+
+    para dia <- 1 hasta dias hacer
+        para cada (cantidad, plazoLimite) en backorders hacer
+            si (dia > plazoLimite) entonces
+                costoPerdida <- costoPerdida + cantidad * 50;
+                quitar (cantidad, plazoLimite) de backorders;
+            fin si
+        fin para
+
+        si (hayPedido) && (dia == diaLlegada) entonces
+            inventario <- inventario + q;
+            hayPedido <- falso;
+            para cada (cantidad, plazoLimite) en backorders hacer
+                atendido <- minimo(cantidad, inventario);
+                inventario <- inventario - atendido;
+                costoEsperaOk <- costoEsperaOk + atendido * 20;
+                actualizar cantidad restante en backorders;
+            fin para
+        fin si
+
+        invInicial <- inventario;
+        demanda <- demandaDiaria();
+
+        si (demanda <= inventario) entonces
+            inventario <- inventario - demanda;
+            promedioDia <- (invInicial + inventario) / 2;
+        sino
+            faltante <- demanda - inventario;
+            // Igual que en p3 (Tabla 5.7 del Ejemplo 5.5): si el inventario se agota
+            // antes de terminar el dia, el promedio es (invInicial/2)*(invInicial/demanda).
+            si (invInicial > 0) entonces
+                promedioDia <- (invInicial / 2) * (invInicial / demanda);
+            sino
+                promedioDia <- 0;
+            fin si
+            inventario <- 0;
+            espera <- tiempoEspera();
+            si (espera == 0) entonces
+                costoPerdida <- costoPerdida + faltante * 50;
+            sino
+                agregar (faltante, dia + espera) a backorders;
+            fin si
+        fin si
+
+        sumaProm <- sumaProm + promedioDia;
+
+        si (inventario <= R) && (!hayPedido) entonces
+            diaLlegada <- dia + tiempoEntrega();
+            hayPedido <- verdadero;
+            ordenes <- ordenes + 1;
+        fin si
+    fin para
+
+    costoOrdenar <- ordenes * 100;
+    costoInventario <- sumaProm * (52.0 / dias);
+
+    retornar costoOrdenar + costoInventario + costoEsperaOk + costoPerdida;
+}
+\end{lstlisting}
+
+\subsubsection{Diagrama de flujo}
+
+\fbox{Pendiente}
+
+\subsubsection{Tabla de simulación}
+
+Simulación manual con $q=90$, $R=40$ (valores de partida, antes de optimizar) e inventario inicial de 100 unidades. Se eligieron valores más ajustados que el óptimo para que se puedan observar ambos mecanismos de faltante (cobertura tras espera y pérdida definitiva):
+
+\begin{center}
+\small
+\begin{tabular}{ccccccl}
+\toprule
+Día & Inv. inicial & Demanda & Inv. final & Faltante & Inv. promedio & Evento \\
+\midrule
+1  & 100 & 30 & 70  & --- & 85.0  & \\
+2  & 70  & 26 & 44  & --- & 57.0  & \\
+3  & 44  & 29 & 15  & --- & 29.5  & Ordena $q$=90 ($R_{ent}=0.22\Rightarrow$2 días), llega día 5 \\
+4  & 15  & 31 & 0   & 16  & 3.63  & $R_{esp}=0.68\Rightarrow$espera 2 días, backorder hasta día 6 \\
+5  & 74  & 32 & 42  & --- & 58.0  & Llega pedido (+90); cubre backorder 16u a \$20/u \\
+6  & 42  & 27 & 15  & --- & 28.5  & Ordena $q$=90 ($R_{ent}=0.42\Rightarrow$2 días), llega día 8 \\
+7  & 15  & 26 & 0   & 11  & 4.33  & $R_{esp}=0.22\Rightarrow$espera 0 días, \textbf{pierde} 11u a \$50/u \\
+8  & 90  & 30 & 60  & --- & 75.0  & Llega pedido (+90) \\
+9  & 60  & 26 & 34  & --- & 47.0  & Ordena $q$=90 ($R_{ent}=0.20\Rightarrow$1 día), llega día 10 \\
+10 & 124 & 30 & 94  & --- & 109.0 & Llega pedido (+90) \\
+11 & 94  & 30 & 64  & --- & 79.0  & \\
+12 & 64  & 28 & 36  & --- & 50.0  & Ordena $q$=90 ($R_{ent}=0.59\Rightarrow$3 días), llega día 15 \\
+13 & 36  & 31 & 5   & --- & 20.5  & \\
+14 & 5   & 25 & 0   & 20  & 0.5   & $R_{esp}=0.81\Rightarrow$espera 3 días, backorder hasta día 17 \\
+15 & 70  & 31 & 39  & --- & 54.5  & Llega pedido (+90); cubre backorder 20u a \$20/u; ordena de nuevo ($R_{ent}=0.34\Rightarrow$2 días), llega día 17 \\
+16 & 39  & 28 & 11  & --- & 25.0  & \\
+17 & 101 & 33 & 68  & --- & 84.5  & Llega pedido (+90) \\
+18 & 68  & 29 & 39  & --- & 53.5  & Ordena $q$=90 ($R_{ent}=0.09\Rightarrow$1 día), llega día 19 \\
+19 & 129 & 27 & 102 & --- & 115.5 & Llega pedido (+90) \\
+20 & 102 & 32 & 70  & --- & 86.0  & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Los días 4, 7 y 14 tienen faltante: el inventario se agota antes de terminar el día, así que su promedio usa la misma fórmula de la Tabla 5.7 del Ejemplo 5.5 que en p3 (por ejemplo, día 4: $\frac{15}{2}\times\frac{15}{31}=3.63$), no el promedio simple entre inicial y final.
+
+En esta traza de 20 días se colocaron 6 órdenes, se cubrieron 36 unidades tras espera (16+20, a \$20/unidad) y se perdieron 11 unidades de inmediato (a \$50/unidad, porque el tiempo de espera generado fue 0). La suma de inventario promedio diario (columna de arriba) fue 1065.96.
+
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+Costo de ordenar & Costo de inventario & Costo de faltante & Costo total \\
+\midrule
+$6(100)=\$600$ & $1065.96(52/260)=\$213.19$ & $36(20)+11(50)=\$1{,}270$ & \$2{,}083.19 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Implementación}
+
+\begin{mitabla}[H]{Variables del modelamiento}
+\begin{tabular}{cL{8cm}c}
+\toprule
+Variable & Descripción & Origen \\
+\midrule
+$q$ & Cantidad fija a ordenar en cada pedido & Variable de decisión \\
+$R$ & Punto de reorden (nivel de inventario) & Variable de decisión \\
+inventario & Estado del sistema, evoluciona día a día & Paso a paso \\
+backorders & Lista de faltantes en espera, con su plazo límite & Nuevo respecto a p3 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\begin{lstlisting}[caption={InventarioConEspera.java}, language=Java]
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class InventarioConEspera {
+
+    static Random rnd = new Random();
+
+    static final int[] VALORES_DEMANDA = {25, 26, 27, 28, 29, 30, 31, 32, 33, 34};
+    static final double[] ACUM_DEMANDA = {0.02, 0.06, 0.12, 0.24, 0.44, 0.68, 0.83, 0.93, 0.98, 1.00};
+
+    static final int[] VALORES_ENTREGA = {1, 2, 3, 4};
+    static final double[] ACUM_ENTREGA = {0.20, 0.50, 0.75, 1.00};
+
+    static final int[] VALORES_ESPERA = {0, 1, 2, 3, 4};
+    static final double[] ACUM_ESPERA = {0.40, 0.60, 0.75, 0.90, 1.00};
+
+    public static int generico(int[] valores, double[] acumulada) {
+        double R = rnd.nextDouble();
+        for (int i = 0; i < acumulada.length; i++) {
+            if (R < acumulada[i]) return valores[i];
+        }
+        return valores[valores.length - 1];
+    }
+
+    public static int demandaDiaria() { return generico(VALORES_DEMANDA, ACUM_DEMANDA); }
+    public static int tiempoEntrega() { return generico(VALORES_ENTREGA, ACUM_ENTREGA); }
+    public static int tiempoEspera()  { return generico(VALORES_ESPERA, ACUM_ESPERA); }
+
+    static class Backorder {
+        int cantidad;
+        int plazoLimite;
+        Backorder(int c, int p) { cantidad = c; plazoLimite = p; }
+    }
+
+    public static double simularInventario(int q, int R, int dias) {
+        int inventario = 100;
+        boolean hayPedido = false;
+        int diaLlegada = 0;
+        int ordenes = 0;
+        double sumaProm = 0.0;
+        double costoEsperaOk = 0.0;
+        double costoPerdida = 0.0;
+        List<Backorder> backorders = new ArrayList<>();
+
+        for (int dia = 1; dia <= dias; dia++) {
+            List<Backorder> vivos = new ArrayList<>();
+            for (Backorder b : backorders) {
+                if (dia > b.plazoLimite) costoPerdida += b.cantidad * 50.0;
+                else vivos.add(b);
+            }
+            backorders = vivos;
+
+            if (hayPedido && dia == diaLlegada) {
+                inventario += q;
+                hayPedido = false;
+                List<Backorder> restantes = new ArrayList<>();
+                for (Backorder b : backorders) {
+                    if (inventario <= 0) { restantes.add(b); continue; }
+                    int atendido = Math.min(b.cantidad, inventario);
+                    inventario -= atendido;
+                    costoEsperaOk += atendido * 20.0;
+                    int resto = b.cantidad - atendido;
+                    if (resto > 0) restantes.add(new Backorder(resto, b.plazoLimite));
+                }
+                backorders = restantes;
+            }
+
+            int invInicial = inventario;
+            int demanda = demandaDiaria();
+            double promedioDia;
+
+            if (demanda <= inventario) {
+                inventario -= demanda;
+                promedioDia = (invInicial + inventario) / 2.0;
+            } else {
+                int faltante = demanda - inventario;
+                // Igual que en p3 (Tabla 5.7 del Ejemplo 5.5): si el inventario se agota
+                // antes de terminar el dia, el promedio es (invInicial/2)*(invInicial/demanda).
+                promedioDia = (invInicial > 0) ? (invInicial / 2.0) * (invInicial / (double) demanda) : 0.0;
+                inventario = 0;
+                int te = tiempoEspera();
+                if (te == 0) costoPerdida += faltante * 50.0;
+                else backorders.add(new Backorder(faltante, dia + te));
+            }
+
+            sumaProm += promedioDia;
+
+            if (inventario <= R && !hayPedido) {
+                diaLlegada = dia + tiempoEntrega();
+                hayPedido = true;
+                ordenes++;
+            }
+        }
+
+        double costoOrdenar = ordenes * 100.0;
+        double costoInventario = sumaProm * (52.0 / dias);
+        return costoOrdenar + costoInventario + costoEsperaOk + costoPerdida;
+    }
+
+    // Corre 20 dias imprimiendo cada paso del modelamiento (Paso 3: comparar R
+    // contra F(x); Paso 4: tramo asignado) para las 3 variables (demanda, entrega,
+    // espera), para verificar el codigo contra la Propuesta de solucion.
+    public static void demostracionModelamiento(int q, int R) {
+        int inventario = 100;
+        boolean hayPedido = false;
+        int diaLlegada = 0;
+        List<Backorder> backorders = new ArrayList<>();
+
+        System.out.println("=== Demostracion del modelamiento (Pasos 3-4), q=" + q + " R=" + R + " ===");
+        for (int dia = 1; dia <= 20; dia++) {
+            List<Backorder> vivos = new ArrayList<>();
+            for (Backorder b : backorders) {
+                if (dia > b.plazoLimite) {
+                    System.out.println("Dia " + dia + ": vence backorder de " + b.cantidad + "u (costo $50 c/u)");
+                } else {
+                    vivos.add(b);
+                }
+            }
+            backorders = vivos;
+
+            if (hayPedido && dia == diaLlegada) {
+                inventario += q;
+                hayPedido = false;
+                System.out.println("Dia " + dia + ": llega pedido, inventario += " + q);
+                List<Backorder> restantes = new ArrayList<>();
+                for (Backorder b : backorders) {
+                    int atendido = Math.min(b.cantidad, inventario);
+                    inventario -= atendido;
+                    System.out.println("  cubre backorder " + atendido + "u (costo $20 c/u)");
+                    int resto = b.cantidad - atendido;
+                    if (resto > 0) restantes.add(new Backorder(resto, b.plazoLimite));
+                }
+                backorders = restantes;
+            }
+
+            int invInicial = inventario;
+            double Rd = rnd.nextDouble();
+            int demanda = 0;
+            for (int i = 0; i < ACUM_DEMANDA.length; i++) {
+                if (Rd < ACUM_DEMANDA[i]) { demanda = VALORES_DEMANDA[i]; break; }
+                if (i == ACUM_DEMANDA.length - 1) demanda = VALORES_DEMANDA[i];
+            }
+            System.out.printf("Dia %d: R=%.4f (Paso 3: comparar contra F(x)) -> x=%d (Paso 4: demanda)%n",
+                    dia, Rd, demanda);
+
+            if (demanda <= inventario) {
+                inventario -= demanda;
+            } else {
+                int faltante = demanda - inventario;
+                inventario = 0;
+                double Re = rnd.nextDouble();
+                int te = 0;
+                for (int i = 0; i < ACUM_ESPERA.length; i++) {
+                    if (Re < ACUM_ESPERA[i]) { te = VALORES_ESPERA[i]; break; }
+                    if (i == ACUM_ESPERA.length - 1) te = VALORES_ESPERA[i];
+                }
+                if (te == 0) {
+                    System.out.printf("  faltante %du, R_espera=%.4f -> espera=0: PIERDE de inmediato ($50 c/u)%n", faltante, Re);
+                } else {
+                    backorders.add(new Backorder(faltante, dia + te));
+                    System.out.printf("  faltante %du, R_espera=%.4f -> espera=%d dias, backorder hasta dia %d%n",
+                            faltante, Re, te, dia + te);
+                }
+            }
+            System.out.println("  inventario: " + invInicial + " -> " + inventario);
+
+            if (inventario <= R && !hayPedido) {
+                double Rt = rnd.nextDouble();
+                int tent = 0;
+                for (int i = 0; i < ACUM_ENTREGA.length; i++) {
+                    if (Rt < ACUM_ENTREGA[i]) { tent = VALORES_ENTREGA[i]; break; }
+                    if (i == ACUM_ENTREGA.length - 1) tent = VALORES_ENTREGA[i];
+                }
+                diaLlegada = dia + tent;
+                hayPedido = true;
+                System.out.printf("  se ordena q=%d, R_entrega=%.4f -> tiempo=%d, llega dia %d%n",
+                        q, Rt, tent, diaLlegada);
+            }
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        demostracionModelamiento(90, 40);
+
+        int mejorQ = 0, mejorR = 0;
+        double mejorCosto = Double.MAX_VALUE;
+        for (int q = 130; q <= 230; q += 10) {
+            for (int R = 90; R <= 140; R += 5) {
+                double suma = 0;
+                for (int anio = 0; anio < 400; anio++) {
+                    suma += simularInventario(q, R, 260);
+                }
+                double promedio = suma / 400;
+                if (promedio < mejorCosto) {
+                    mejorCosto = promedio;
+                    mejorQ = q;
+                    mejorR = R;
+                }
+            }
+        }
+        System.out.printf("Par optimo: q=%d, R=%d, costo promedio anual = %.2f%n",
+                mejorQ, mejorR, mejorCosto);
+    }
+}
+\end{lstlisting}
+
+\textbf{Implementación en Excel:}
+
+Hoja \texttt{P4\_InventarioEspera}, misma estructura que p3, con datos de entrada distintos (\texttt{B1}=$q$=180, \texttt{B2}=$R$=115, \texttt{B3}=inventario inicial=100, \texttt{B4}=costo de ordenar=100, \texttt{B5}=costo de inventario=52, \texttt{B6}=costo de faltante con espera=20, \texttt{B7}=costo de faltante sin espera=50) y tres tablas de Transformada Inversa (demanda, entrega, espera) en vez de dos.
+
+Como llevar varios pedidos en espera simultáneos con sus propios plazos límite es difícil con fórmulas nativas por fila, se usa una tabla auxiliar \texttt{Pendientes} al costado con columnas [Día del faltante, Cantidad, Día límite, Cubierto (Sí/No), Perdido (Sí/No)], una fila por cada evento de faltante, consultada desde la tabla principal con \texttt{BUSCARV}/\texttt{SUMAR.SI.CONJUNTO} para saber cuánto se cubre a \$20/unidad y cuánto se pierde a \$50/unidad. El resto (inventario promedio con la corrección de faltante, costo de ordenar, costo de inventario, búsqueda de $(q,R)$ óptimo) sigue la misma lógica que p3.
+
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\vspace{4cm}Captura de la hoja de cálculo — pendiente de agregar\vspace{4cm}}}
+\caption{Hoja de cálculo — Control de Inventarios con espera del cliente}
+\end{figure}
+
+\subsection{Validación}
+
+\subsubsection{\texorpdfstring{Prueba de escritorio con $n=25$}{Prueba de escritorio con n=25}}
+
+Costo total anual, corriendo la simulación completa (260 días) 25 veces con $q=180,R=115$:
+
+\begin{center}
+\small
+\begin{tabular}{ccccc}
+\toprule
+Corrida (año) & Costo total & Órdenes & Unid. cubiertas tras espera & Unid. perdidas \\
+\midrule
+1  & 12208.70 & 44 & 0  & 0  \\
+2  & 11809.90 & 43 & 23 & 0  \\
+3  & 11738.00 & 44 & 10 & 0  \\
+4  & 12008.20 & 43 & 2  & 0  \\
+5  & 11653.90 & 44 & 0  & 4  \\
+6  & 11926.60 & 44 & 0  & 0  \\
+7  & 12653.20 & 43 & 26 & 7  \\
+8  & 12421.80 & 44 & 0  & 0  \\
+9  & 11503.60 & 43 & 9  & 0  \\
+10 & 11807.80 & 44 & 1  & 0  \\
+11 & 12107.10 & 43 & 0  & 6  \\
+12 & 11375.60 & 43 & 0  & 0  \\
+13 & 12175.60 & 43 & 26 & 4  \\
+14 & 12555.80 & 43 & 1  & 11 \\
+15 & 12041.20 & 43 & 0  & 3  \\
+16 & 13476.90 & 44 & 0  & 26 \\
+17 & 11823.00 & 44 & 1  & 0  \\
+18 & 12027.20 & 44 & 34 & 2  \\
+19 & 11904.80 & 44 & 2  & 3  \\
+20 & 12328.10 & 44 & 9  & 0  \\
+21 & 11826.10 & 44 & 0  & 1  \\
+22 & 12198.40 & 44 & 18 & 0  \\
+23 & 11629.50 & 44 & 0  & 0  \\
+24 & 11774.10 & 43 & 6  & 0  \\
+25 & 12289.90 & 44 & 0  & 5  \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Promedio de las 25 corridas: \$12,050.60.
+
+\subsubsection{\texorpdfstring{Corridas con $n \geq 50$}{Corridas con n mayor igual 50}}
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+$n$ (años) & Costo total anual promedio \\
+\midrule
+50   & \$12,040.52 \\
+100  & \$12,125.76 \\
+250  & \$12,118.61 \\
+500  & \$12,099.73 \\
+1000 & \$12,116.90 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+El promedio se estabiliza alrededor de \$12,100 a medida que crece $n$.
+
+\subsection{Interpretación}
+
+\subsubsection{Resultados}
+
+Probando pares $(q,R)$ candidatos (barrido con $q$ entre 100 y 300, $R$ entre 90 y 180, refinado con 500 años simulados por par), el par de menor costo total anual promedio encontrado fue $q=180, R=115$, con un costo total anual promedio de aproximadamente \textbf{\$12,100}, verificado de forma independiente en Java ($q=180,R=115$, \$12{,}107) y Python ($q=180,R=115$, \$12{,}091). Igual que en p3, la zona alrededor de ese par es relativamente plana (pares entre $q=170$-$190$ con $R=115$ dan costos muy similares).
+
+\subsubsection{Interpretación}
+
+El punto de reorden $R=115$ es mayor que la demanda esperada durante el tiempo de entrega ($\approx 29.6 \times 2.05 \approx 60.7$ unidades), dejando un margen de seguridad considerable — mayor proporcionalmente que en p3, lo cual es razonable porque acá un faltante no siempre se pierde de inmediato (60\% de las veces el cliente espera), por lo que el sistema puede permitirse operar con algo más de holgura antes de que el costo de faltante se dispare. El costo total anual (\$12,100) es mucho mayor que el de p3 (\$1,838), lo cual es consistente con que la demanda diaria en p4 es casi 8 veces mayor (promedio $\approx 29.6$ contra $\approx 3.7$ unidades) y el costo de ordenar y de inventario también son más altos.
+
+\subsection{Conclusión}
+
+Incorporar la espera del cliente cambia la forma en que se contabiliza el faltante (dos tarifas en vez de una) pero no cambia la estructura general del modelo: sigue siendo Transformada Inversa discreta sobre las variables de entrada, combinada con simulación día a día del inventario. La política óptima aproximada encontrada es ordenar $q \approx 180$ unidades cada vez que el inventario cae a $R=115$ unidades o menos, con un costo total anual esperado de aproximadamente \$12,100. La validación con prueba de escritorio (n=25 y n$\geq$50) y la implementación independiente en Java y Python confirman que el modelo converge de forma estable a ese resultado.

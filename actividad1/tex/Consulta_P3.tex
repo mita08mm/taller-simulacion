@@ -1,0 +1,427 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{listings}
+
+\lstnewenvironment{Algoritmo}[1]{
+    \lstset{
+        language=C,
+        frame=single,
+        basicstyle=\small\ttfamily,
+        caption={#1},
+        captionpos=t,
+        breaklines=true,
+        showstringspaces=false,
+        literate=
+            {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'\i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+            {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+            {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+    }
+}{}
+
+\geometry{margin=2.5cm}
+
+\begin{document}
+
+\section{Sistema de Inventarios (sin espera del cliente)}
+
+\subsection{Demanda diaria}
+
+\begin{description}
+    \item[Paso 1: Encontrar la función $f(x)$]
+
+    \begin{center}
+    \begin{tabular}{cc}
+    \toprule
+    $x$ & $f(x)$ \\
+    \midrule
+    0 & 0.04 \\
+    1 & 0.06 \\
+    2 & 0.10 \\
+    3 & 0.20 \\
+    4 & 0.30 \\
+    5 & 0.18 \\
+    6 & 0.08 \\
+    7 & 0.03 \\
+    8 & 0.01 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \textbf{Aclaración: esta tabla no es una distribución Poisson.} Para que una variable siga una distribución de Poisson, la media ($\lambda$) y la varianza ($\sigma^2$) tienen que ser exactamente iguales.
+
+    \textbf{Cálculo de la media,} $\text{media} = \sum x \cdot f(x)$, sumando cada valor de $x$ multiplicado por su probabilidad:
+    \begin{align*}
+    \text{media} &= 0(0.04) + 1(0.06) + 2(0.10) + 3(0.20) + 4(0.30) + 5(0.18) + 6(0.08) + 7(0.03) + 8(0.01) \\
+    &= 0 + 0.06 + 0.20 + 0.60 + 1.20 + 0.90 + 0.48 + 0.21 + 0.08 \\
+    &= 3.73
+    \end{align*}
+
+    \textbf{Cálculo de la varianza,} $\text{varianza} = \sum (x-\text{media})^2 \cdot f(x)$, restando la media a cada $x$, elevando al cuadrado, y multiplicando por su probabilidad:
+    \begin{center}
+    \small
+    \begin{tabular}{ccccc}
+    \toprule
+    $x$ & $x-3.73$ & $(x-3.73)^2$ & $f(x)$ & $(x-3.73)^2 \cdot f(x)$ \\
+    \midrule
+    0 & $-3.73$ & 13.9129 & 0.04 & 0.556516 \\
+    1 & $-2.73$ & 7.4529  & 0.06 & 0.447174 \\
+    2 & $-1.73$ & 2.9929  & 0.10 & 0.299290 \\
+    3 & $-0.73$ & 0.5329  & 0.20 & 0.106580 \\
+    4 & $0.27$  & 0.0729  & 0.30 & 0.021870 \\
+    5 & $1.27$  & 1.6129  & 0.18 & 0.290322 \\
+    6 & $2.27$  & 5.1529  & 0.08 & 0.412232 \\
+    7 & $3.27$  & 10.6929 & 0.03 & 0.320787 \\
+    8 & $4.27$  & 18.2329 & 0.01 & 0.182329 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+    Sumando la última columna: $0.556516+0.447174+0.299290+0.106580+0.021870+0.290322+0.412232+0.320787+0.182329 = 2.6371$.
+
+    Como la varianza (2.6371) es notablemente menor que la media (3.73) — lo que en estadística se llama subdispersión —, la fórmula de Poisson $\frac{e^{-\lambda}\lambda^x}{x!}$ no se ajusta a este problema. Si se forzara $\lambda=3.73$ en esa fórmula, los valores individuales no coinciden con la tabla: para $x=0$, la tabla da $f(0)=0.04$ pero la fórmula de Poisson daría $e^{-3.73}\approx 0.024$. Por eso esta es una distribución discreta general (tabla de frecuencias empírica), y solo se puede resolver con las sumatorias paso a paso de abajo — no con la fórmula de Poisson.
+
+    \item[Paso 2: Determinar la función acumulada $F(x)$]
+
+    $F(x)$ en cada valor de $x$ es simplemente ir sumando el $f(x)$ de ese valor con el $F(x)$ que ya llevabas acumulado del valor anterior:
+
+    \begin{align*}
+    F(0) &= f(0) = 0.04 \\
+    F(1) &= F(0) + f(1) = 0.04 + 0.06 = 0.10 \\
+    F(2) &= F(1) + f(2) = 0.10 + 0.10 = 0.20 \\
+    F(3) &= F(2) + f(3) = 0.20 + 0.20 = 0.40 \\
+    F(4) &= F(3) + f(4) = 0.40 + 0.30 = 0.70 \\
+    F(5) &= F(4) + f(5) = 0.70 + 0.18 = 0.88 \\
+    F(6) &= F(5) + f(6) = 0.88 + 0.08 = 0.96 \\
+    F(7) &= F(6) + f(7) = 0.96 + 0.03 = 0.99 \\
+    F(8) &= F(7) + f(8) = 0.99 + 0.01 = 1.00
+    \end{align*}
+
+    Por eso $F(8)=1.00$: al llegar al último valor ya se sumaron todas las probabilidades de la tabla.
+
+    \begin{center}
+    \begin{tabular}{cc}
+    \toprule
+    $x$ & $F(x)$ \\
+    \midrule
+    0 & 0.04 \\
+    1 & 0.10 \\
+    2 & 0.20 \\
+    3 & 0.40 \\
+    4 & 0.70 \\
+    5 & 0.88 \\
+    6 & 0.96 \\
+    7 & 0.99 \\
+    8 & 1.00 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 3: Igualar la función acumulada $F(x) = R$]
+
+    $$ F(x)=R \qquad ; \qquad 0 < R < 1 $$
+
+    Acá ``igualar'' no es despejar una fórmula (como en el caso continuo), sino comparar un $R$ generado contra la tabla de $F(x)$ del Paso 2, hasta encontrar en qué fila deja de cumplirse $R \geq F(x)$. Ejemplo con $R=0.53$:
+
+    \begin{center}
+    \begin{tabular}{cccl}
+    \toprule
+    $x$ & $F(x)$ & ¿$R=0.53 < F(x)$? & \\
+    \midrule
+    0 & 0.04 & no ($0.53 \geq 0.04$) & sigue \\
+    1 & 0.10 & no ($0.53 \geq 0.10$) & sigue \\
+    2 & 0.20 & no ($0.53 \geq 0.20$) & sigue \\
+    3 & 0.40 & no ($0.53 \geq 0.40$) & sigue \\
+    4 & 0.70 & \textbf{sí} ($0.53 < 0.70$) & \textbf{se detiene, $x=4$} \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    $R=0.53$ es mayor o igual que $F(3)=0.40$ pero menor que $F(4)=0.70$ — por eso $R$ ``iguala'' (queda emparejado) con $x=4$, y no con otro valor.
+
+    \textbf{Demostración de que el tramo asignado es correcto.} Con $0 < R < 1$ generado con \text{gcm}(), por definición de variable uniforme:
+    \[
+    P(a \leq R < b) = b-a
+    \]
+    A cada $x_i$ se le asigna el tramo $\big[F(x_{i-1}),\,F(x_i)\big)$. Su ancho es:
+    \[
+    F(x_i)-F(x_{i-1}) = \sum_{k \leq x_i} f(x_k) - \sum_{k \leq x_{i-1}} f(x_k) = f(x_i)
+    \]
+    Sustituyendo $a=F(x_{i-1})$, $b=F(x_i)$ en la primera ecuación:
+    \[
+    P\big(\text{se genera } x_i\big) = P\big(F(x_{i-1}) \leq R < F(x_i)\big) = F(x_i)-F(x_{i-1}) = f(x_i)
+    \]
+    Con $x_i=4$: $F(3)=0.40$, $F(4)=0.70$, ancho $=0.70-0.40=0.30=f(4)$. Queda demostrado que la probabilidad de generar $x=4$ es exactamente $0.30$, la misma que trae la tabla original — no una aproximación.
+
+    \item[Paso 4: Aplicar la función inversa $x=F^{-1}(R)$]
+
+    Repetir esa comparación fila por fila cada vez que se genera un $R$ sería lento; el Paso 4 arma de una vez la tabla con los tramos ya resueltos (demostrados en el Paso 3), para no tener que comparar contra $F(x)$ cada vez:
+
+    \begin{center}
+    \begin{tabular}{ll}
+    Si $0.00 \leq R < 0.04$, entonces $x=0$ & Si $0.40 \leq R < 0.70$, entonces $x=4$ \\
+    Si $0.04 \leq R < 0.10$, entonces $x=1$ & Si $0.70 \leq R < 0.88$, entonces $x=5$ \\
+    Si $0.10 \leq R < 0.20$, entonces $x=2$ & Si $0.88 \leq R < 0.96$, entonces $x=6$ \\
+    Si $0.20 \leq R < 0.40$, entonces $x=3$ & Si $0.96 \leq R < 0.99$, entonces $x=7$ \\
+                                            & Si $0.99 \leq R \leq 1.00$, entonces $x=8$ \\
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 5: Propuesta algorítmica para la variable aleatoria]
+
+    En vez de escribir un \texttt{si/sino si} por cada valor, se guardan los valores y su acumulada en dos arreglos y se recorren con un bucle — la misma función sirve para cualquier tabla, sin importar su tamaño:
+
+    \begin{Algoritmo}{}
+valores   <- [0, 1, 2, 3, 4, 5, 6, 7, 8]
+acumulada <- [0.04, 0.10, 0.20, 0.40, 0.70, 0.88, 0.96, 0.99, 1.00]
+
+entero funcion demandaDiaria(){
+    real R <- gcm();
+    para i <- 0 hasta longitud(acumulada)-1 hacer
+        si (R < acumulada[i]) entonces
+            retornar valores[i];
+        fin si
+    fin para
+}
+    \end{Algoritmo}
+\end{description}
+
+\subsection{Tiempo de entrega}
+
+\begin{description}
+    \item[Paso 1: Encontrar la función $f(x)$]
+    
+
+    \begin{center}
+    \begin{tabular}{cc}
+    \toprule
+    $x$ (días) & $f(x)$ \\
+    \midrule
+    1 & 0.25 \\
+    2 & 0.50 \\
+    3 & 0.20 \\
+    4 & 0.05 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 2: Determinar la función acumulada $F(x)$]
+
+    \begin{align*}
+    F(1) &= f(1) = 0.25 \\
+    F(2) &= F(1) + f(2) = 0.25 + 0.50 = 0.75 \\
+    F(3) &= F(2) + f(3) = 0.75 + 0.20 = 0.95 \\
+    F(4) &= F(3) + f(4) = 0.95 + 0.05 = 1.00
+    \end{align*}
+
+    \begin{center}
+    \begin{tabular}{cc}
+    \toprule
+    $x$ (días) & $F(x)$ \\
+    \midrule
+    1 & 0.25 \\
+    2 & 0.75 \\
+    3 & 0.95 \\
+    4 & 1.00 \\
+    \bottomrule
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 3: Igualar la función acumulada $F(x) = R$]
+
+    $$ F(x)=R \qquad ; \qquad 0 < R < 1 $$
+
+    Igual que con la demanda: se compara el $R$ generado contra la tabla de $F(x)$ hasta encontrar la primera fila donde $R < F(x)$. Ejemplo con $R=0.42$: $R \geq F(1)=0.25$ pero $R < F(2)=0.75$, entonces el tiempo de entrega es $x=2$ días.
+
+    \item[Paso 4: Aplicar la función inversa $x=F^{-1}(R)$]
+
+    Con los tramos ya resueltos, sin tener que comparar contra $F(x)$ cada vez:
+
+    \begin{center}
+    \begin{tabular}{l}
+    Si $0.00 \leq R < 0.25$, entonces $x=1$ día \\
+    Si $0.25 \leq R < 0.75$, entonces $x=2$ días \\
+    Si $0.75 \leq R < 0.95$, entonces $x=3$ días \\
+    Si $0.95 \leq R \leq 1.00$, entonces $x=4$ días \\
+    \end{tabular}
+    \end{center}
+
+    \item[Paso 5: Propuesta algorítmica para la variable aleatoria]
+
+    Misma idea: valores y acumulada en arreglos, un bucle genérico:
+
+    \begin{Algoritmo}{}
+valores   <- [1, 2, 3, 4]
+acumulada <- [0.25, 0.75, 0.95, 1.00]
+
+entero funcion tiempoEntrega(){
+    real R <- gcm();
+    para i <- 0 hasta longitud(acumulada)-1 hacer
+        si (R < acumulada[i]) entonces
+            retornar valores[i];
+        fin si
+    fin para
+}
+    \end{Algoritmo}
+\end{description}
+
+\subsection{Algoritmo de simulación del inventario}
+
+\begin{Algoritmo}{}
+real funcion simularInventario(entero q, entero R, entero dias){
+    entero inventario, faltanteAcum, ordenes, diaLlegada, hayPedido;
+    real sumaProm, costoOrdenar, costoInventario, costoFaltante;
+
+    inventario <- 15;
+    faltanteAcum <- 0;
+    ordenes <- 0;
+    sumaProm <- 0;
+    hayPedido <- falso;
+
+    para dia <- 1 hasta dias hacer
+        si (hayPedido) && (dia == diaLlegada) entonces
+            inventario <- inventario + q;
+            hayPedido <- falso;
+        fin si
+
+        invInicial <- inventario;
+        demanda <- demandaDiaria();
+
+        si (demanda <= inventario) entonces
+            inventario <- inventario - demanda;
+            promedioDia <- (invInicial + inventario) / 2;
+        sino
+            faltanteAcum <- faltanteAcum + (demanda - inventario);
+            // el inventario se agota antes de terminar el dia: el promedio no es
+            // (invInicial+0)/2, es el promedio de la parte con stock (invInicial/2)
+            // multiplicado por la fraccion del dia que duro esa parte (invInicial/demanda)
+            si (invInicial > 0) entonces
+                promedioDia <- (invInicial / 2) * (invInicial / demanda);
+            sino
+                promedioDia <- 0;
+            fin si
+            inventario <- 0;
+        fin si
+
+        sumaProm <- sumaProm + promedioDia;
+
+        si (inventario <= R) && (!hayPedido) entonces
+            diaLlegada <- dia + tiempoEntrega();
+            hayPedido <- verdadero;
+            ordenes <- ordenes + 1;
+        fin si
+    fin para
+
+    costoOrdenar <- ordenes * 50;
+    costoInventario <- sumaProm * (26.0 / dias);
+    costoFaltante <- faltanteAcum * 25;
+
+    retornar costoOrdenar + costoInventario + costoFaltante;
+}
+\end{Algoritmo}
+
+\subsection{Simulación manual ($q=30$, $R=10$)}
+
+\textbf{Qué significa ``colocar una orden'' y cómo se usa el tiempo de entrega:}
+
+Cuando el inventario al final del día queda en $R=10$ o menos, y no hay ya un pedido en camino, se coloca una orden de $q=30$ unidades. La cantidad que llega es \textbf{siempre $q=30$}, sin importar cuánta era la demanda ese día ni en cuánto quedó el inventario — es la política de ``lote constante'': lo único que varía entre una orden y otra es cuándo llega (el tiempo de entrega), nunca cuánto llega. Colocar la orden son dos cosas concretas:
+\begin{enumerate}
+    \item Se genera \textbf{cuándo va a llegar}: se saca un $R$ nuevo (distinto del que generó la demanda de ese día) y se lo pasa por la tabla de tiempo de entrega (Paso 4 de la sección anterior).
+    \item Se calcula el día de llegada $=$ día en que se colocó la orden $+$ tiempo de entrega obtenido.
+\end{enumerate}
+Mientras se espera esa orden, no se coloca ninguna otra — no tiene sentido pedir de nuevo antes de que llegue lo que ya se pidió.
+
+Ejemplo con la tabla de abajo: el día 2 el inventario terminó en 6, que es $\leq R=10$, y no había pedido pendiente $\Rightarrow$ se coloca la orden 1 (columna ``Orden'' marca ``1'' en esa fila). Para saber cuándo llega, se genera $R=0.42$ para el tiempo de entrega: cae en el tramo $0.25 \leq R < 0.75 \Rightarrow 2$ días. Día de llegada $= 2+2 = 4$.
+
+Los días 2 y 3 el inventario sigue bajando con la demanda normal — todavía no llegó nada. Recién el día 4, \textbf{antes} de generar la demanda de ese día, se suma $q=30$ al inventario que había quedado el día 3 (4 unidades): $4+30=34$. Por eso en la tabla el ``Inventario inicial'' del día 4 es 34 y no 4. Después de sumar el pedido, el día 4 sigue como cualquier otro día: se genera su propia demanda y se resta normalmente.
+
+La columna ``Orden'' de la tabla marca únicamente el día en que \emph{se coloca} la orden (día 2 $\to$ ``1'', día 10 $\to$ ``2''); no marca el día en que llega — eso queda anotado aparte, debajo de la tabla.
+
+\textbf{Inventario promedio en días con faltante (día 11):} el inventario empieza el día en 4, pero la demanda es 8 — no alcanza, y el inventario llega a 0 \emph{antes} de que termine el día (se agota apenas se cubre una fracción de la demanda). Por eso el promedio de ese día no es $(4+0)/2=2.0$; usando la misma fórmula del Ejemplo 5.5 de \texttt{cap5\_simulacion.tex} (Tabla 5.7):
+\[
+\text{promedio día 11} = \frac{4}{2} \times \frac{4}{8} = 2 \times 0.5 = 1.0
+\]
+El día 12 el inventario ya empieza en 0 (invInicial$=0$), así que el promedio de ese día es directamente $0$ — no hay nada que promediar.
+
+Inventario inicial: 15 unidades.
+
+\begin{center}
+\small
+\begin{tabular}{cccccccc}
+\toprule
+\multirow{2}{*}{Día} & Inventario & Número & \multirow{2}{*}{Demanda} & Inventario & \multirow{2}{*}{Faltante} & \multirow{2}{*}{Orden} & Inventario \\
+ & inicial & aleatorio & & final & & & diario promedio \\
+\midrule
+1  & 15 & 0.53 & 4 & 11 &   &   & 13.0 \\
+2  & 11 & 0.81 & 5 & 6  &   & 1 & 8.5  \\
+3  & 6  & 0.15 & 2 & 4  &   &   & 5.0  \\
+4  & 34 & 0.68 & 4 & 30 &   &   & 32.0 \\
+5  & 30 & 0.09 & 1 & 29 &   &   & 29.5 \\
+6  & 29 & 0.77 & 5 & 24 &   &   & 26.5 \\
+7  & 24 & 0.95 & 6 & 18 &   &   & 21.0 \\
+8  & 18 & 0.31 & 3 & 15 &   &   & 16.5 \\
+9  & 15 & 0.61 & 4 & 11 &   &   & 13.0 \\
+10 & 11 & 0.98 & 7 & 4  &   & 2 & 7.5  \\
+11 & 4  & 0.99 & 8 & 0  & 4 &   & 1.0  \\
+12 & 0  & 0.45 & 4 & 0  & 4 &   & 0.0  \\
+13 & 30 & 0.22 & 3 & 27 &   &   & 28.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Orden 1 (día 2): $R=0.42 \Rightarrow$ tiempo de entrega $=2$ días $\Rightarrow$ llega día 4.
+Orden 2 (día 10): $R=0.88 \Rightarrow$ tiempo de entrega $=3$ días $\Rightarrow$ llega día 13.
+
+\textbf{De dónde sale cada número del costo:} los tres costos se leen directo de las columnas de la tabla de arriba, no de ningún dato nuevo.
+
+\begin{itemize}
+    \item \textbf{2} (para el costo de ordenar) = cuántas veces aparece algo en la columna ``Orden'' = 1 vez en el día 2 + 1 vez en el día 10 = 2 órdenes en total.
+    \item \textbf{202.0} (para el costo de inventario) = la suma de \emph{toda} la columna ``Inventario diario promedio'', los 13 días (el día 11 usa la fórmula corregida, $1.0$, no $2.0$):
+    \[
+    13.0+8.5+5.0+32.0+29.5+26.5+21.0+16.5+13.0+7.5+1.0+0.0+28.5 = 202.0
+    \]
+    \item \textbf{8} (para el costo de faltante) = la suma de \emph{toda} la columna ``Faltante'': $4$ (día 11) $+$ $4$ (día 12) $= 8$; en los demás días esa columna está vacía porque no hubo faltante.
+\end{itemize}
+
+Con esos tres números se aplican directamente las fórmulas de costo del \texttt{Algoritmo de simulación del inventario} (\texttt{costoOrdenar <- ordenes * 50}, etc.):
+
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+Costo de ordenar & Costo de inventario & Costo de faltante & Costo total \\
+\midrule
+$2(50)=\$100$ & $202.0(26/260)=\$20.20$ & $8(25)=\$200$ & \$320.20 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+El costo total (\$320.20) es simplemente la suma de esos tres: $100+20.20+200=320.20$.
+
+\section{Preguntas pendientes para el docente (p3 y p4)}
+
+\begin{enumerate}
+    \item ¿Se revisa el inventario todos los días para decidir si hay que pedir más mercadería, o se revisa solo cada cierto tiempo (por ejemplo, cada 3 días)? Nosotros asumimos que se revisa todos los días.
+
+    \item ¿Cómo se debe contar cuánto inventario ``tuviste guardado'' en el día? Nosotros usamos el promedio entre lo que había al empezar el día y lo que quedó al final.
+
+    \item Probamos varios pares $(q,R)$ y varios dieron casi el mismo costo — no hay un único par ``perfecto''. ¿El docente espera un $q$ y $R$ exactos, o alcanza con reportar el rango de valores que dan el mejor resultado?
+
+    \item Para buscar el mejor $(q,R)$ probamos varios pares y nos quedamos con el de menor costo. ¿Alcanza con eso, o se espera un método de búsqueda más formal?
+
+    \item (Solo p4) Si dos clientes están esperando su pedido y llega mercadería que no alcanza para los dos, ¿a quién se le entrega primero? Nosotros decidimos que al que lleva más tiempo esperando.
+
+    \item (Solo p4) ¿Cómo se debe contar si un cliente ``se cansó de esperar''? Nosotros lo revisamos día por día: si el pedido no llega antes de que se le acabe la paciencia al cliente, esa venta se pierde.
+
+    \item Para p3 y p4 solo hicimos la implementación en Java (sin Excel). ¿Está bien así, o hace falta Excel también para estos dos problemas?
+
+    \item ¿Hay una forma o símbolos específicos que el docente pide para el diagrama de flujo de la simulación de inventarios?
+
+    \item ¿Cuántos días o años hace falta simular para confiar en el resultado? Nosotros simulamos hasta 1000 años para que el promedio ya no cambie.
+\end{enumerate}
+
+\end{document}

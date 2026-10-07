@@ -1,0 +1,607 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,provide=*]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{enumitem}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\linespread{1.3}\selectfont 7. LENGUAJES DE SIMULACIÓN\par}
+\end{center}
+\vspace{0.5cm}
+
+\setcounter{chapter}{7}
+\setcounter{page}{123}
+
+%==========================================================
+Las primeras etapas de un estudio de simulación se refieren a la
+definición del sistema a ser modelado y a la descripción del sistema de
+términos de relaciones lógicas de sus variables y diagramas de flujo.
+Sin embargo, llega el momento de describir el modelo en un lenguaje que
+sea aceptado por la computadora que se va a usar. En esta etapa se
+tienen dos cursos de acción a seguir: 1) Desarrollar el software
+requerido para estudios de simulación, o 2) Comprar algún paquete de
+simulación como GPSS, GASP, simula, etc. Desafortunadamente, para la
+segunda alternativa existen una gran cantidad de paquetes (lenguajes de
+programación de propósito especial), que resulta extremadamente difícil
+decidir cuál paquete se ajusta mejor a una aplicación determinada. Esta
+situación origina que en la mayoría de las veces, la selección de un
+paquete depende de si el analista lo conoce, lo entiende y lo sabe
+aplicar. No obstante, estas dos alternativas se deben de evaluar en
+términos económicos antes de tomar una decisión.
+
+%==========================================================
+\section*{7.1. Ventajas de los lenguajes de simulación}
+
+El proceso evolutivo de los lenguajes de simulación ha sido largo y
+extenso. Empezó a finales de la década de los 50's. En un principio los
+lenguajes que se desarrollaron eran de propósito general. Sin embargo,
+poco a poco los estudiosos de este tema se dieron cuenta de la gran
+similitud que existía entre las diferentes situaciones o sistemas que se
+simulaban. Lo anterior condujo obviamente al desarrollo de lenguajes de
+propósito especial, los cuales en la actualidad tienen una gran demanda
+y su proceso de comercialización ha sido amplio y extenso. Entre las
+ventajas principales de estos lenguajes de simulación, se pueden
+mencionar las siguientes:
+
+\begin{enumerate}[label=\alph*)]
+\item Reducción en la tarea de programación. Con los lenguajes de
+simulación, el tiempo dedicado a la programación del modelo se reduce
+considerablemente. Existen algunos paquetes como GPSS, en los que con un
+número muy reducido de estatutos, se pueden simular sistemas que en otro
+lenguaje como Fortran, requerirían una gran cantidad de estatutos y
+subrutinas.
+\item Mejor definición del sistema. A través de los lenguajes de
+simulación, se facilita la tarea de definir las diferentes entidades que
+interactúan dentro del sistema. También, con estos lenguajes se
+determina con mayor facilidad las interrelaciones que existen entre las
+entidades que forman el sistema.
+\item Mayor flexibilidad para cambios. Con los lenguajes generales como
+Fortran, el proceso de cambios puede ser largo y tedioso. Sin embargo,
+con el uso de lenguajes de simulación, los cambios son una tarea simple
+y rutinaria.
+\item Mejor diferenciación de las entidades que forman el sistema. El
+uso de lenguajes de simulación facilita determinar o definir las
+características y atributos de una entidad. Con las entidades bien
+definidas y diferenciadas, se aumenta y mejora el entendimiento del
+sistema a simular.
+\item Se relacionan mejor las entidades. Con las entidades bien
+definidas, los lenguajes de simulación permiten relacionar mejor a cada
+una de estas entidades, es decir, se determina más fácilmente las
+relaciones que las entidades guardan entre sí y el análisis de cada una
+de ellas.
+\end{enumerate}
+
+%==========================================================
+\section*{7.2. Características de los lenguajes de simulación}
+
+Los lenguajes de simulación que actualmente existen en el mercado,
+tienen una serie de características propias que los diferencian de los
+demás. Entre estas características se pueden mencionar las siguientes:
+
+\begin{enumerate}[label=\alph*)]
+\item El procedimiento utilizado para generar números aleatorios
+uniformes.
+\item Los procedimientos o métodos utilizados para generar las
+variables aleatorias no-uniformes más conocidas y más usadas.
+\item La forma de adelantar el ``reloj de la simulación'', la cual
+puede ser: 1) Incrementos a tiempo fijo, o 2) Incrementos al próximo
+evento.
+\item El análisis estadístico de los resultados de la simulación.
+\item El formato en que los resultados de la simulación son
+presentados.
+\item La forma en que las inconsistencias y errores de lógica es
+reportada.
+\item El lenguaje en el cual el paquete está escrito, el cual puede
+ser: Fortran, Algol, PL/I, Asembler, etc.
+\item Los diferentes tipos de computadoras cuyo compilador es
+compatible con el del paquete en cuestión.
+\end{enumerate}
+
+A continuación, se presentan las características principales de los
+lenguajes de simulación más usados.
+
+\medskip
+\noindent\textbf{GPSS (General Purpose Simulation System)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+Persona que lo desarrolló: & Geoffrey Gordon \\
+Versiones más conocidas: & GPSS I, GPSS II, GPSS III, GPSS/360, GPSS V. \\
+Lenguaje del paquete: & Asembler \\
+Reloj de la simulación: & Incrementos al próximo evento \\
+Computadoras compatibles: & Generalmente se adapta a cualquier tipo de computadora. \\
+\end{tabular}
+\end{table}
+
+\noindent\textbf{SIMSCRIPT (No tiene ningún significado)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+Personas que lo desarrollaron: & H. M. Markowitz, H. W. Karr y B. Hausner. \\
+Versiones más conocidas: & Simscript I, Simscript I.5, Simscript II, Simscript II.5, C-Simscript. \\
+Lenguaje del paquete: & Fortran las primeras versiones, Asembler las últimas. \\
+Reloj de la simulación: & Incrementos al próximo evento para el caso discreto, e incrementos a tiempo fijo para el caso continuo (C-Simscript). \\
+Computadoras compatibles: & CDC 6000/7000, univac 1100, IBM 360/370, Honeywell 600/6000. \\
+\end{tabular}
+\end{table}
+
+\noindent\textbf{GASP (General Activity Simulation Program)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+Personas que lo desarrollaron: & P. J. Kiviat y A. Colher \\
+Versiones más conocidas: & GASP II, GASP IV, GASP-PLUS \\
+Lenguaje del paquete: & Fortran, PL/I. \\
+Reloj de la simulación: & Incrementos al próximo evento para el caso discreto, e incrementos a tiempo fijo para el caso continuo (GASP IV y PLUS). \\
+Computadoras compatibles: & Cualquier computadora con compilador de Fortran o PL/I. \\
+\end{tabular}
+\end{table}
+
+\noindent\textbf{SLAM (Simulation Language for Alternative Modeling)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ll}
+Personas que lo desarrollaron: & A. Alan B. Pritsker y Asociados \\
+Versiones más conocidas: & SLAM fue el resultado de la fusión de varios lenguajes como GASP IV y QGERT. \\
+Lenguaje del paquete: & Fortran IV. \\
+Reloj de la simulación: & Incrementos al próximo evento para el caso discreto, e incrementos a tiempo fijo para el caso continuo. \\
+Computadoras compatibles: & Cualquier computadora con compilador de Fortran \\
+\end{tabular}
+\end{table}
+
+Cualesquiera de estos lenguajes tienen sus propias ventajas y
+desventajas y no se puede decir que un lenguaje es mejor que otro.
+Generalmente, entre más fácil de aprender y de usar sea un lenguaje,
+menor será su flexibilidad y su eficiencia. Por consiguiente, decidir
+qué lenguaje utilizar en una aplicación específica, no es una tarea
+fácil de realizar.
+
+%==========================================================
+\section*{7.3. Factores a considerar en la selección de un lenguaje}
+
+La selección de un lenguaje de simulación generalmente está supeditada
+al tipo de computadora que se tiene disponible, es decir, en la mayoría
+de las veces ya se cuenta con cierta configuración de hardware. Por
+consiguiente, conociendo la computadora que se va a usar, los factores a
+considerar en la selección del lenguaje serían:
+
+\begin{enumerate}[label=\alph*)]
+\item Los manuales disponibles. Es muy importante considerar la
+facilidad de entender e interpretar los manuales disponibles.
+\item Compilador del lenguaje. Es necesario investigar la
+compatibilidad del compilador del lenguaje con la computadora
+disponible.
+\item La documentación y diagnóstico de errores. Es conveniente
+analizar la forma en que el lenguaje reporta las inconsistencias y los
+errores de lógica.
+\item La eficiencia. Uno de los factores principales a considerar en
+la selección de un lenguaje es su eficiencia de operación. Dentro de la
+eficiencia se considera el tiempo de organizar, programar, compilar y
+ejecutar.
+\item Los costos involucrados. Entre los costos que origina la
+adquisición de un paquete se pueden mencionar: El costo de instalación,
+el costo de mantenimiento y actualización del software y el costo de
+operación.
+\item Conocimiento del lenguaje. Otro factor importante a considerar
+en la selección del lenguaje, es el conocimiento y dominio que de éste
+tengan las personas o analistas encargados de realizar los estudios de
+simulación.
+\item Justificación económica. Finalmente, y el más importante de
+todos, es la justificación económica del lenguaje de simulación. A este
+respecto, es conveniente señalar que la adquisición de un paquete se
+debe considerar como un proyecto de inversión, donde los beneficios que
+se derivan de tal adquisición, deben de compensar la inversión y los
+gastos que origina.
+\end{enumerate}
+
+%==========================================================
+\section*{7.4. Clasificación de los lenguajes de simulación}
+
+Los modelos de simulación se clasifican en dos categorías: 1) Modelos de
+simulación continua y 2) Modelos de simulación discreta. Los modelos de
+simulación continua, generalmente son apropiados cuando el analista
+considera al sistema bajo estudio, como un flujo continuo de
+información. En simulación continua, generalmente el reloj de
+simulación se incrementa a intervalos fijos de tiempo. Por otra parte,
+en modelos de simulación discreta, al analista le interesa lo que le
+sucede a entidades individuales del sistema. Por consiguiente, el reloj
+de la simulación en simulación discreta, se incrementa cada vez que
+ocurre un evento.
+
+Los modelos de simulación discreta pueden desarrollarse a través de tres
+enfoques: 1) Enfoque de eventos, 2) Enfoque de actividades y 3) Enfoque
+de procesos. Un evento se define como un cambio en el estado de una
+entidad del sistema. Una actividad es una colección de operaciones que
+transforman el estado de una entidad. Un proceso es una secuencia de
+eventos que ocurren en un tiempo determinado.
+
+\begin{figure}[H]
+\centering
+\caption*{\textbf{Figura 7.1} Eventos, actividades y procesos}
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}
+[Figura: línea de tiempo "Proceso" con Evento 1 (arribo), Evento 2 (empieza el servicio), Evento 3 (empieza el servicio), Evento 4 (termina el servicio), Evento 5 (termina el servicio); Actividad 1 entre Eventos 2-3, Actividad 2 entre Eventos 3-5]
+\vspace{2cm}}}
+\end{figure}
+
+Además de los tres enfoques anteriores, algunos autores hacen una
+diferenciación entre lenguajes con orientación simbólica (GPSS) y
+lenguajes con orientación de estatutos de programación. Los primeros son
+más fáciles de aprender, pero los segundos son más flexibles. La figura
+7.2 muestra una clasificación de los lenguajes de simulación. En esta
+figura se puede apreciar que los lenguajes simbólicos a pesar de tener
+un enfoque de procesos en su diseño, se consideran como una cuarta
+categoría para diferenciarlos de los lenguajes de orientación de
+estatutos de programación.
+
+Finalmente, vale la pena mencionar que recientemente se han estado
+desarrollando lenguajes que permiten el análisis y evaluación de modelos
+discretos y modelos continuos. GASP IV y C-SIMSCRIPT fueron los primeros
+lenguajes de este tipo que se desarrollaron, aunque recientemente está
+disponible un nuevo lenguaje de este tipo llamado SLAM. Estos lenguajes
+permiten al analista modelar sistemas discretos, sistemas continuos y
+sistemas donde algunas entidades se comportan en forma discreta y otras
+en forma continua.
+
+\begin{figure}[H]
+\centering
+\caption*{\textbf{Figura 7.2} Clasificación de los lenguajes de simulación}
+\fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}
+[Figura: árbol -- Lenguajes de simulación se divide en: Lenguajes para simulación continua / Lenguajes para simulación continua y discreta (GASP IV, C-SIMSCRIPT, SLAM) / Lenguajes para simulación discreta, que a su vez se divide en Enfoque de eventos (GASP II, SIMSCRIPT), Enfoque de actividades (FORSIM-IV), Enfoque de procesos (SIMULA), Enfoque de símbolos (GPSS)]
+\vspace{2cm}}}
+\end{figure}
+
+%==========================================================
+\section*{7.5. Introducción al GPSS}
+
+Como se ha mencionado en párrafos anteriores, existen actualmente en el
+mercado una gran cantidad de paquetes de simulación. Sin embargo, el
+paquete GPSS es sin duda uno de los más conocidos y usados en empresas e
+instituciones educativas.\footnote{Actualmente en el ITESM se está
+utilizando la versión GPSS-V.} Por esta razón, en esta sección se
+tratará de describir a través de una serie de ejemplos, las
+potencialidades y los diferentes campos de aplicación en los cuales se
+puede aplicar este paquete (versión GPSS-V). Obviamente esta
+presentación no incluye toda la gama de aplicaciones que se le pueden
+dar a este paquete. Para tener una concepción más amplia del GPSS, se
+puede recurrir al libro \emph{Simulation Using GPSS} cuyo autor es
+Thomas J. Schriber.
+
+Para representar la llegada y salida de una facilidad de servicio
+(1 servidor), los bloques que se utilizan son SEIZE y RELEASE, donde el
+campo A representa la facilidad de servicio que se está utilizando. El
+primer bloque SEIZE indica que se inicia la entrada a la facilidad de
+servicio A y el bloque RELEASE representa la salida de dicha facilidad.
+
+El tiempo de servicio se representa mediante el bloque ADVANCE A,B
+donde: Campo A = Tiempo promedio de servicio y Campo B = Desviación con
+respecto a la media. Por ejemplo si el tiempo entre llegadas es
+uniforme entre 10 y 18 minutos, entonces, A = 14 y B = 4.
+
+Finalmente, para llevar un conteo de la cantidad de transacciones
+(clientes) que han pasado por el sistema, se utiliza el bloque
+TERMINATE, y para representar la generación de llegadas al sistema se
+utiliza el bloque GENERATE A,B,C,D,E donde: Campo C especifica el tiempo
+de ocurrencia de la primera transacción, Campo D especifica el límite de
+transacciones que pueden ocurrir en el bloque GENERATE, y Campo E
+especifica la prioridad de las transacciones al momento de generarse.
+
+\subsection*{Ejemplo 7.2. Centro Electrónico de Cálculo}
+
+Al salón de terminales del Centro Electrónico de Cálculo del ITESM,
+arriban estudiantes de acuerdo a una distribución uniforme entre 2 y 8
+minutos. En el salón existen 10 terminales. El tiempo promedio que un
+estudiante usa la terminal, está uniformemente distribuido entre 40 y
+80 minutos. Si al llegar al salón de terminales el estudiante las
+encuentra todas ocupadas, entonces, existe un 50\% de probabilidad de
+que el estudiante regrese después de 5 minutos (suponga que en esos 5
+minutos el estudiante va a la cafetería a comprar golosinas y
+refrescos). ¿Determine al momento de que 1000 estudiantes hayan pasado
+por el salón de terminales, la cantidad de estudiantes que al llegar al
+sistema encontraron todas las terminales ocupadas y no regresaron?
+
+Para simular este problema se requiere utilizar nuevos bloques. Por
+ejemplo, es necesario conocer qué bloques utilizar para representar a
+una facilidad de servicio con muchos servidores (cada terminal es un
+servidor con un tiempo de servicio uniforme entre 40 y 80 minutos).
+También, se requiere conocer el bloque que representa las
+transferencias condicionales e incondicionales que ocurren en el
+sistema. Para el primer caso, los bloques que se utilizan son ENTER y
+LEAVE, donde: $A$ = Representa el nombre o el número que se le da a la
+facilidad de servicio (STORAGE), y $B$ = Representa la cantidad de
+servidores que se ocupan o desocupan a la vez, al llegar o abandonar el
+sistema una determinada transacción. El primer bloque ENTER indica que
+se inicia la entrada a la facilidad de servicio STORAGE A y el bloque
+LEAVE representa la salida de dicha facilidad.
+
+Por otra parte, para representar las transferencias condicionales e
+incondicionales que ocurren en un sistema, se utiliza el bloque
+TRANSFER, el cual puede ser codificado de las siguientes formas:
+
+\begin{verbatim}
+TRANSFER  .3, ETI 1, ETI 2
+TRANSFER  BOTH,, ETI 1
+TRANSFER  , ETI 2
+\end{verbatim}
+
+El primer caso indica que la probabilidad de ir al bloque con etiqueta
+ETI 1 es de 0.70. El complemento es la probabilidad de ir al bloque con
+etiqueta ETI 2. El segundo caso indica que la transacción continúa en
+el siguiente bloque cada vez que esto sea posible, y continúa en el
+bloque con etiqueta ETI 1 cuando no sea posible. Si no es posible
+continuar en ninguno de los bloques, entonces, la transacción espera
+hasta que sea posible continuar en alguno de los bloques, dándole
+preferencia al siguiente bloque. El último caso indica una transferencia
+incondicional al bloque con etiqueta ETI 1.
+
+Utilizando estos últimos bloques, la codificación de este problema se
+muestra en la figura 7.5. Note que en esta última codificación se ha
+introducido otro estatuto de control llamado STORAGE. En el campo de
+localización de este estatuto se identifica al STORAGE y en el campo A
+del estatuto se indica la capacidad del STORAGE. De acuerdo a esta
+codificación, se obtienen los resultados que se muestran en la figura
+7.6. En esta figura se puede observar que cuando hayan pasado
+estudiantes por el C.E.C., 290 estudiantes que encontraron ocupadas las
+terminales al llegar, ya no regresan. También, se puede apreciar que
+280 estudiantes que encontraron al llegar a todas las terminales
+ocupadas, sí regresaron.
+
+Por otra parte, la información que se obtiene con respecto al salón de
+terminales es la siguiente: El promedio de terminales ocupadas es
+9.252, la cantidad de estudiantes que entraron al salón fue de 1009, el
+tiempo promedio de utilización de las terminales fue de 59.311 minutos,
+el porcentaje de utilización de las terminales es de 92.5\%,
+actualmente existen 9 estudiantes trabajando en las terminales y la
+cantidad máxima de estudiantes que hubo en el salón fue de 10.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Figura 7.5} Codificación del problema del centro electrónico de cálculo}
+\begin{tabular}{lll}
+\toprule
+ & Generate & 5, 3 \quad \textit{Llegadas al C.E.C.} \\
+OTR & Transfer & Both,, LLE \quad \textit{Ver si hay terminales disponibles} \\
+ & Enter & 1 \quad \textit{Entrar al salón} \\
+ & Advance & 60, 20 \quad \textit{Ocupar la terminal} \\
+ & Leave & 1 \quad \textit{Salir del salón} \\
+ & Tabulate & 1 \quad \textit{Tiempo en las terminales} \\
+ & Terminate & 1 \quad \textit{Se incrementa contador} \\
+LLE & Transfer & .5,, REJ \quad \textit{50\% regresa de nuevo} \\
+ & Seize & 1 \quad \textit{Entra a la cafetería} \\
+ & Advance & 5 \quad \textit{Compra golosinas} \\
+ & Release & 1 \quad \textit{Sale de la cafetería} \\
+ & Transfer & ,OTR \quad \textit{Regresa al C.E.C.} \\
+REJ & Terminate & \quad \textit{Abandonan el C.E.C.} \\
+1 & Storage & 10 \quad \textit{Salón con 10 terminales} \\
+1 & Table & M1,40,5,50 \quad \textit{Histograma del tiempo en el C.E.C.} \\
+ & Start & 10, NP \quad \textit{Elimina estado transiente} \\
+ & Reset & \\
+ & Start & 1000 \quad \textit{Salida de 1000 clientes} \\
+ & End & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Por último, la figura 7.6 muestra el histograma de frecuencia del
+tiempo de permanencia en el salón de terminales. Como se puede observar
+en esta figura, el tiempo promedio que un estudiante se pasa en el
+salón de terminales es de 61.047 minutos.
+
+\subsection*{Ejemplo 7.3. Peluquería con tiempo entre llegadas y tiempo de servicio exponenciales}
+
+Para el ejemplo 7.1, suponga que el tiempo entre llegadas de los dos
+tipos de clientes es exponencial con media de 65 minutos para el primer
+tipo de cliente y con media de 75 minutos para el segundo tipo de
+cliente. También, en este mismo ejemplo piense que el tiempo de servicio
+es exponencial con media de 15 minutos para un corte de pelo y 7 minutos
+para una rasurada. Por último, imagine que en la peluquería solamente
+existen 3 lugares disponibles para esperar el servicio.
+
+Para resolver este problema, es necesario introducir una serie de
+conceptos nuevos. Por ejemplo, se requiere conocer la forma de
+representar dentro del programa una función determinada, así como
+también la forma de simular el tiempo entre llegadas y el tiempo de
+servicio de una función exponencial.
+
+En GPSS es posible incluir dentro del programa una serie de funciones.
+Cada función se define por medio de parejas coordenadas $(X,Y)$. Las
+funciones que se manejan pueden ser continuas o discretas. Sin embargo,
+puesto que en GPSS las funciones se definen por medio de parejas
+coordenadas, entonces, cada vez que se trabaja con funciones continuas,
+se interpola linealmente entre las parejas coordenadas correspondientes.
+Lo anterior significa que habrá menos error entre más cercanos estén los
+puntos que definen la función continua. Por otra parte, no existe
+ninguna restricción con respecto a los valores de $X$ y $Y$, a
+excepción de $X$ que en algunas ocasiones representa a un número
+uniforme entre 0 y 1. Finalmente, conviene señalar que si se referencia
+a un valor de $X$ menor que el más pequeño de las parejas coordenadas
+que definen la función $((X_1,Y_1),(X_2,Y_2),\ldots,(X_n,Y_n))$,
+entonces, el valor de $Y$ que resulta es $Y_1$ y si se referencia un
+valor de $X$ mayor que $X_n$, entonces se obtiene para $Y$ un valor de
+$Y_n$.
+
+Para hacer referencia a una función, se utiliza el siguiente estatuto de
+control:
+
+\begin{center}
+ETI FUNCTION A, B
+\end{center}
+
+donde:
+\begin{align*}
+\text{ETI} &= \text{Etiqueta en el campo de localización que identifica a la función.} \\
+\text{Campo A} &= \text{Variable independiente que puede ser un gobernador de números uniformes o cualquier otro parámetro} \\
+\text{Campo B} &= \text{Identifica si la función que se está usando es continua o discreta. Por ejemplo, } C_n \text{ representa a una función continua que está definida por } n \text{ parejas coordenadas y } D_n \text{ representa a una función discreta que está definida por } n \text{ parejas coordenadas.}
+\end{align*}
+
+Inmediatamente después del estatuto de control que hace referencia a la
+función, se alimentan las parejas coordenadas que se seleccionaron para
+definir la función. Estas parejas se alimentan a partir de la columna 1,
+separando con comas los valores de $X$ de los valores de $Y$, y
+separando con una diagonal las parejas coordenadas. También, conviene
+aclarar que los valores alimentados de $(X,Y)$ no se deben pasar de la
+columna 71.
+
+Puesto que el ejemplo que se está analizando, la distribución del tiempo
+entre llegadas y el tiempo de servicio es exponencial, entonces, de
+acuerdo a la teoría presentada en el capítulo 4 (Método de la
+transformada inversa), las parejas coordenadas que se deben alimentar
+corresponden a la siguiente función:
+
+\begin{equation}
+Y = -\ln(1-R)
+\end{equation}
+
+es decir, el valor de $X$ se obtiene por medio de un generador de
+números rectangulares\footnote{Un generador de números rectangulares se
+presenta como $RN_n$ donde $n$ indica el número del generador que se
+está utilizando.} y el valor de $Y$ de acuerdo a la expresión anterior.
+Conociendo la media de la distribución exponencial y el valor de $Y$,
+entonces, es posible obtener un valor simulado de esa distribución, esto
+es:
+
+\begin{equation}
+\text{Valor simulado de dist. exponencial} = (\text{Medida de dist. exponencial})(Y)
+\end{equation}
+
+este procedimiento es muy recomendable puesto que de esta forma
+distribuciones exponenciales con diferentes medias pueden ser simuladas
+dentro del mismo programa.
+
+Por otra parte, para simular el tiempo entre llegadas y el tiempo de
+servicio, es necesario introducir una variante de los bloques GENERATE
+y ADVANCE. Para utilizar estos bloques con distribuciones exponenciales,
+el campo A de estos bloques representa la media de la distribución y el
+campo B hace referencia a la función $Ln(1-R)$. Conociendo la media y un
+valor simulado de $Y$, es posible obtener un valor simulado para el
+tiempo entre llegadas o el tiempo de servicio.
+
+Utilizando estos últimos conceptos, la codificación de este problema es
+como se muestra en la figura 7.7. De acuerdo a esta codificación, se
+obtienen los resultados que se muestran en la figura 7.8. En esta figura
+se puede apreciar que por el sistema pasaron 537 clientes del primer
+tipo y 463 clientes del segundo tipo. También en esta figura se puede
+observar que hubo 63 clientes que no encontraron espacio disponible al
+momento de arribar a la peluquería. Por otra parte, el tiempo promedio
+de servicio (ver FACILITIES) sin tomar en cuenta al tipo de cliente es
+de 17.708 minutos. Además, en esta ocasión el servidor se encuentra
+ocupado en 49.5\% de su tiempo disponible.
+
+Con respecto a la sala de espera, la información obtenida es la
+siguiente: el contenido promedio es de 0.763, al salón de espera
+entraron 1000 clientes, el tiempo promedio de ocupación de un lugar de
+la sala de espera fue de 27.305 minutos, la ocupación promedio de un
+lugar de la sala de espera fue de 25.4\% y la cantidad máxima de
+clientes que hubo en el salón de espera fue de 3.
+
+Finalmente, en la figura 7.8 se muestran los histogramas de los tiempos
+de permanencia en la peluquería de los dos tipos de clientes. Como se
+puede observar en esta figura, el primer tipo de cliente permanece en
+el sistema un tiempo promedio de 24.247 minutos y el segundo tipo de
+cliente permanece 30.85 minutos.
+
+\begin{table}[H]
+\centering
+\caption*{\textbf{Figura 7.7} Codificación del ejemplo 7.3 al considerar tiempo entre llegadas y tiempo de servicio exponencial}
+\begin{tabular}{lll}
+\toprule
+\multicolumn{3}{l}{1 \quad Function \quad RN1, C24} \\
+\midrule
+\multicolumn{3}{l}{0.0,0.0/0.1,0.104/0.2,0.222/0.3,0.355/0.4,0.509/0.5,0.69} \\
+\multicolumn{3}{l}{0.6,0.915/0.7,1.2/0.75,1.38/0.8,1.6/0.84,1.83/0.88,2.12} \\
+\multicolumn{3}{l}{0.9,2.3/0.92,2.52/0.94,2.81/0.95,2.99/0.96,3.2/0.97,3.5} \\
+\multicolumn{3}{l}{0.98,3.9/0.99,4.6/0.995,5.3/0.998,6.2/0.999,7/0.9997,8} \\
+\midrule
+ & Generate & 65, FN1 \quad \textit{Llegadas del 1er. tipo de cliente} \\
+ & Transfer & Both,,Away \quad \textit{Ver si hay lugar disponible} \\
+ & Enter & 1 \quad \textit{Entra a la sala de espera} \\
+ & Seize & 1 \quad \textit{Se inicia el servicio} \\
+ & Advance & 15, FN1 \quad \textit{Corte de pelo} \\
+ & Release & 1 \quad \textit{Se termina el servicio} \\
+ & Tabulate & 1 \quad \textit{Tiempo en el sis. del 1er. tipo de cliente} \\
+ & Leave & 1 \quad \textit{Deja un espacio en la sala de espera} \\
+ & Terminate & 1 \quad \textit{Se incrementa contador} \\
+ & Generate & 75, FN1 \quad \textit{Llegada del 2do. tipo de cliente} \\
+ & Transfer & Both,,Away \quad \textit{Ver si hay lugar disponible} \\
+ & Enter & 1 \quad \textit{Entra a la sala de espera} \\
+ & Seize & 1 \quad \textit{Se inicia el servicio} \\
+ & Advance & 7, FN1 \quad \textit{Servicio de rasura} \\
+ & Advance & 15, FN1 \quad \textit{Corte de pelo} \\
+ & Release & 1 \quad \textit{Se termina el servicio} \\
+ & Tabulate & 2 \quad \textit{Tiempo en el sist. 2do. tipo de cliente} \\
+ & Leave & 1 \quad \textit{Deja un espacio en la sala de espera} \\
+ & Terminate & 1 \quad \textit{Se incrementa contador} \\
+Away & Terminate & \textit{Los que no encuentran lugar} \\
+1 & Storage & 3 \quad \textit{Tres lugares para esperar} \\
+1 & Table & M1,5,10,20 \quad \textit{Histograma de frecuencias} \\
+2 & Table & M1,5,10,20 \quad \textit{Histograma de frecuencias} \\
+ & Start & 10, NP \quad \textit{Elimina estado transiente} \\
+ & Reset & \\
+ & Start & \\
+ & End & 1000 \quad \textit{Salida de 1000 clientes} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%==========================================================
+\section*{PROBLEMAS}
+
+\begin{enumerate}
+\item[7.1.] Cierta máquina produce partes a una razón de 1 pieza cada
+15 minutos. El tiempo requerido para inspeccionar estas piezas sigue
+una distribución uniforme entre 8 y 14 minutos. El inspector que
+examina las piezas aproximadamente acepta el 90\% de las piezas
+examinadas. Sin embargo, si una pieza es rechazada, ésta pasa a ser
+reprocesada. El tiempo de reproceso sigue una distribución uniforme
+entre 10 y 18 minutos. Si se simula la inspección de 1000 piezas,
+¿Cuál es el tiempo promedio que una pieza permanece en el sistema?
+
+\item[7.2.] Los estudiantes del ITESM llegan a la copiadora xerox de la
+biblioteca a una razón de uno cada $10 \pm 15$ minutos (distribución
+uniforme). El tiempo de servicio sigue una distribución uniforme entre
+6 y 10 minutos. Sin embargo, si el estudiante encuentra en la cola más
+de 10 personas esperando, él decide dar un recorrido de 10 minutos por
+la biblioteca. Si se simula el servicio de 1000 estudiantes, determine
+el contenido promedio de la cola y el tiempo promedio de permanencia en
+el sistema.
+
+\item[7.3.] Al comedor de estudiantes del ITESM llegan dos tipos de
+clientes. El tiempo entre llegadas de los dos tipos de clientes es
+uniforme entre 5 y 11 minutos. El 65\% de las personas que llegan al
+comedor son profesores y el resto estudiantes. El tiempo requerido para
+servir los alimentos a un profesor es uniforme entre 2 y 6 minutos, y el
+tiempo de servicio para un estudiante es uniforme entre 3 y 7 minutos.
+Si la capacidad del comedor es de 200 personas, determine el tiempo
+promedio que cada tipo de cliente permanece en el sistema, al momento
+de que hayan pasado por el comedor 2000 personas.
+
+\item[7.4.] Resolver utilizando GPSS el problema 5.12.
+\item[7.5.] Resolver utilizando GPSS el problema 5.13.
+\item[7.6.] Para el problema 5.14, determine mediante GPSS la cantidad
+de clientes que al llegar no encuentran lugar en el estacionamiento.
+Resuelva este mismo problema suponiendo que el estacionamiento tiene 4,
+5, 7 y 8 lugares disponibles.
+\item[7.7.] Resolver utilizando GPSS el problema 5.16.
+\item[7.8.] Resolver utilizando GPSS el problema 5.17.
+\item[7.9.] Los estudiantes del ITESM arriban a la biblioteca de
+acuerdo a una distribución exponencial con media de 3 minutos. La
+biblioteca consta de 4 pisos con capacidades de 250 para \ldots
+\emph{(problema incompleto en el original consultado)}
+\end{enumerate}
+
+\end{document}

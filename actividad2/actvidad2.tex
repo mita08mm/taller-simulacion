@@ -1,0 +1,464 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\geometry{margin=2.5cm}
+\begin{document}
+
+\section*{Guía Metodológica y Técnica Integral}
+\addcontentsline{toc}{section}{Guía Metodológica y Técnica Integral}
+\begin{center}
+\large Análisis de Mercado y Herramienta de Recolección de Datos\\
+(Enfoque ARCUSUR)
+\end{center}
+
+\section{Presentación y Enunciado Director}
+
+Esta guía metodológica y técnica se diseña para orientar la ejecución de un
+Análisis de Mercado sobre el perfil, expectativas de formación y
+empleabilidad de los titulados de la carrera de Ingeniería en Sistemas. Los
+resultados obtenidos servirán como insumo empírico fundamental para
+alimentar el Plan de Desarrollo Estratégico y respaldar el proceso de
+acreditación ante el sistema ARCUSUR.
+
+\textbf{Enunciado Director:} Desarrollar un \emph{pipeline} de análisis
+estadístico descriptivo, exploratorio, de ingeniería de software y
+experimentación por simulación de sistemas sobre un conjunto estructurado
+de datos de titulados profesionales de ingeniería de sistemas, con el fin
+de cuantificar tendencias de formación continua, identificar patrones
+demográficos y de preferencia académica, y proveer métricas robustas que
+justifiquen la actualización curricular y la gestión de alianzas
+estratégicas institucionales.
+
+\section{Estructura Oficial del Documento de Análisis de Mercado}
+
+Para que el informe final cumpla con los estándares académicos e
+institucionales exigidos, se utilizará la siguiente tabla de contenidos:
+
+\begin{enumerate}
+    \item \textbf{Introducción y Justificación} \\
+    Antecedentes del estudio de mercado, objetivos (general y específicos)
+    y justificación frente a los criterios de pertinencia y acreditación
+    ARCUSUR.
+
+    \item \textbf{Marco Metodológico} \\
+    Diseño cuantitativo y exploratorio, definición de la población
+    objetivo, técnicas de recolección de datos y especificación del
+    pipeline de procesamiento estadístico (Data Wrangling, estadística
+    univariada, bivariada con pruebas $\chi^2$ y visualización
+    computacional).
+
+    \item \textbf{Análisis de la Demanda Educativa y Perfil de los
+    Titulados} \\
+    Caracterización demográfica, temporal (media y desviación estándar de
+    la antigüedad de egreso) y presentación de matrices de datos e
+    indicadores de formación continua y fuentes de financiamiento.
+
+    \item \textbf{Análisis de la Oferta Laboral y Requerimientos del
+    Sector Productivo} \\
+    Mapeo de áreas tecnológicas de alta demanda, evaluación de
+    competencias técnicas/transversales y ejemplos prácticos de
+    modelamiento analítico.
+
+    \item \textbf{Diagnóstico y Síntesis de Resultados} \\
+    Cruces de variables clave, matrices de frecuencia cruzada y hallazgos
+    principales para la Dirección de Carrera.
+
+    \item \textbf{Conclusiones y Propuestas Estratégicas} \\
+    Líneas de acción orientadas a los egresados (fomento de becas,
+    posgrados modulares, vinculación empresarial B2B y observatorio
+    permanente).
+
+    \item \textbf{Referencias Bibliográficas} (Según Normativa APA 7\textsuperscript{a} edición).
+\end{enumerate}
+
+\section{Especificaciones Técnicas para el Desarrollo de la Herramienta de Recolección de Datos}
+
+La herramienta de recolección (formulario web / sistema de encuestas) debe
+construirse para capturar de forma limpia las variables requeridas en el
+análisis. A continuación, se detallan las Historias de Usuario clave que
+guiarán su desarrollo, junto con las directrices exactas de interpretación
+analítica de la información generada.
+
+\subsection*{Historia de Usuario 1: Registro de Antigüedad y Empleabilidad}
+
+\textbf{Enunciado:} Como titulado de Ingeniería en Sistemas, quiero
+registrar mi año de egreso, estado de ocupación actual y sector de
+desempeño en la herramienta, para que la dirección de carrera conozca el
+perfil temporal y la tasa de inserción de mi cohorte.
+
+\textbf{Implementación técnica sugerida:} Campos obligatorios de tipo
+numérico para el año de egreso y menús desplegables cerrados (dropdowns)
+para sector y estado laboral, evitando sesgos por texto libre.
+
+\textbf{Interpretación adecuada de la información:} Permite calcular
+estadísticos descriptivos univariados (media, mediana y desviación
+estándar de los años transcurridos desde la titulación). Su lectura indica
+el grado de madurez profesional de la muestra, permitiendo segmentar a los
+egresados entre profesionales junior (alta demanda de especializaciones
+iniciales) y mandos consolidados.
+
+\subsection*{Historia de Usuario 2: Preferencias de Formación Continua y Áreas de Interés}
+
+\textbf{Enunciado:} Como titulado, quiero indicar el nivel de posgrado de
+mi interés (Maestría, Especialidad, Doctorado) y el área temática
+prioritaria (ej. Ciencia de Datos, Ciberseguridad, Desarrollo de
+Software), para que la universidad oriente su oferta académica hacia las
+tecnologías con mayor demanda real.
+
+\textbf{Implementación técnica sugerida:} Preguntas de selección múltiple
+con límite o selección única jerárquica para evitar ambigüedades en la
+categorización de datos.
+
+\textbf{Interpretación adecuada de la información:} Genera distribuciones
+de frecuencia absoluta y relativa. Permite identificar concentraciones
+críticas de mercado (por ejemplo, cuando ramas como Ciencia de Datos e
+Ingeniería de Software agrupan más del 70\% de las preferencias), lo que
+justifica técnica y financieramente la apertura de nuevos programas
+académicos modulares o híbridos.
+
+\subsection*{Historia de Usuario 3: Identificación de Mecanismos de Financiamiento}
+
+\textbf{Enunciado:} Como titulado, quiero reportar las fuentes de
+financiamiento estimadas para mis futuros estudios (recursos propios,
+becas estatales, créditos educativos o patrocinio empresarial), para que
+la institución detecte restricciones económicas y gestione alianzas
+estratégicas.
+
+\textbf{Implementación técnica sugerida:} Opción de selección categórica
+nominal con categorías mutuamente excluyentes o ponderadas.
+
+\textbf{Interpretación adecuada de la información:} Facilita la
+construcción de tablas de contingencia cruzadas con el tipo de posgrado
+deseado y la aplicación de pruebas de independencia (Chi-Cuadrada). Su
+correcta interpretación revela si existe dependencia financiera (ej. alta
+vulnerabilidad ligada a recursos propios o becas limitadas), orientando
+directrices directas como la firma de convenios con banca y la
+diversificación de becas institucionales.
+
+\subsection*{Historia de Usuario 4: Evaluación de Brechas en Competencias Profesionales}
+
+\textbf{Enunciado:} Como titulado con experiencia en el mercado, quiero
+evaluar la suficiencia de las competencias técnicas (hard skills) y
+transversales (soft skills) adquiridas en mi formación de grado frente a
+los requerimientos de mi puesto, para retroalimentar la malla curricular.
+
+\textbf{Implementación técnica sugerida:} Escalas Likert (de 1 a 5)
+combinadas con campos de texto estructurado opcional.
+
+\textbf{Interpretación adecuada de la información:} Proporciona un
+diagnóstico cuantitativo del nivel de satisfacción y de las brechas
+formativas detectadas en el mercado laboral. Estos puntajes medios y
+desviaciones estándar actúan como evidencia empírica directa requerida por
+los pares evaluadores en los procesos de acreditación de calidad.
+
+\subsection*{Historia de Usuario 5: Automatización de Reportes y Matrices de Frecuencia Cruzada}
+
+\textbf{Enunciado:} Como administrador del sistema y miembro del comité de
+evaluación, quiero exportar matrices de frecuencia cruzada y gráficos
+estadísticos interactivos (mapas de calor y diagramas de radar), para
+sustentar con rigor matemático el Plan de Desarrollo Estratégico.
+
+\textbf{Implementación técnica sugerida:} Módulo de exportación de datos
+en formato tabular limpio (CSV/Excel) y un panel analítico (dashboard)
+automatizado en el backend.
+
+\textbf{Interpretación adecuada de la información:} Sintetiza la fase de
+Data Wrangling y análisis exploratorio computacional. Traduce
+interacciones de datos complejos en reportes listos para la toma de
+decisiones gerenciales y académicas, garantizando trazabilidad y
+transparencia en los compromisos de mejora continua de la carrera.
+
+\section{Producto Final}
+
+La guía metodológica y técnica resultará en un documento final de Análisis
+de Mercado sobre el perfil, expectativas de formación y empleabilidad de
+los titulados de la carrera de Ingeniería en Sistemas.
+
+Así mismo, al final se deberá contar con una herramienta de software de
+colección de datos que permita experimentar y analizar diferentes
+escenarios que permitan entender y apoyar la toma de decisiones de gestión
+académica que potencia permanentemente la capacidad académica y de fuerza
+laboral de los profesionales que salen de la Universidad Mayor de San
+Simón.
+
+\section{Recomendaciones y Plazos}
+
+Este enunciado es referencial por lo que el estudiante deberá respaldar
+fehacientemente la toma de datos en campo en relación a las empresas e
+industrias vinculadas de otra manera a la tecnología computacional. Esta
+actividad requiere individualizar al menos tres empresas de desarrollo de
+software o del ámbito dedicado al negocio de las tecnologías, una del
+ámbito público y otra del ámbito privado.
+
+Respecto de la fecha de entrega de esta actividad es el 13 de septiembre
+de los corrientes, de acuerdo a la modalidad ya practicada en la actividad
+anterior.
+
+\section{Anexos}
+
+La encuesta propuesta es la siguiente:
+
+\subsection*{Encuesta de opinión a titulados de Ingeniería en Sistemas}
+
+\textit{Estimad@ Ingenier@: La Carrera de Ingeniería en Sistemas está en
+proceso de Autoevaluación para la elaboración de un PLAN DE DESARROLLO
+ESTRATÉGICO en el marco de una futura postulación de acreditación ante el
+ARCUSUR. Por lo que debido a la gran importancia de este proceso le
+pedimos por favor que pueda ayudarnos compartiendo su opinión sobre varios
+aspectos importantes de la Carrera.}
+
+\subsubsection*{0. Datos generales}
+
+\begin{itemize}[nosep]
+    \item Edad que tiene actualmente (opción única, hasta ``35 años o más'').
+    \item Género (opción única): Hombre / Mujer / Otro.
+\end{itemize}
+
+\subsubsection*{Formación complementaria}
+
+\begin{itemize}[nosep]
+    \item ¿Ha realizado o se encuentra realizando algún programa de
+    formación complementaria (posgrado, diplomado, doble titulación,
+    especialización, etc.)? SI / NO
+    \item ¿Cuál es el programa de formación complementaria de mayor nivel
+    que ha concluido o que se encuentra realizando? Diplomado /
+    Especialidad / Maestría / Doctorado / Pos doctorado.
+    \item ¿Dónde ha cursado el programa indicado? EUPG / Dirección de
+    Posgrado FCyT / IBNORCA / Universidades internacionales /
+    Universidades públicas nacionales / Universidades privadas nacionales
+    / Otro.
+    \item ¿Cuál fue la fuente de financiamiento para cursar el programa
+    indicado? Financiado con recursos propios / Total financiamiento por
+    medio de una beca / Financiado parcialmente por medio de una beca.
+    \item Indique el nombre del programa (texto libre).
+\end{itemize}
+
+\subsubsection*{Interés en posgrado}
+
+\begin{itemize}[nosep]
+    \item ¿Estaría interesado en realizar estudios en algún programa de
+    posgrado dentro de las áreas de la Ingeniería en Sistemas? SI / NO
+    \item ¿En cuál de las siguientes áreas le interesaría realizar el
+    programa? IA / Robótica / Ingeniería de Software / Base de Datos /
+    Redes de Datos y Seguridad.
+    \item En caso de realizar un estudio de posgrado ¿en qué organización
+    educativa optaría por realizar sus estudios? (mismas opciones que
+    ``¿Dónde ha cursado el programa indicado?'').
+    \item Opinión (escala Likert: Totalmente en desacuerdo / En
+    desacuerdo / De acuerdo / Totalmente de acuerdo) sobre: ¿Considera que
+    existen programas de formación de posgrado ofertados en la Dirección
+    de Posgrado de la FCyT que son afines a las áreas de especialidad de
+    un Ingeniero en Sistemas?
+\end{itemize}
+
+\subsubsection*{Trayectoria profesional}
+
+\begin{itemize}[nosep]
+    \item ¿Cuántos son los años de vida profesional que lleva hasta la
+    fecha? (numérico)
+    \item De esa cantidad, ¿qué cantidad corresponde al total de tiempo
+    en que se ha encontrado desempleado? (numérico)
+    \item ¿Cuál de las siguientes afirmaciones describe su situación
+    laboral actual? Actualmente trabajando en una organización /
+    Actualmente NO trabajo / Dedico mi tiempo completo a un emprendimiento
+    propio.
+    \item ¿Cuál es el origen del desarrollo de su propio emprendimiento?
+    Idea propia / Idea conjunta con compañeros / StartUp / Spin Off
+    (derivado de un proyecto de la Universidad) / Otro.
+    \item ¿Qué tipo de entregable genera el negocio? Producto / Servicio
+    / Ambos.
+    \item ¿Ha requerido financiamiento externo para su negocio? Sí,
+    mediante préstamos bancarios / Sí, mediante inversores / No,
+    financiamiento propio.
+    \item Escala Likert (Insatisfecho / Algo satisfecho / Satisfecho):
+    ¿Qué tan satisfecho está con el rendimiento actual de su negocio?
+    \item Escala Likert (No es importante / Poco importante / Importante
+    / Muy importante): ¿Qué tan importante considera que fue su formación
+    en Ingeniería en Sistemas para iniciar y gestionar su negocio?
+    \item ¿El trabajo que ejerce actualmente es su primer empleo? SI / NO
+    \item Luego de titularse, ¿cuánto tiempo se demoró en conseguir su
+    primer trabajo relacionado con su formación? Ya trabajaba antes de
+    titularse / Menos de 1 mes / Entre 1--4 meses / Entre 4--8 meses /
+    Entre 8--12 meses / Más de 12 meses.
+    \item Desde que se tituló, ¿en cuántos empleos se ha desempeñado?
+    (incluyendo el actual) 1 / 2 / 3 / Más de 3.
+\end{itemize}
+
+\subsubsection*{Satisfacción con la formación}
+
+\begin{itemize}[nosep]
+    \item Escala Likert (Totalmente en desacuerdo / En desacuerdo / De
+    acuerdo / Totalmente de acuerdo): De manera global, ¿cuál es el grado
+    de satisfacción que ha desarrollado con la formación profesional
+    recibida en la Carrera de Ingeniería de Sistemas?
+    \item Escala Likert (misma escala): Considera que existe concordancia
+    entre la formación profesional recibida en la Carrera y los
+    requerimientos (del mercado laboral).
+    \item ¿Qué aspectos de la Carrera les resultaron de bastante utilidad?
+    (elección múltiple): aplicación práctica de conceptos teóricos en
+    proyectos reales / oportunidad de pasantías o prácticas profesionales
+    / distribución de horarios de clases / desarrollo de habilidades
+    analíticas y de resolución de problemas / colaboración de equipos
+    multidisciplinarios / enseñanza de herramientas y software específico
+    de la industria.
+    \item ¿Qué aspectos de la Carrera considera que pueden mejorarse?
+    (elección múltiple): mayor integración teoría-práctica / mayor
+    relacionamiento con empresas por prácticas profesionales /
+    distribución de horarios (horario para trabajadores, módulos
+    virtuales, etc.) / actualización constante del plan de estudios /
+    incremento de actividades extracurriculares (investigación, servicio
+    social, etc.) / ofrecimiento de más opciones de especialización.
+    \item Indique 5 asignaturas cursadas que considera que le brindaron
+    una ventaja competitiva (elección múltiple, opciones: Introducción /
+    Base de Datos / Inteligencia Artificial / Redes de Computadora /
+    Electivas / T.I.S. / Básicas (Física, Cálculo, Álgebras) /
+    Planificación de Proyectos y Gestión / Tecnología Redes Avanzadas /
+    otra asignatura -- texto libre).
+    \item Indique 5 asignaturas cursadas que no le resultaron de mucha
+    utilidad (elección múltiple, opciones: Básicas (Física, Cálculo,
+    Álgebras) / Aplic. Interactivas para Televisión Digital / Telefonía
+    IP / Web Semánticas / Graficación por Computadora / Robótica / Taller
+    de Programación en Bajo Nivel / Teoría de Autómatas y Leng. Formales /
+    Programación Funcional / Teoría de Grafos / Contabilidad Básica /
+    otra asignatura -- texto libre).
+\end{itemize}
+
+\subsubsection*{Red de contactos}
+
+\begin{itemize}[nosep]
+    \item ¿Le interesaría formar parte de una red de contactos oficial de
+    la Carrera? SI / NO
+    \item Email de contacto (texto libre).
+    \item Número telefónico de contacto, de preferencia con WhatsApp
+    (texto libre).
+    \item Link de LinkedIn (texto libre).
+\end{itemize}
+
+\subsection*{Encuesta a empleadores}
+
+\textit{La Carrera de Ingeniería de Sistemas de la Facultad de Ciencias y
+Tecnología (UMSS), en el marco de su proceso de Autoevaluación Académica,
+desarrolla la etapa de recopilación de información primaria mediante la
+aplicación del presente cuestionario dirigido a empleadores de
+profesionales titulados de la Carrera. El objetivo es conocer la
+percepción del sector empleador respecto al desempeño profesional,
+competencias, capacidades y formación académica de los Ingenieros de
+Sistemas titulados por la UMSS, con la finalidad de identificar
+fortalezas y oportunidades de mejora en el proceso formativo de la
+Carrera. La información será utilizada exclusivamente con fines
+académicos e institucionales, garantizando confidencialidad y anonimato.}
+
+\begin{enumerate}
+    \item Correo (obligatorio).
+    \item Nombre de la Empresa o Institución (obligatorio, texto libre).
+    \item Tipo de organización (obligatorio): Público / Privado.
+    \item Tamaño de la organización (obligatorio): Grande (100+
+    funcionarios) / Mediana (31--99) / Pequeña (11--30) / Micro (hasta 10).
+    \item Rubro o sector principal de la organización (obligatorio,
+    opción única): Desarrollo de software / Servicios de TI /
+    Telecomunicaciones y redes / Soporte técnico y mantenimiento de
+    sistemas / Consultoría en sistemas / transformación digital / Banca y
+    servicios financieros / Instituciones públicas / gobierno / Educación
+    e investigación / Industria y manufactura / Comercio y comercio
+    electrónico / Salud / Seguridad informática / ciberseguridad /
+    Análisis de datos / inteligencia de negocios / Startups o
+    emprendimientos tecnológicos / Otros.
+\end{enumerate}
+
+\subsubsection*{Empleabilidad}
+
+Se busca conocer la demanda laboral, oportunidades de contratación y
+desempeño de los profesionales titulados de Ingeniería de Sistemas en las
+organizaciones, con el fin de evaluar la pertinencia de la formación
+profesional frente a las necesidades del entorno laboral.
+
+\begin{enumerate}[resume]
+    \item ¿La organización ha contratado Ingenieros de la carrera de
+    Sistemas en los últimos 5 años? SI / NO
+    \item Considerando las necesidades actuales y proyectadas, ¿existe la
+    posibilidad de incorporar Ingenieros de Sistemas en los próximos
+    años? Alta probabilidad de contratación / Depende del crecimiento o
+    nuevos proyectos / No se tiene prevista la contratación actualmente /
+    No requiere profesionales del área.
+    \item ¿Qué nivel de formación académica o actualización profesional
+    demanda su organización para contratar nuevos profesionales del
+    área? Licenciatura / Diplomado / Especialidad / Maestría / Doctorado
+    / Post-doctorado.
+    \item ¿A través de qué medio convoca a profesionales en su
+    organización? Medios escritos y audiovisuales / Internet y redes
+    sociales / Postulación competitiva (convocatorias públicas y
+    privadas) / Oferta profesional personal / Recomendación de terceros /
+    Otros.
+    \item ¿Qué tipo de cargos desempeñan los profesionales titulados de
+    la Carrera en su organización? (selección múltiple, obligatorio): de
+    apoyo / asistencia tecnológica / técnico (desarrollo de software,
+    administración de sistemas, redes, bases de datos, soporte TI) /
+    analista (sistemas, datos, procesos o soluciones tecnológicas) /
+    especialista (ciberseguridad, arquitectura de software,
+    infraestructura tecnológica, etc.) / supervisor / coordinador de área
+    tecnológica / jefatura o gerencial (gestión de proyectos, dirección
+    de TI, transformación digital) / consultor tecnológico / otro.
+    \item Desde su experiencia en el sector laboral, ¿qué nuevas áreas de
+    conocimiento, tecnologías o tendencias emergentes considera
+    importantes para la formación del profesional? (texto libre).
+    \item ¿Cuáles son las nuevas herramientas tecnológicas (software,
+    plataformas o entornos de desarrollo) que debería conocer y manejar
+    el profesional titulado? (texto libre).
+    \item Desde su experiencia, ¿qué habilidades, competencias y
+    destrezas considera fundamentales que debe desarrollar el profesional
+    de Ingeniería de Sistemas? (texto libre).
+\end{enumerate}
+
+\subsubsection*{Formación y perfil profesional}
+
+Se busca conocer la valoración de los empleadores sobre la formación,
+competencias y desempeño profesional de los titulados de Ingeniería de
+Sistemas, con el propósito de fortalecer la calidad académica y adecuar
+el perfil profesional a las necesidades del mercado laboral. Escala:
+Totalmente de acuerdo / Parcialmente de acuerdo / Totalmente en
+desacuerdo / No sabe. Criterios evaluados:
+
+\begin{itemize}[nosep]
+    \item La Carrera de Ingeniería de Sistemas de la UMSS brinda
+    confianza a nuestra organización como formadora de profesionales del
+    área tecnológica.
+    \item Considero que el título profesional otorgado por la Carrera es
+    consistente con el nivel de formación y las competencias demostradas
+    por sus titulados.
+    \item Las autoridades de la Carrera consultan regularmente nuestra
+    opinión como empleadores respecto al perfil profesional y las
+    competencias requeridas en el ámbito laboral.
+    \item Conozco el perfil profesional y las competencias de egreso
+    declaradas por la Carrera.
+    \item El perfil profesional declarado por la Carrera es coherente con
+    el desempeño laboral demostrado por sus titulados.
+    \item La formación proporcionada por la Carrera permite a sus
+    titulados alcanzar un desempeño destacado tanto en el ámbito
+    profesional como en su formación integral.
+    \item La Carrera considera nuestra opinión como empleadores e
+    incorpora las necesidades del sector laboral en la definición y
+    mejora de actividades de formación práctica, pasantías y modalidades
+    de titulación.
+    \item El desempeño profesional de los titulados evidencia el
+    desarrollo de competencias laborales como: comunicación efectiva,
+    análisis y resolución de problemas, pensamiento crítico, aprendizaje
+    continuo, trabajo en equipo, iniciativa personal y manejo adecuado de
+    tecnologías de información.
+    \item Los profesionales titulados demuestran valores y actitudes
+    relacionados con la ética profesional, responsabilidad social,
+    inclusión, diversidad, respeto a los derechos humanos y compromiso
+    con el medio ambiente.
+    \item He participado en procesos de recopilación de información,
+    evaluación o retroalimentación relacionados con el desempeño laboral
+    de los titulados de la Carrera.
+\end{itemize}
+
+\end{document}
+    

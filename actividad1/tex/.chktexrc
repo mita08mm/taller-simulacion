@@ -1,0 +1,32 @@
+# Desactivar TODAS las reglas de ChkTeX
+# Este archivo desactiva completamente el análisis de estilo de ChkTeX
+
+# Desactivar advertencias específicas (todas las que aparecen en el proyecto)
+CmdLine
+{
+    # Silenciar advertencias
+    -n1   # Command terminated with space
+    -n3   # Enclose parenthesis with {}
+    -n8   # Wrong length of dash
+    -n9   # ] expected found )
+    -n11  # Use \ldots for ellipsis
+    -n18  # Use `` or '' for quotes
+    -n24  # Delete space for page references
+    -n36  # Space before parenthesis
+    -n40  # Other cosmetic warnings
+}
+
+# Silenciar absolutamente todo
+QuoteStyle
+{
+    # No verificar estilos de comillas
+}
+
+# No verificar nada en modo verbatim o texttt
+VerbEnvir
+{
+    texttt
+    verbatim
+    lstlisting
+    Verbatim
+}

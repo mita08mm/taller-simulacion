@@ -1,0 +1,6 @@
+# Sistema
+.DS_Store
+**/.DS_Store
+
+# PDFs (son salida de build de LaTeX, se regeneran con latexmk; no se trackean)
+*.pdf

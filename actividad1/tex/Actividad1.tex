@@ -1,0 +1,178 @@
+\documentclass[12pt]{article}
+
+% chktex-file 1
+% chktex-file 3
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{booktabs}
+
+\geometry{margin=2.5cm}
+\begin{document}
+
+\section*{Actividad de Taller de Simulación de Sistemas}
+\addcontentsline{toc}{section}{Actividad de Taller de Simulación de Sistemas}
+
+Deberá estructurar la entrega de su trabajo de acuerdo a los siguientes puntos:
+\begin{enumerate}
+    \item Modelo de simulación teórico de los problemas asignados.
+    \item La simulación implementada en Excel: corresponde a la simulación manual y los correspondientes gráficos.
+    \item El programa Java de simulación: El punto de partida es el modelo teórico de Simulación.
+    \item Llevar a cabo la validación correspondiente en el modelo de simulación manual y aquel implementado.
+    \item Presentar los requerimientos respecto de informe, diapositivas y código fuente ya explicados en clase.
+\end{enumerate}
+
+A continuación los ejercicios que hacen a su actividad de taller de simulación.
+
+\section{Parte 1: Dos problemas distintos}
+
+\subsection{Problema 1: Función dada (aplicar transformada inversa)}
+
+La función de densidad proporcionada es:
+
+\[
+f(x)=
+\begin{cases}
+\dfrac{(x-3)^2}{18}{}, & 0 \leq x \leq 6 \\
+0, & 0 > x > 6
+\end{cases}
+\]
+
+El objetivo consiste en generar valores aleatorios mediante el método de transformada inversa y verificar que los valores obtenidos pertenezcan al intervalo $[0,6]$.
+
+\subsection{Problema 2: Gráfico dado (repetición según apuntes)}
+
+En este segundo problema de la Parte 1 se trabaja con el gráfico proporcionado por el docente, siguiendo el mismo procedimiento explicado en los apuntes de clase.
+
+\begin{center}
+\begin{tikzpicture}[scale=1.2]
+
+% Ejes
+\draw[->] (0,0) -- (8,0) node[right] {$x$};
+\draw[->] (0,0) -- (0,4) node[above] {$f(x)$};
+
+% Triángulo
+\draw (1.5,0) -- (4,3) -- (6.5,0);
+
+% Línea punteada
+\draw[dashed] (4,0) -- (4,3);
+
+% Etiquetas
+\node[below] at (1.5,0) {$a$};
+\node[below] at (4,0) {$b$};
+\node[below] at (6.5,0) {$c$};
+
+\end{tikzpicture}
+\end{center}
+
+\section{Parte 2: Aplicaciones de Simulación}
+
+\subsection{Problema 1}
+
+La demanda diaria y el tiempo de entrega de un cierto producto, siguen las siguientes distribuciones de probabilidad:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Demanda diaria & Probabilidad \\
+\midrule
+0 & 0.04 \\
+1 & 0.06 \\
+2 & 0.10 \\
+3 & 0.20 \\
+4 & 0.30 \\
+5 & 0.18 \\
+6 & 0.08 \\
+7 & 0.03 \\
+8 & 0.01 \\
+\bottomrule
+\end{tabular}
+\qquad
+\begin{tabular}{cc}
+\toprule
+Tiempo de entrega (días) & Probabilidad \\
+\midrule
+1 & 0.25 \\
+2 & 0.50 \\
+3 & 0.20 \\
+4 & 0.05 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La información con respecto a los costos relevantes es la siguiente:
+
+\begin{itemize}
+    \item Costo de ordenar: \$50/orden
+    \item Costo de inventario: \$26/unidad/año
+    \item Costo de faltante: \$25/unidad
+\end{itemize}
+
+Si el inventario inicial es de 15 unidades, ¿determine la cantidad óptima a ordenar (q) y el nivel óptimo de reorden (R)? (Asuma que se trabajan 260 días en el año.)
+
+\subsection{Problema 2}
+
+La demanda diaria y el tiempo de entrega de un cierto producto, siguen las siguientes distribuciones de probabilidad:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Demanda diaria & Probabilidad \\
+\midrule
+25 & 0.02 \\
+26 & 0.04 \\
+27 & 0.06 \\
+28 & 0.12 \\
+29 & 0.20 \\
+30 & 0.24 \\
+31 & 0.15 \\
+32 & 0.10 \\
+33 & 0.05 \\
+34 & 0.02 \\
+\bottomrule
+\end{tabular}
+\qquad
+\begin{tabular}{cc}
+\toprule
+Tiempo de entrega (días) & Probabilidad \\
+\midrule
+1 & 0.20 \\
+2 & 0.30 \\
+3 & 0.25 \\
+4 & 0.25 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Si el producto no está disponible cuando es requerido, el cliente puede esperar la llegada de un nuevo lote por un tiempo limitado, es decir, si el cliente decide esperar 2 días y la mercancía no llega en ese tiempo, entonces, la demanda de este cliente se considera perdida. La distribución de probabilidad del tiempo que un cliente está dispuesto a esperar para que se le surta su pedido, es la siguiente:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+Tiempo de espera (días) & Probabilidad \\
+\midrule
+0 & 0.40 \\
+1 & 0.20 \\
+2 & 0.15 \\
+3 & 0.15 \\
+4 & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+La información con respecto a los costos relevantes es la siguiente:
+
+\begin{itemize}
+    \item Costo de ordenar: \$100/orden
+    \item Costo de inventario: \$52/unidad/año
+    \item Costo de faltante suponiendo que el cliente espera: \$20/unidad
+    \item Costo de faltante suponiendo que el cliente NO espera: \$50/unidad
+\end{itemize}
+
+Si el inventario inicial es de 100 unidades, ¿determine la cantidad óptima a ordenar (q) y el nivel óptimo de reorden (R)? (Asuma que se trabajan 260 días en el año.)
+
+\end{document}

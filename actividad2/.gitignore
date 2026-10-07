@@ -1,0 +1,17 @@
+# Sistema
+.DS_Store
+
+# LaTeX: solo .tex deben quedar visibles (los PDF se ignoran a nivel repo);
+# todo lo demás (aux, log, fls, fdb_latexmk, toc, out, synctex) va a build/ y se ignora
+build/
+tex/build/
+**/*.aux
+**/*.log
+**/*.fls
+**/*.fdb_latexmk
+**/*.out
+**/*.toc
+**/*.synctex.gz
+
+# Sobrantes sueltos
+texput.log

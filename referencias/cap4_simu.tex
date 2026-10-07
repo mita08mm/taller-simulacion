@@ -1,0 +1,409 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,provide=*]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{enumitem}
+
+\renewcommand{\arraystretch}{1.15}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\linespread{1.3}\selectfont 4. GENERACIÓN DE VARIABLES ALEATORIAS NO-UNIFORMES\par}
+\end{center}
+\vspace{0.5cm}
+
+\setcounter{chapter}{4}
+\setcounter{page}{49}
+
+%==========================================================
+En todo modelo de simulación estocástico, existen una o varias variables aleatorias interactuando. Generalmente, estas variables siguen distribuciones de probabilidad teóricas o empíricas diferentes a la distribución uniforme. Por consiguiente, para simular este tipo de variables, es necesario contar con un generador de números uniformes y una función que a través de un método específico, transforme estos números en valores de la distribución de probabilidad deseada. Existen varios procedimientos para lograr este objetivo. Entre los procedimientos más comunes y más difundidos se pueden mencionar: 1) El método de la transformada inversa, 2) El método de rechazo, 3) El método de composición y 4) Procedimientos especiales.
+
+%==========================================================
+\section*{4.1. Método de la transformada inversa}
+
+El método de la transformada inversa utiliza la distribución acumulada $F(x)$ de la distribución que se va a simular. Puesto que $F(x)$ está definida en el intervalo $(0, 1)$, se puede generar un número aleatorio uniforme $R$ y tratar de determinar el valor de la variable aleatoria para la cual su distribución acumulada es igual a $R$, es decir, el valor simulado de la variable aleatoria que sigue una distribución de probabilidad $f(x)$, se determina al resolver la siguiente ecuación:
+
+\begin{equation}
+F(x) = R \implies x = F^{-1}(R)
+\end{equation}
+
+La dificultad principal de este método descansa en el hecho de que en algunas ocasiones es difícil encontrar la transformada inversa. Sin embargo, si esta función inversa ya ha sido establecida, generando números aleatorios uniformes se podrán obtener valores de la variable aleatoria que sigan la distribución de probabilidad deseada.
+
+\subsection*{Ejemplo 4.1. Distribución exponencial}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\[
+f(x) = \begin{cases} 
+\lambda e^{-\lambda x} & \text{si } x \ge 0 \\ 
+0 & \text{si } x < 0 
+\end{cases}
+\]
+
+La distribución acumulada de esta distribución es:
+\begin{equation}
+F(x) = \int_{0}^{x} \lambda e^{-\lambda t} \, dt = 1 - e^{-\lambda x}
+\end{equation}
+
+e igualando la distribución acumulada con el número uniforme $R$, se obtiene:
+\[
+1 - e^{-\lambda x} = R \implies e^{-\lambda x} = 1 - R
+\]
+
+Pero si $R$ sigue una distribución uniforme, entonces $1 - R$ también sigue esta distribución. Por consiguiente:
+\[
+e^{-\lambda x} = R
+\]
+\begin{equation}
+x = -\frac{1}{\lambda} \ln R
+\end{equation}
+
+\subsection*{Ejemplo 4.2. Distribución uniforme}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\[
+f(x) = \begin{cases} 
+\frac{1}{b - a} & \text{si } a \le x \le b \\ 
+0 & \text{en otro caso} 
+\end{cases}
+\]
+
+La distribución acumulada de esta distribución es:
+\begin{equation}
+F(x) = \int_{a}^{x} \frac{1}{b - a} \, dt = \frac{x - a}{b - a}
+\end{equation}
+
+e igualando esta expresión con el número uniforme $R$ se obtiene:
+\[
+\frac{x - a}{b - a} = R
+\]
+\begin{equation}
+x = a + (b - a)R
+\end{equation}
+
+\subsection*{Ejemplo 4.3. Distribución empírica}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\[
+f(x) = \begin{cases} 
+x & \text{si } 0 \le x \le 1 \\ 
+1/2 & \text{si } 1 < x \le 2 
+\end{cases}
+\]
+
+La distribución acumulada de esta distribución es:
+\begin{equation}
+F(x) = \begin{cases} 
+\int_{0}^{x} t \, dt = \frac{x^2}{2} & \text{si } 0 \le x \le 1 \\[1ex]
+\frac{1}{2} + \int_{1}^{x} \frac{1}{2} \, dt = \frac{x}{2} & \text{si } 1 < x \le 2 
+\end{cases}
+\end{equation}
+
+puesto que la acumulada de la función tiene un valor de $1/2$ cuando $x = 1$, entonces el valor de la variable aleatoria $x$ se determina de acuerdo a la siguiente expresión:
+\begin{equation}
+x = \begin{cases} 
+\sqrt{2R} & \text{si } R \le 1/2 \\ 
+2R & \text{si } R > 1/2 
+\end{cases}
+\end{equation}
+
+\subsection*{Ejemplo 4.4. Distribución Poisson}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\begin{equation}
+f(x) = \frac{e^{-5} 5^x}{x!}, \quad x = 0, 1, 2, \dots
+\end{equation}
+
+Puesto que esta distribución de probabilidad es discreta, es necesario evaluar $f(x)$ para cada valor de $x$, y entonces determinar la distribución acumulada $F(x)$. Tanto la distribución de probabilidad como la distribución acumulada de esta variable aparecen en la Tabla 4.1. De acuerdo a esta distribución acumulada, la Tabla 4.2 muestra el valor que tomará la variable aleatoria $x$ dependiendo del intervalo al cual pertenece el número uniforme $R$.
+
+\begin{table}[H]
+\centering
+\caption{Distribución de probabilidad y distribución acumulada de la función $e^{-5} 5^x / x!$}
+\begin{tabular}{ccc}
+\toprule
+$x$ & \begin{tabular}[c]{@{}c@{}}Distribución de\\ probabilidad\end{tabular} & \begin{tabular}[c]{@{}c@{}}Distribución\\ acumulada\end{tabular} \\ \midrule
+0 & 0.0067 & 0.0067 \\
+1 & 0.0337 & 0.0404 \\
+2 & 0.0842 & 0.1246 \\
+3 & 0.1404 & 0.2650 \\
+4 & 0.1755 & 0.4405 \\
+5 & 0.1755 & 0.6160 \\
+6 & 0.1462 & 0.7622 \\
+7 & 0.1044 & 0.8666 \\
+8 & 0.0653 & 0.9319 \\
+9 & 0.0363 & 0.9682 \\
+10 & 0.0181 & 0.9863 \\
+11 & 0.0082 & 0.9945 \\
+12 & 0.0034 & 0.9979 \\
+13 & 0.0013 & 0.9992 \\
+14 & 0.0005 & 0.9997 \\
+15 & 0.0002 & 0.9999 \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Transformada inversa de la función $e^{-5}5^x/x!$:}
+\begin{itemize}
+    \item Si $0.0000 \le R < 0.0067$, entonces $x = 0$
+    \item Si $0.0067 \le R < 0.0404$, entonces $x = 1$
+    \item Si $0.0404 \le R < 0.1246$, entonces $x = 2$
+    \item Si $0.1246 \le R < 0.2650$, entonces $x = 3$
+    \item Si $0.2650 \le R < 0.4405$, entonces $x = 4$
+    \item Si $0.4405 \le R < 0.6160$, entonces $x = 5$
+    \item Si $0.6160 \le R < 0.7622$, entonces $x = 6$
+    \item Si $0.7622 \le R < 0.8666$, entonces $x = 7$
+    \item Si $0.8666 \le R < 0.9319$, entonces $x = 8$
+    \item Si $0.9319 \le R < 0.9682$, entonces $x = 9$
+    \item Si $0.9682 \le R < 0.9863$, entonces $x = 10$
+    \item Si $0.9863 \le R < 0.9945$, entonces $x = 11$
+    \item Si $0.9945 \le R < 0.9979$, entonces $x = 12$
+    \item Si $0.9979 \le R < 0.9992$, entonces $x = 13$
+    \item Si $0.9992 \le R < 0.9997$, entonces $x = 14$
+    \item Si $0.9997 \le R < 0.9999$, entonces $x = 15$
+\end{itemize}
+
+%==========================================================
+\section*{4.2. Método de rechazo}
+
+Existe otro procedimiento para generar números al azar de distribuciones de probabilidad no-uniformes. A este procedimiento se le conoce con el nombre de método de rechazo. Este método consiste primeramente en generar un valor de la variable aleatoria y en seguida probar que dicho valor simulado proviene de la distribución de probabilidad que se está analizando. Para comprender la lógica de este método, suponga que $f(x)$ es una distribución de probabilidad acotada y con rango finito, es decir, $a \le x \le b$. De acuerdo a esta función de probabilidad, la aplicación del método de rechazo implica el desarrollo de los siguientes pasos:
+
+\begin{enumerate}
+    \item Generar dos números uniformes $R_1$ y $R_2$.
+    \item Determinar el valor de la variable aleatoria $x$ de acuerdo a la siguiente relación lineal de $R_1$:
+    \begin{equation}
+    x = a + (b - a)R_1
+    \end{equation}
+    \item Evaluar la función de probabilidad en $x = a + (b - a)R_1$.
+    \item Determinar si la siguiente desigualdad se cumple:
+    \begin{equation}
+    R_2 \le \frac{f(a + (b - a)R_1)}{M}
+    \end{equation}
+    Se utiliza $x = a + (b - a)R_1$ si la respuesta es afirmativa como un valor simulado de la variable aleatoria. De lo contrario, es necesario pasar nuevamente al paso 1 tantas veces como sea necesario.
+\end{enumerate}
+
+La teoría sobre la que se apoya este método se basa en el hecho de que la probabilidad de que $R_2 \le f(x)/M$ es exactamente $f(x)/M$. Por consiguiente, si un número es escogido al azar de acuerdo a $x = a + (b - a)R_1$ y rechazado si $R_2 > f(x)/M$, entonces la distribución de probabilidad de las $x$'s aceptadas será exactamente $f(x)$. Por otra parte, conviene señalar que si todas las $x$'s fueran aceptadas, entonces $x$ estaría uniformemente distribuida entre $a$ y $b$.
+
+Finalmente, es necesario mencionar que algunos autores como Tocher, han demostrado que el número esperado de intentos para que $x$ sea aceptada como una variable aleatoria que sigue una distribución de probabilidad $f(x)$, es $M$. Esto significa que este método podría ser un tanto ineficiente para ciertas distribuciones de probabilidad en las cuales la moda sea grande.
+
+\subsection*{Ejemplo 4.5. Distribución empírica}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\begin{equation}
+f(x) = \begin{cases} 
+2x & \text{si } 0 \le x \le 1 \\ 
+0 & \text{en otro caso} 
+\end{cases}
+\end{equation}
+
+Para esta función, $a = 0$, $b = 1$ y $M = 2$. Por consiguiente, aplicando los pasos descritos previamente se tiene:
+\begin{enumerate}
+    \item Generar dos números uniformes $R_1$ y $R_2$.
+    \item Calcular $x = R_1$.
+    \item ¿Es $R_2 \le R_1$? Si la respuesta es afirmativa, entonces $x = R_1$ es un valor simulado de la variable aleatoria. De lo contrario, se requiere regresar al paso 1 tantas veces como sea necesario.
+\end{enumerate}
+
+\subsection*{Ejemplo 4.6. Distribución triangular}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\begin{equation}
+f(x) = \begin{cases} 
+\frac{2(x - a)}{(c - a)(b - a)} & \text{si } a \le x \le b \\[2ex]
+\frac{-2(x - c)}{(c - a)(c - b)} & \text{si } b \le x \le c 
+\end{cases}
+\end{equation}
+
+Para esta distribución de probabilidad, $M = 2/(c - a)$. Sin embargo, esta distribución está compuesta de dos funciones: una válida en el rango $a \le x \le b$ y la otra válida en $b \le x \le c$. Por consiguiente, los pasos necesarios para simular esta distribución por el método de rechazo serían:
+
+\begin{enumerate}
+    \item Generar $R_1$ y $R_2$.
+    \item Calcular $x = a + (c - a)R_1$.
+    \item ¿Es $x < b$? Si la respuesta es afirmativa, $f(x)$ sería:
+    \begin{equation}
+    f(x) = \frac{2}{(c - a)(b - a)}(a + (c - a)R_1 - a) = \frac{2R_1}{b - a}
+    \end{equation}
+    Por el contrario, si la respuesta es negativa, $f(x)$ sería:
+    \begin{equation}
+    f(x) = \frac{-2}{(c - a)(c - b)}(a + (c - a)R_1 - c) = \frac{2(1 - R_1)}{c - b}
+    \end{equation}
+    \item ¿Es $R_2 < \frac{f(x)(c - a)}{2}$? Si la respuesta es afirmativa, entonces $x = a + (c - a)R_1$ se considera como un valor simulado de la variable aleatoria. De lo contrario se requiere regresar al paso 1 tantas veces como sea necesario.
+\end{enumerate}
+
+%==========================================================
+\section*{4.3. Método de composición}
+
+Otro método para generar valores de variables aleatorias no-uniformes es el método de composición. Mediante este método la distribución de probabilidad $f(x)$ se expresa como una mezcla de varias distribuciones de probabilidad $f_i(x)$ seleccionadas adecuadamente.
+
+El procedimiento para la selección de las $f_i(x)$ se basa en el objetivo de minimizar el tiempo de computación requerido para la generación de valores de la variable aleatoria analizada.
+
+Los pasos requeridos para la aplicación de este método en la simulación de variables aleatorias no-uniformes son los siguientes:
+
+\begin{enumerate}
+    \item Dividir la distribución de probabilidad original en sub-áreas ($A_1, A_2, \dots, A_n$).
+    \item Definir una distribución de probabilidad para cada sub-área.
+    \item Expresar la distribución de probabilidad original en la forma siguiente:
+    \begin{equation}
+    f(x) = A_1 f_1(x) + A_2 f_2(x) + \dots + A_n f_n(x), \quad \text{donde } \sum A_i = 1
+    \end{equation}
+    \item Obtener la distribución acumulada de las áreas.
+    \item Generar dos números uniformes $R_1, R_2$.
+    \item Seleccionar la distribución de probabilidad $f_i(x)$ con la cual se va a simular el valor de $x$. La selección de esta distribución se obtiene al aplicar el método de la transformada inversa, en el cual el eje Y está representado por la distribución acumulada de las áreas, y el eje X por las distribuciones $f_i(x)$. Para esta selección se utiliza el número uniforme $R_1$.
+    \item Utilizar el número uniforme $R_2$ para simular por el método de la transformada inversa o algún otro procedimiento especial, números al azar que sigan la distribución de probabilidad $f_i(x)$ seleccionada en el paso anterior.
+\end{enumerate}
+
+\subsection*{Ejemplo 4.7. Distribución triangular}
+Siguiendo los pasos descritos previamente, la generación de números al azar que sigan esta distribución triangular, puede ser resumida en los siguientes pasos:
+
+\begin{enumerate}
+    \item La distribución de probabilidad original se va a dividir en dos áreas:
+    \[
+    A_1 = \frac{b - a}{c - a}, \quad A_2 = \frac{c - b}{c - a}
+    \]
+    \item En seguida se determinan las distribuciones de probabilidad y distribución acumulada de las áreas definidas en el paso anterior:
+    \begin{align}
+    f_1(x) &= \frac{2}{(b - a)^2}(x - a) \\
+    F_1(x) &= \frac{(x - a)^2}{(b - a)^2} \\
+    f_2(x) &= \frac{-2}{(c - b)^2}(x - c) \\
+    F_2(x) &= 1 - \frac{(x - c)^2}{(c - b)^2}
+    \end{align}
+    \item Posteriormente la distribución de probabilidad original se expresa como:
+    \begin{equation}
+    f(x) = \left(\frac{b - a}{c - a}\right) \left(\frac{2}{(b - a)^2}(x - a)\right) + \left(\frac{c - b}{c - a}\right) \left(\frac{-2}{(c - b)^2}(x - c)\right)
+    \end{equation}
+    \item Con las áreas y distribuciones $f_i(x)$ definidas en los pasos anteriores, la distribución acumulada de las áreas se utiliza para la selección.
+    \item Generar dos números uniformes $R_1$ y $R_2$.
+    \item Si $R_1 < \frac{b - a}{c - a}$, se simulan valores de la distribución $f_1(x)$:
+    \[
+    \frac{(x - a)^2}{(b - a)^2} = R_2 \implies x = a + (b - a)\sqrt{R_2} \tag{4.21}
+    \]
+    Si la respuesta es negativa, se simulan valores de la distribución $f_2(x)$:
+    \[
+    1 - \frac{(x - c)^2}{(c - b)^2} = R_2 \implies x = c - (c - b)\sqrt{1 - R_2} \tag{4.22}
+    \]
+    \item Repetir los pasos anteriores tantas veces como se desee.
+\end{enumerate}
+
+%==========================================================
+\section*{4.4. Procedimientos especiales}
+
+Existen algunas distribuciones como la distribución Erlang, la distribución Normal, etc., cuya simulación a través del método de la transformada inversa sería demasiado complicado. Para éstas y algunas otras distribuciones, es posible utilizar algunas de sus propiedades para facilitar y agilizar el proceso de generación de números al azar.
+
+\subsection*{Ejemplo 4.8. Distribución normal}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\begin{equation}
+f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{1}{2}\left(\frac{x - \mu}{\sigma}\right)^2}, \quad \text{para } -\infty < x < \infty
+\end{equation}
+
+Puesto que no es posible expresar la distribución acumulada de la distribución normal en forma explícita, entonces no es posible utilizar para la generación de números al azar, el método de la transformada inversa. En lugar de este método, se puede hacer uso del teorema del límite central, el cual establece que la suma de $n$ variables aleatorias independientes se aproxima a una distribución normal a medida que $n$ se aproxima a infinito. Lo anterior expresado en forma de teorema sería:
+
+Si $x_1, x_2, \dots, x_n$ es una secuencia de $n$ variables aleatorias independientes con $E(x_i) = \mu_i$ y $\text{Var}(x_i) = \sigma_i^2$ (ambas finitas) y $Y = \sum a_i x_i$, entonces bajo ciertas condiciones generales:
+\begin{equation}
+Z = \frac{Y - \sum_{i=1}^n a_i \mu_i}{\sqrt{\sum_{i=1}^n a_i^2 \sigma_i^2}}
+\end{equation}
+tiene una distribución normal estándar a medida que $n$ se aproxima a infinito.
+
+Si las variables que se están sumando son uniformes en el intervalo $(0, 1)$, entonces:
+\begin{equation}
+Z = \frac{\sum_{i=1}^n R_i - n/2}{\sqrt{n/12}}
+\end{equation}
+tiene una distribución normal estándar. Puesto que la normal estándar de una variable aleatoria $x$ distribuida normalmente se obtiene como:
+\begin{equation}
+Z = \frac{x - \mu}{\sigma}
+\end{equation}
+entonces, la simulación de la variable aleatoria $x$ se haría de acuerdo a la siguiente expresión:
+\begin{equation}
+x = \mu + \sigma \left( \frac{\sum_{i=1}^n R_i - n/2}{\sqrt{n/12}} \right)
+\end{equation}
+
+Finalmente, se ha comprobado que utilizando un valor de $n = 12$, la confiabilidad de los valores simulados es bastante aceptable. Además, es muy poco probable obtener valores simulados de $x$ en la región $\mu - 6\sigma < x < \mu + 6\sigma$. También, es obvio que utilizando un valor de $n = 12$, la expresión (4.27) se simplifica a:
+\begin{equation}
+x = \mu + \sigma \left( \sum_{i=1}^{12} R_i - 6 \right)
+\end{equation}
+
+\subsection*{Ejemplo 4.9. Distribución Erlang}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\begin{equation}
+f(x) = \frac{\lambda^n x^{n-1} e^{-\lambda x}}{(n - 1)!}, \quad \text{para } x \ge 0
+\end{equation}
+donde $n$ y $\lambda$ son parámetros positivos, y además, el valor de $n$ está restringido a ser entero.
+
+Ha sido demostrado por algunos matemáticos que esta distribución es justamente la suma de $n$ variables aleatorias exponenciales cada una con valor esperado $1/\lambda$. Por consiguiente, para generar números al azar que sigan una distribución Erlang, se necesita solamente sumar los valores simulados de $n$ variables aleatorias exponenciales con media $1/\lambda$, es decir:
+\begin{equation}
+x = \sum_{i=1}^n x_i = -\frac{1}{\lambda} \sum_{i=1}^n \ln R_i = -\frac{1}{\lambda} \ln \left( \prod_{i=1}^n R_i \right)
+\end{equation}
+donde las $x_i$'s siguen una distribución exponencial y han sido generadas por el método de la transformada inversa.
+
+\subsection*{Ejemplo 4.10. Distribución binomial}
+Se desea generar números al azar que sigan la siguiente distribución de probabilidad:
+\begin{equation}
+f(x) = \binom{n}{x} \theta^x (1 - \theta)^{n - x}, \quad \text{para } x = 0, 1, \dots, n
+\end{equation}
+
+Puesto que la distribución binomial es justamente la suma de $n$ variables aleatorias Bernoulli, entonces la generación de números al azar que sigan una distribución binomial implica sumar los valores simulados de $n$ variables aleatorias Bernoulli. El procedimiento para generar esta distribución puede ser descrito en los siguientes pasos:
+\begin{enumerate}
+    \item Generar $n$ números uniformes $R$.
+    \item Contar cuántos de estos números generados son menores que $\theta$.
+    \item La cantidad encontrada en el paso 2 es el valor simulado de la variable aleatoria $x$.
+    \item Repetir los pasos anteriores tantas veces como se desee.
+\end{enumerate}
+
+\subsection*{Ejemplo 4.11. Distribución Poisson}
+Ya se ha explicado cómo simular una distribución Poisson por el método de la transformada inversa. Sin embargo, la distribución Poisson se puede simular de otra manera si se hace uso de la relación existente entre esta distribución y la distribución exponencial. Se puede demostrar que si:
+\begin{enumerate}
+    \item El número total de eventos que ocurren durante un intervalo de tiempo dado es independiente del número de eventos que ya han ocurrido previamente al inicio del intervalo y
+    \item La probabilidad de que un evento ocurra en el intervalo de $t$ a $t + \Delta t$ es aproximadamente $\lambda \Delta t$ para todos los valores de $t$,
+\end{enumerate}
+entonces: 1) La distribución de probabilidad del tiempo entre eventos es $f(t) = \lambda e^{-\lambda t}$ y 2) La probabilidad de que ocurran $x$ eventos durante el tiempo $T$ es:
+\begin{equation}
+f(x) = \frac{e^{-\lambda T} (\lambda T)^x}{x!}
+\end{equation}
+donde $\lambda T$ es el número de eventos promedio que ocurre durante el tiempo $T$.
+
+Por consiguiente, la simulación de una distribución Poisson haciendo uso de la relación anterior, se haría de acuerdo a los siguientes pasos:
+\begin{enumerate}
+    \item Definir el tiempo $T$.
+    \item Simular mediante el método de la transformada inversa números al azar que sigan una distribución exponencial con media $1/\lambda$.
+    \item Sumar los tiempos entre eventos simulados en el paso anterior de modo que esta suma no sea mayor que $T$.
+    \item Contar de acuerdo al paso anterior, el número de eventos que ocurrieron durante el tiempo $T$.
+    \item Repetir los pasos anteriores tantas veces como se desee.
+\end{enumerate}
+
+%==========================================================
+\section*{PROBLEMAS}
+
+\textbf{4.1.} Generar por el método de la transformada inversa, números al azar que sigan las siguientes distribuciones de probabilidad:
+
+\begin{enumerate}
+    \item[a)] Distribución triangular en el intervalo $[a, c]$ con moda en $b$.
+    \item[b)] Distribución trapezoidal/por tramos.
+    \item[c)] $f(x) = \begin{cases} (x - 8)/16 & \text{si } 0 \le x \le 6 \\ 0 & \text{en otro caso} \end{cases}$
+    \item[d)] $f(x) = (2\lambda) x e^{-\lambda x^2}, \quad x \ge 0$
+\end{enumerate}
+
+\textbf{4.2.} Generar por el método de rechazo, números al azar que sigan las siguientes distribuciones de probabilidad:
+
+\begin{enumerate}
+    \item[a)] $f(x) = \begin{cases} 3/4 & \text{si } 0 \le x \le 1 \\ -\frac{9}{8}(x - 5/3) & \text{si } 1 < x \le 5/3 \end{cases}$
+    \item[b)] $f(x) = \begin{cases} 1/4 & \text{si } 0 \le x \le 1 \\ 1/4 + 3(x - 1) & \text{si } 1 < x \le 3/2 \end{cases}$
+    \item[c)] $f(x) = \begin{cases} 3/4 & \text{si } 0 \le x \le 1 \\ 1/4 & \text{si } 1 < x \le 2 \end{cases}$
+    \item[d)] Distribución en forma de V entre $x = 4$ y $x = 6$.
+\end{enumerate}
+
+\textbf{4.3.} Generar por el método de composición, números al azar que sigan las siguientes distribuciones de probabilidad:
+
+\begin{enumerate}
+    \item[a)] $f(x) = p \beta_1 e^{-\beta_1 x} + (1 - p) \beta_2 e^{-\beta_2 x}, \quad x \ge 0, \; 0 \le p \le 1$
+    \item[b)] $f(x) = p \binom{n}{x} \theta_1^x (1 - \theta_1)^{n-x} + (1 - p) \binom{n}{x} \theta_2^x (1 - \theta_2)^{n-x}, \quad 0 \le x \le n, \; 0 \le p \le 1$
+    \item[c)] Distribución triangular con base entre 8 y 10, con pico en 9.
+    \item[d)] Distribución trapezoidal sobre $[0, c]$ con meseta entre $a$ y $b$.
+\end{enumerate}
+
+\textbf{4.4.} Generar utilizando procedimientos especiales, números al azar que sigan distribuciones de probabilidad:
+
+\begin{enumerate}
+    \item[a)] $f(x) = p q^x, \quad x = 0, 1, 2, \dots, \quad p + q = 1$
+    \item[b)] $f(x) = \frac{1}{2^{\gamma/2} \Gamma(\gamma/2)} x^{\frac{\gamma}{2} - 1} e^{-x/2}, \quad x \ge 0$ \quad (Distribución Chi-cuadrada)
+    \item[c)] $f(x) = \frac{\Gamma\left(\frac{\nu_1 + \nu_2}{2}\right)}{\Gamma\left(\frac{\nu_1}{2}\right)\Gamma\left(\frac{\nu_2}{2}\right)} \left(\frac{\nu_1}{\nu_2}\right)^{\frac{\nu_1}{2}} \frac{x^{\frac{\nu_1}{2} - 1}}{\left(1 + \frac{\nu_1}{\nu_2} x\right)^{\frac{\nu_1 + \nu_2}{2}}}, \quad x \ge 0$ \quad (Distribución F de Snedecor)
+    \item[d)] $f(x) = \frac{\Gamma\left(\frac{\gamma + 1}{2}\right)}{\sqrt{\gamma \pi} \, \Gamma\left(\frac{\gamma}{2}\right)} \left(1 + \frac{x^2}{\gamma}\right)^{-\frac{\gamma + 1}{2}}, \quad -\infty < x < \infty$ \quad (Distribución t de Student)
+\end{enumerate}
+
+\end{document}
