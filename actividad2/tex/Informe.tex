@@ -26,7 +26,11 @@
 \usepackage{listings}
 \usepackage{pdflscape}
 \usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{hanging}
+\usepackage{xurl}
 \usepackage{hyperref}
+\hypersetup{hidelinks}
 
 \geometry{margin=2cm, top=3cm, bottom=3cm}
 \setlength{\headheight}{13.6pt}
@@ -65,11 +69,11 @@
 
 \lstset{
   basicstyle=\ttfamily\small,
-  keywordstyle=\color{blue}\bfseries,
-  commentstyle=\color{green!50!black},
-  stringstyle=\color{red!60!black},
+  keywordstyle=\bfseries,
+  commentstyle=\itshape,
+  stringstyle=\ttfamily,
   numbers=left,
-  numberstyle=\tiny\color{gray},
+  numberstyle=\tiny,
   frame=single,
   breaklines=true,
   tabsize=4,
@@ -79,49 +83,857 @@
     {ñ}{{\~n}}1 {Ñ}{{\~N}}1
 }
 
+% Marca visible (en negrita) para resultados calculados con el dataset de prueba.
+% Cuando se procesen las respuestas reales: reemplazar los valores y
+% redefinir estos comandos como vacíos.
+\newcommand{\datosprueba}{\textbf{[Datos de prueba]}}
+\newcommand{\avisoprueba}{\begin{center}\fbox{\parbox{0.92\textwidth}{\small\textbf{Resultados provisionales.} Los valores de esta sección se calcularon con el dataset de prueba (respuestas sintéticas) para validar la herramienta. Se reemplazan por los resultados de las encuestas reales antes de la entrega.}}\end{center}}
+
 \begin{document}
 
 \setlength{\parindent}{0pt}
+\pagenumbering{roman}
 
 \begin{titlepage}
 \centering
-\begin{minipage}{\textwidth}
-\end{minipage}
-\begin{minipage}{\textwidth}
-\centering
-\large UNIVERSIDAD MAYOR DE SAN SIMÓN
-\large FACULTAD DE CIENCIAS Y TECNOLOGÍA
+{\large\bfseries UNIVERSIDAD MAYOR DE SAN SIMÓN\par}
+\vspace{4pt}
+{\bfseries FACULTAD DE CIENCIAS Y TECNOLOGÍA\par}
+\vspace{4pt}
+{\bfseries CARRERA DE INGENIERÍA DE SISTEMAS\par}
 
-\large INGENIERÍA DE SISTEMAS
-\end{minipage}
-
-\begin{minipage}{\textwidth}
-\end{minipage}
-\vspace{6cm}
-
-{\huge Análisis de Mercado y Herramienta de Recolección de Datos}
-
-\vspace{0.5cm}
-{\Large Enfoque ARCUSUR}
-\vfill
+\vspace*{\fill}
+{\huge\bfseries ANÁLISIS DE MERCADO Y HERRAMIENTA\\DE RECOLECCIÓN DE DATOS\par}
+\vspace{0.8cm}
+{\Large Enfoque ARCUSUR\par}
+\vspace{0.8cm}
+{\normalsize Informe de Actividad 2\par}
+\vspace*{\fill}
 
 \begin{flushleft}
-
-Nombre: [Nombre del estudiante]
-
-Docente: [Nombre del docente]
-
-Materia: [Nombre de la materia]
-
+\begin{tabular}{@{}ll}
+\textbf{Presentado por:} & Miguel Mita Choque \\[4pt]
+\textbf{Docente:}        & Henrry Frank Villarroel Tapia \\[4pt]
+\textbf{Materia:}        & Taller de Simulación de Sistemas \\
+\end{tabular}
 \end{flushleft}
 
+\vspace{1.5cm}
+{\bfseries Cochabamba, Bolivia\par}
 \end{titlepage}
 
+\section*{Resumen}
+
+Este informe presenta el análisis de mercado sobre el perfil, la
+formación continua y la empleabilidad de los titulados de la Carrera de
+Ingeniería de Sistemas de la Universidad Mayor de San Simón, como insumo
+para el proceso de Autoevaluación orientado a la acreditación ARCU-SUR.
+Las variables analizadas se eligieron a partir de los indicadores que el
+documento de Criterios de Calidad ARCU-SUR para Ingeniería pide sobre
+graduados, perfil de egreso, posgrado y vinculación con el sector
+productivo, y se obtienen de dos encuestas: una a titulados y otra a
+empleadores. Los datos se procesan en una herramienta de software
+propia que calcula frecuencias, medias con intervalo de confianza del
+95\%, pruebas de independencia chi-cuadrada sobre tablas de
+contingencia, y simula escenarios de inserción laboral mediante el
+método de la Transformada Inversa discreta. \textit{[Pendiente: completar
+con la síntesis de resultados una vez procesadas las respuestas reales.]}
+
+\textbf{Palabras clave:} análisis de mercado, empleabilidad, ARCU-SUR,
+simulación, Ingeniería de Sistemas.
+
 \tableofcontents
+\listoftables
 \newpage
 
+\pagenumbering{arabic}
 \setlength{\parskip}{10pt}
 
-% Escribe aquí el contenido.
+\section{Introducción y Justificación}
+
+\subsection{Antecedentes}
+
+La Carrera de Ingeniería de Sistemas de la Universidad Mayor de San Simón
+se encuentra en un proceso de Autoevaluación orientado a la elaboración de
+un Plan de Desarrollo Estratégico, en el marco de una futura postulación
+de acreditación ante el sistema ARCU-SUR. Este proceso requiere contar con
+información empírica actualizada sobre el perfil, las expectativas de
+formación continua y la situación de empleabilidad de sus titulados, así
+como sobre los requerimientos que el sector productivo plantea a los
+profesionales egresados de la carrera.
+
+El propio documento de Criterios de Calidad ARCU-SUR, en su apartado de
+documentación y fuentes de información, pide presentar las ``encuestas
+aplicadas para la autoevaluación'' y la ``información sobre mecanismos
+de seguimiento de graduados'' (ARCU-SUR, 2019). El presente estudio
+levanta esa información mediante dos instrumentos propios (encuestas a
+titulados y a empleadores) y la procesa con una herramienta de software
+desarrollada para este fin.
+
+\subsection{Objetivos}
+
+\subsubsection{Objetivo General}
+
+Analizar el perfil, la formación continua y la empleabilidad de los
+titulados de la Carrera de Ingeniería de Sistemas de la UMSS, de acuerdo
+con los criterios de calidad ARCU-SUR para graduados y perfil de egreso.
+
+\subsubsection{Objetivos Específicos}
+
+\begin{enumerate}
+  \item Calcular los indicadores de condiciones de empleo que pide el
+  criterio ARCU-SUR 3.2.3 (tasa de empleo, tiempo medio para obtener el
+  primer empleo y concordancia entre titulación y empleo).
+  \item Determinar, mediante pruebas de independencia chi-cuadrada, la
+  relación entre la situación laboral, la formación complementaria y la
+  valoración de la formación recibida.
+  \item Describir la valoración que los empleadores hacen del perfil
+  profesional y de las competencias de los titulados.
+  \item Simular escenarios de inserción laboral a partir de las
+  distribuciones observadas en la encuesta.
+  \item Desarrollar una herramienta de software que importe, procese y
+  visualice los datos recolectados.
+\end{enumerate}
+
+\subsection{Justificación}
+
+El sistema ARCU-SUR evalúa a las carreras de ingeniería en cuatro
+dimensiones: Contexto Institucional, Proyecto Académico, Comunidad
+Universitaria e Infraestructura (ARCU-SUR, 2019). Varios de sus
+criterios dependen directamente de información sobre los titulados y
+sobre quienes los emplean:
+
+\begin{itemize}
+  \item \textbf{3.2.3 Condiciones de empleo}, cuyos indicadores son el
+  ``tiempo medio para obtener el primer empleo'', el ``destino laboral y
+  profesional de los graduados; tasa de empleo'' y la ``concordancia
+  entre las características de la titulación y las del empleo''.
+  \item \textbf{3.2.1 Resultados} y \textbf{3.2.2 Vinculación y
+  seguimiento a los graduados}, que piden evaluar el resultado del
+  proceso formativo y contar con un sistema de seguimiento de
+  graduados.
+  \item \textbf{2.1.2 Perfil de Egreso}, que exige ``coherencia entre el
+  perfil de egreso y la demanda explícita de competencias profesionales
+  \ldots{} expresadas por agentes sociales relevantes''.
+  \item \textbf{2.1.7 Actualización curricular}, \textbf{2.4.1 Cursos de
+  actualización profesional permanente} y \textbf{1.1.5} (programas de
+  posgrado).
+\end{itemize}
+
+Este estudio produce, con datos propios, la evidencia que esos criterios
+piden. Además, la herramienta de software queda como un mecanismo
+permanente de seguimiento: cada nueva aplicación de las encuestas se
+importa y los indicadores se recalculan sin rehacer el análisis.
+
+\section{Marco Metodológico}
+
+\subsection{Diseño}
+
+El estudio es de tipo cuantitativo y exploratorio. Es cuantitativo
+porque se basa en respuestas estructuradas (categóricas y numéricas)
+resumidas mediante frecuencias, medias e intervalos de confianza. Es
+exploratorio porque busca identificar relaciones entre variables sin
+partir de una hipótesis previa. Se complementa con un componente de
+simulación: a partir de las distribuciones observadas se generan
+cohortes de titulados para estudiar cómo cambiarían los indicadores de
+empleo bajo distintos escenarios.
+
+\subsection{Población Objetivo}
+
+\begin{enumerate}
+  \item \textbf{Titulados} de la Carrera de Ingeniería de Sistemas de la
+  UMSS. La encuesta se distribuye únicamente a titulados de la Carrera,
+  por lo que el formulario no incluye una pregunta filtro.
+  \item \textbf{Empleadores} de titulados de la Carrera: cinco
+  organizaciones (cantidad confirmada con el docente), con al menos una
+  del ámbito público y una del privado, como exige el enunciado.
+\end{enumerate}
+
+\subsection{Técnicas de Recolección de Datos}
+
+Se aplican dos encuestas estructuradas mediante formularios web: la de
+titulados en Microsoft Forms y la de empleadores en Google Forms. Ambos
+instrumentos se transcriben completos en los Anexos del enunciado. La
+encuesta a titulados tiene lógica condicional: según la situación
+laboral declarada, se muestra una rama distinta de preguntas
+(trabaja en una organización, tiene un emprendimiento propio o no
+trabaja).
+
+Ambos formularios registran automáticamente la fecha de cada respuesta.
+La herramienta usa esa fecha para delimitar el período analizado, de
+modo que el formulario puede seguir abierto y cada informe se cierra con
+una fecha de corte, o se comparan respuestas antiguas y nuevas.
+
+\input{generado/periodo}
+
+Las Historias de Usuario del enunciado orientaron el diseño de la
+herramienta. La Tabla~\ref{tab:hu} muestra qué preguntas reales del
+formulario responden a cada una; el análisis se hace siempre sobre las
+preguntas tal como fueron aplicadas.
+
+\begin{mitabla}{Historias de Usuario y preguntas del formulario que las responden\label{tab:hu}}
+\begin{tabular}{cL{4.2cm}L{8.8cm}}
+\toprule
+HU & Tema & Preguntas del formulario utilizadas \\
+\midrule
+1 & Antigüedad y empleabilidad & Años de vida profesional, tiempo desempleado, situación laboral, sector, rubro, cargo, remuneración, tiempo hasta el primer empleo \\
+2 & Formación continua y áreas de interés & Formación complementaria y su nivel, interés en posgrado, área de interés, institución elegida, opinión sobre la oferta de posgrado de la FCyT \\
+3 & Mecanismos de financiamiento & Fuente de financiamiento del programa cursado; financiamiento del emprendimiento \\
+4 & Brechas en competencias & Satisfacción con la formación, concordancia formación--mercado, aspectos útiles y a mejorar, asignaturas; escala de perfil profesional de empleadores \\
+5 & Reportes y matrices cruzadas & Exportación CSV, tablas de contingencia, mapas de calor y diagrama de radar en la herramienta \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\subsection{Variables e Indicadores según ARCU-SUR}
+
+Una variable o un cruce se incluye en el análisis solo si responde a un
+indicador concreto del documento de Criterios ARCU-SUR y sale de una
+pregunta real del formulario. La Tabla~\ref{tab:indicadores} resume los
+indicadores calculados y la Tabla~\ref{tab:cruces} los cruces de
+variables.
+
+\begin{mitabla}{Indicadores calculados y criterio ARCU-SUR al que responden\label{tab:indicadores}}
+\begin{tabular}{cL{4.6cm}L{6.6cm}c}
+\toprule
+Id & Indicador & Cálculo & Criterio \\
+\midrule
+U1 & Tasa de empleo & Proporción que trabaja en una organización o en un emprendimiento propio & 3.2.3 \\
+U2 & Tiempo medio al primer empleo & Media e IC 95\% usando el punto medio de cada rango (meses) & 3.2.3 \\
+U3 & Años de vida profesional y desempleo & Media, desviación estándar e IC 95\% & 3.2.3 \\
+U4 & Destino laboral & Frecuencias de rubro, sector, departamento, cargo y remuneración & 3.2.3 \\
+U5 & Concordancia titulación--empleo & Frecuencias y media de las escalas de pertinencia y concordancia (1--4) & 3.2.3 \\
+U6 & Satisfacción con la formación & Frecuencias y media; aspectos útiles y a mejorar & 3.2.1 \\
+U7 & Ranking de asignaturas & Menciones de asignaturas con ventaja y poco útiles & 2.1.7 \\
+U8 & Demanda de posgrado & \% con formación complementaria, \% con interés, área e institución & 2.4.1 / 1.1.5 \\
+U9 & Oferta de posgrado FCyT & Frecuencias y media de la escala (1--4) & 2.4.1 \\
+U10 & Seguimiento de graduados & \% interesado en la red de contactos de la Carrera & 3.2.2 \\
+U11 & Perfil según empleadores & Porcentaje de cada opción en los 10 criterios de perfil profesional & 2.1.2 / 2.4.2 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\begin{mitabla}{Cruces de variables (pruebas de independencia)\label{tab:cruces}}
+\begin{tabular}{cL{5.4cm}L{5.8cm}c}
+\toprule
+Id & Cruce & Propósito & Criterio \\
+\midrule
+C1 & Situación laboral $\times$ satisfacción con la formación & Determinar si la valoración de la formación cambia según la situación laboral & 3.2.1 / 3.2.3 \\
+C2 & Sector $\times$ pertinencia del puesto & Determinar si la concordancia titulación--empleo depende del sector & 3.2.3 \\
+C3 & Formación complementaria $\times$ remuneración & Determinar si la formación complementaria se asocia con la remuneración & 2.4.1 / 3.2.3 \\
+C4 & Interés en posgrado $\times$ oferta FCyT afín & Determinar si la afinidad percibida de la oferta FCyT depende del interés en un posgrado & 2.4.1 / 1.1.5 \\
+C5 & Área de interés $\times$ institución elegida & Identificar áreas en que la oferta de la UMSS no capta la demanda de posgrado & 2.4.1 / 1.1.5 \\
+C6 & Concordancia $\times$ tiempo al primer empleo & Determinar si una formación alineada al mercado se asocia con un ingreso más rápido al empleo & 3.2.3 \\
+C7 & Financiamiento $\times$ nivel cursado & Complementar la historia de usuario de financiamiento & --- \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Para los empleadores el análisis es solo descriptivo: con cinco
+organizaciones, cualquier tabla de contingencia tendría frecuencias
+esperadas menores a 5 en todas sus celdas y la prueba chi-cuadrada no
+sería confiable.
+
+\subsection{Decisiones de Procesamiento}
+
+El formulario se aplica tal como fue diseñado. Las situaciones que
+afectan el cálculo se resuelven con las siguientes decisiones, que la
+herramienta aplica de forma automática:
+
+\begin{itemize}
+  \item \textbf{Tiempo hasta el primer empleo.} Solo lo responde la rama
+  ``trabaja en una organización''. Para calcular su media se reemplaza
+  cada rango por su punto medio en meses: ya trabajaba $=0$, menos de un
+  mes $=0.5$, 1--4 meses $=2.5$, 4--8 meses $=6$, 8--12 meses $=10$. La
+  opción ``más de 12 meses'' no tiene límite superior y se toma como 12,
+  por lo que la media obtenida es una cota inferior.
+  \item \textbf{Escalas de acuerdo de titulados} (4 niveles). Se
+  codifican de 1 (totalmente en desacuerdo) a 4 (totalmente de
+  acuerdo). La pregunta de satisfacción usa esta misma escala, por lo
+  que se interpreta como grado de acuerdo con estar satisfecho. Para las
+  tablas de contingencia los cuatro niveles se agrupan en ``en
+  desacuerdo'' y ``de acuerdo'', de modo que las celdas tengan
+  suficientes datos.
+  \item \textbf{Escala de empleadores.} Tiene dos niveles de acuerdo, uno
+  de desacuerdo y la opción ``no sabe''; al no ser simétrica, no se
+  calcula media: se reporta el porcentaje de cada opción.
+  \item \textbf{Otras agrupaciones para los cruces:} remuneración (hasta
+  Bs 5.000 / más de Bs 5.000), tiempo al primer empleo (hasta 4 meses /
+  más de 4 meses), institución de posgrado (UMSS: EUPG o FCyT / otra) y
+  nivel cursado (diplomado o especialidad / maestría o superior).
+  \item \textbf{Cargos.} Las listas de cargos de ambas encuestas son
+  distintas; para compararlas se usa una tabla de homologación propia
+  (Anexo~\ref{anexo:homologacion}).
+  \item \textbf{Datos personales.} Correo, teléfono y LinkedIn se eliminan
+  al importar los datos, antes de cualquier cálculo. Las organizaciones
+  se listan, pero ningún resultado se atribuye a una organización con
+  nombre.
+\end{itemize}
+
+\subsection{Pipeline de Procesamiento}
+
+\begin{enumerate}
+  \item \textbf{Importación y depuración:} el CSV exportado de cada
+  formulario se importa en la herramienta, que elimina los datos
+  personales, toma la fecha de cada respuesta y valida que estén las
+  columnas necesarias.
+  \item \textbf{Selección del período:} se eligen las respuestas
+  recibidas entre dos fechas (o todas).
+  \item \textbf{Estadística univariada:} frecuencias absolutas y
+  relativas de cada pregunta; media, desviación estándar e intervalo de
+  confianza del 95\% para las variables numéricas y las escalas.
+  \item \textbf{Estadística bivariada:} tablas de contingencia y prueba
+  chi-cuadrada para los cruces C1--C7.
+  \item \textbf{Simulación:} generación de cohortes de titulados con la
+  Transformada Inversa discreta y comparación de escenarios.
+  \item \textbf{Visualización y exportación:} panel de control con
+  gráficos de barras, mapas de calor y diagrama de radar; exportación de
+  los datos limpios y de cada matriz cruzada en CSV.
+\end{enumerate}
+
+\subsection{Formulación del Modelo Estadístico}
+
+\subsubsection{Intervalo de Confianza para una Media}\label{sec:ic}
+
+La encuesta no llega a todos los titulados, sino a una muestra. La media
+calculada con esa muestra no es exactamente la media de todos los
+titulados; el intervalo de confianza indica entre qué valores se
+encuentra esta última con una probabilidad del 95\%, y así evita
+presentar un valor muestral como si fuera exacto.
+
+Para las variables numéricas (años de vida profesional, años desempleado,
+tiempo al primer empleo) y las escalas de acuerdo se
+calcula un intervalo de confianza del 95\% para la media poblacional
+$\mu$, siguiendo el procedimiento descrito en Coss Bu (1998) para el
+caso en que la varianza de la población es desconocida:
+
+\begin{enumerate}
+  \item Calcular la media muestral $\bar{x}$, sumando todos los valores
+  recolectados y dividiendo entre el tamaño de la muestra $n$.
+  \item Calcular la desviación estándar muestral $S$, que mide qué tan
+  dispersos están los datos respecto a $\bar{x}$.
+  \item Determinar el valor $t_{n-1,\alpha/2}$ de la distribución $t$ de
+  Student, buscándolo en tabla según los grados de libertad ($n-1$) y
+  el nivel de confianza elegido (95\%, es decir $\alpha=0.05$).
+  \item Calcular el margen de error: $\dfrac{S}{\sqrt{n}}\,t_{n-1,\alpha/2}$.
+  \item Construir el intervalo sumando y restando el margen de error a
+  la media muestral:
+\end{enumerate}
+
+\begin{equation}
+\bar{x} - \frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2} \;\le\; \mu \;\le\; \bar{x} + \frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2}
+\end{equation}
+
+\subsubsection{Prueba de Independencia Chi-Cuadrada}\label{sec:chi}
+
+Al cruzar dos preguntas de la encuesta, las diferencias que aparecen en
+la tabla pueden deberse al azar de la muestra. La prueba chi-cuadrada
+permite decidir si esas diferencias son lo bastante grandes como para
+afirmar que las dos variables están relacionadas, y así no sacar
+conclusiones de diferencias casuales.
+
+La prueba de las frecuencias (Chi-Cuadrado) vista en la asignatura
+compara, para una variable con $k$ categorías, la frecuencia observada
+$FO_i$ contra la frecuencia esperada $FE_i = n/k$ en cada categoría,
+mediante el estadístico $X_0^2 = \sum_{i=1}^{k} (FO_i-FE_i)^2/FE_i$,
+comparado contra el valor teórico $X_{\alpha,k-1}^2$ de tabla. La
+asignatura también cubre la prueba de las series, que extiende esta
+misma lógica a pares ordenados dispuestos en una grilla de $k\times k$
+celdas ($FO_{ij}$), con frecuencia esperada uniforme
+$FE = (n-1)/k^2$ en cada celda.
+
+Para este informe se necesita evaluar si dos variables categóricas
+están relacionadas entre sí. El procedimiento se aplica a los cruces
+C1--C7 de la Tabla~\ref{tab:cruces}, usando la misma estructura de
+grilla $FO_{ij}$ de la prueba de las series. La diferencia es que, a
+diferencia de un par de números aleatorios, las categorías de dos
+preguntas de la encuesta no tienen por qué estar distribuidas de forma
+uniforme entre sí, por lo que la frecuencia esperada de cada celda no
+puede asumirse uniforme ($FE=(n-1)/k^2$): debe calcularse a partir de
+los totales de fila y columna realmente observados. Esto sigue los
+mismos pasos del procedimiento de la asignatura:
+
+\begin{enumerate}
+  \item Contar con la muestra: construir la tabla de contingencia,
+  cruzando ambas variables. Cada celda $FO_{ij}$ es la cantidad de
+  encuestados que respondió a la vez la categoría $i$ de la primera
+  variable y la categoría $j$ de la segunda (frecuencia observada), y
+  $N$ es el total de encuestados.
+  \item Calcular la frecuencia esperada de cada celda, es decir, la
+  cantidad que se esperaría si ambas variables fueran independientes
+  (generalización de $FE=n/k$ para totales de fila y columna no
+  uniformes):
+\end{enumerate}
+
+\begin{equation}
+FE_{ij} = \frac{(\text{total de la fila } i)(\text{total de la columna } j)}{N}
+\end{equation}
+
+\begin{enumerate}
+  \setcounter{enumi}{2}
+  \item Calcular el estadístico Chi-Cuadrado, sumando la diferencia al
+  cuadrado entre lo observado y lo esperado de cada celda, dividida
+  entre lo esperado:
+\end{enumerate}
+
+\begin{equation}
+X_0^2 = \sum_{i=1}^{k}\sum_{j=1}^{m} \frac{(FO_{ij} - FE_{ij})^2}{FE_{ij}}
+\end{equation}
+
+\begin{enumerate}
+  \setcounter{enumi}{3}
+  \item Determinar el estadístico teórico $X_{\alpha,(k-1)(m-1)}^2$ de
+  tabla ($k$ y $m$ son el número de categorías de cada variable). Los
+  grados de libertad $(k-1)(m-1)$ son mayores que los $k^2-1$ de la
+  prueba de las series porque, al estimar $FE_{ij}$ con los totales de
+  fila y columna (en vez de asumirla uniforme), se fijan $k-1$ totales
+  de fila y $m-1$ totales de columna adicionales.
+  \item Establecer la relación entre estadísticos: $X_0^2 <
+  X_{\alpha,(k-1)(m-1)}^2$.
+  \item Conclusión: si se cumple la relación anterior, no se puede
+  rechazar que las variables son independientes; si no se cumple, hay
+  evidencia de que están relacionadas.
+\end{enumerate}
+
+En resumen, para nuestro caso cada símbolo significa:
+
+\begin{itemize}
+  \item $N$: número total de encuestados que entraron a la tabla (en el
+  Paso 1).
+  \item $k$: número de categorías de la primera variable (ej.
+  financiamiento tiene $k=3$: recursos propios, beca total, beca
+  parcial).
+  \item $m$: número de categorías de la segunda variable (ej. tipo de
+  posgrado).
+  \item $FO_{ij}$: cantidad real de encuestados que cayó en la
+  categoría $i$ de la primera variable \textbf{y} la categoría $j$ de
+  la segunda, al mismo tiempo (lo que efectivamente respondieron).
+  \item $FE_{ij}$: cantidad que se esperaría en esa misma celda
+  \textbf{si no hubiera relación} entre las dos variables (se calcula,
+  no se cuenta directamente de la encuesta).
+  \item $X_0^2$: un solo número que resume qué tan lejos está lo
+  observado de lo esperado en toda la tabla; mientras más grande, más
+  evidencia de que las variables sí están relacionadas.
+\end{itemize}
+
+El desarrollo completo de esta prueba, paso a paso y con los datos de la
+encuesta, se presenta para cada cruce en la Sección~\ref{sec:cruces}.
+
+\subsection{Modelo de Simulación}\label{sec:modelo-sim}
+
+Los dos indicadores literales del criterio 3.2.3 (tasa de empleo y tiempo
+medio para obtener el primer empleo) se estudian también por simulación.
+El modelo genera cohortes de titulados: a cada titulado simulado se le
+asigna una situación laboral y, si trabaja en una organización, un
+tiempo hasta su primer empleo. Ambas variables son discretas y su
+distribución es la observada en la encuesta, por lo que se generan con
+el método de la Transformada Inversa discreta.
+
+\subsubsection{Generación de números aleatorios}
+
+Se usa un generador congruencial mixto:
+
+\begin{equation}
+x_{n+1} = (a\,x_n + c) \bmod m, \qquad R = \frac{x_{n+1}}{m}, \qquad 0 \le R < 1
+\end{equation}
+
+con $a = 1\,664\,525$, $c = 1\,013\,904\,223$ y $m = 2^{32}$. Se verifican
+las tres propiedades de periodo completo:
+
+\begin{enumerate}[label=\roman*)]
+  \item $c$ y $m$ son primos entre sí: $m=2^{32}$ solo tiene el factor
+  2 y $c$ es impar.
+  \item Todo primo que divide a $m$ divide a $a-1$: el único primo es 2
+  y $a-1 = 1\,664\,524$ es par.
+  \item $m$ es múltiplo de 4 y $a-1 = 4 \times 416\,131$ también lo es.
+\end{enumerate}
+
+Como se cumplen i), ii) y iii), el generador tiene periodo completo
+($2^{32}$ valores), mucho mayor que la cantidad de números que usa la
+simulación.
+
+\input{generado/sim_generador}
+
+\subsubsection{Transformada Inversa discreta}
+
+\textit{Paso 1. Contar con la función de probabilidad $p(x)$.} Para cada
+variable, $p(x)$ es la frecuencia relativa observada de cada categoría
+en la encuesta.
+
+\textit{Paso 2. Definir la función acumulada} $F(x_i) = \sum_{j \le i} p(x_j)$.
+
+\textit{Paso 3. Igualar $F(x)$ y $R$.} Cada categoría ocupa el rango de $R$
+$[F(x_{i-1}),\,F(x_i))$.
+
+\textit{Paso 4. Aplicar la inversa.} $x = F^{-1}(R)$ es la primera
+categoría $x_i$ que cumple $R < F(x_i)$.
+
+Las tablas con las probabilidades obtenidas de la encuesta y sus rangos
+de $R$ se presentan en la Sección~\ref{sec:simulacion}.
+
+\textit{Paso 5. Implementar el algoritmo.}
+
+\begin{lstlisting}[caption={Algoritmo de una corrida de la simulación}, language=Pascal]
+para cada corrida k = 1 .. n hacer
+    empleados <- 0 ; enOrganizacion <- 0 ; sumaMeses <- 0
+    para cada titulado t = 1 .. N hacer
+        R1 <- gcm() ; R2 <- gcm()
+        situacion <- F_situacion^-1(R1)
+        si situacion <> "No trabaja" entonces empleados <- empleados + 1
+        si situacion = "Trabaja en una organizacion" entonces
+            meses <- puntoMedio(F_tiempo^-1(R2))
+            enOrganizacion <- enOrganizacion + 1
+            sumaMeses <- sumaMeses + meses
+        finSi
+    finPara
+    tasa[k]   <- empleados / N
+    tiempo[k] <- sumaMeses / enOrganizacion
+finPara
+\end{lstlisting}
+
+$R_2$ se genera para todos los titulados aunque no se use, para que el
+escenario base y el modificado consuman exactamente la misma secuencia
+de números aleatorios y la diferencia entre ambos se deba solo al
+cambio de probabilidades.
+
+\subsubsection{Escenarios y número de corridas}
+
+El escenario base usa las probabilidades observadas. El escenario
+modificado plantea una situación hipotética que la Carrera podría buscar
+con mayor vinculación con empresas: se reduce en un 50\% la probabilidad
+de ``no trabaja'' (que pasa a ``trabaja en una organización'') y se
+traslada el 30\% de la probabilidad de los tiempos mayores a 4 meses a
+la categoría 1--4 meses. Ambos porcentajes son parámetros de la
+herramienta.
+
+De cada escenario se ejecutan $n = 1000$ corridas con cohortes de
+$N = 100$ titulados. Con los $n$ resultados de cada indicador se calcula
+su media y su intervalo de confianza del 95\% con la misma fórmula de la
+sección anterior. Como el ancho del intervalo es $2S\,t_{n-1,\alpha/2}/\sqrt{n}$,
+reducirlo a la mitad exige cuadruplicar las corridas (Coss Bu, 1998); con
+$n=1000$ el margen de error de la tasa de empleo queda por debajo de
+0.3 puntos porcentuales.
+
+\subsection{Herramienta de Software}
+
+La herramienta tiene dos partes:
+
+\begin{itemize}
+  \item \textbf{Backend en Java}, sin dependencias externas (servidor
+  HTTP del propio JDK). Lee los CSV, aplica las decisiones de
+  procesamiento, calcula indicadores, cruces y simulación, y expone los
+  resultados como servicios REST en formato JSON.
+  \item \textbf{Frontend web} en Vue, con la librería de componentes
+  Naive UI y la librería de gráficos ECharts. Se organiza por módulos
+  (titulados, empleadores, análisis y datos): indicadores de
+  empleabilidad y posgrado, valoración de la formación con diagrama de
+  radar, cruces de variables con mapas de calor, simulación de
+  escenarios con sus tablas de Transformada Inversa, e importación y
+  exportación de datos. Todas las pantallas pueden filtrarse por el
+  período en que se recibieron las respuestas. Las Historias de Usuario del enunciado se
+  cubren con estas funcionalidades (Tabla~\ref{tab:hu}).
+\end{itemize}
+
+\begin{mitabla}{Pantallas de la herramienta y servicios que las alimentan}
+\begin{tabular}{L{4.4cm}L{4.4cm}L{5.8cm}}
+\toprule
+Pantalla & Servicio REST & Contenido \\
+\midrule
+Inicio & \texttt{/api/empleabilidad}, \texttt{/api/formacion}, \texttt{/api/demografia} & Indicadores principales y su criterio ARCU-SUR \\
+Empleabilidad & \texttt{/api/empleabilidad} & U1--U5, emprendimiento, razones para no trabajar \\
+Formación y posgrado & \texttt{/api/formacion}, \texttt{/api/financiamiento} & U8, U9, fuente de financiamiento \\
+Valoración de la formación & \texttt{/api/competencias} & U6, U7 y radar del perfil (U11) \\
+Cruces de variables & \texttt{/api/cruces} & C1--C7: mapa de calor, $FO$, $FE$, $X_0^2$ y decisión \\
+Perfil y demanda (empleadores) & \texttt{/api/empleadores} & Descriptivos, homologación de cargos, preguntas abiertas \\
+Simulación & \texttt{/api/simulacion} & Parámetros, tablas TI, tabla de simulación y corridas \\
+Importar y exportar & \texttt{/api/importar}, \texttt{/api/exportar} & Carga de CSV y descarga de datos limpios y matrices \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\section{Análisis de la Demanda Educativa y Perfil de los Titulados}\label{sec:titulados}
+
+\avisoprueba
+
+Todas las tablas de esta sección y de las dos siguientes se generan con
+la herramienta a partir de las respuestas importadas, de modo que cada
+número puede rastrearse hasta su cálculo. En las preguntas de opción
+única se cuenta cuántos titulados eligieron cada opción ($f_i$) y se
+divide entre el número de respuestas ($f_i/n$).
+
+\subsection{Caracterización Demográfica}
+
+La edad y el género no responden por sí mismos a un indicador ARCU-SUR.
+Se presentan para describir a quienes respondieron la encuesta, de modo
+que los resultados de las secciones siguientes se lean sabiendo a qué
+grupo de titulados representan.
+
+\input{generado/demografia}
+
+\subsection{Tasa de Empleo}
+
+La tasa de empleo es uno de los indicadores con que ARCU-SUR evalúa si
+la formación se refleja en las posibilidades de empleo de los graduados
+(criterio 3.2.3). Se calcula como la proporción de titulados que
+trabajan, ya sea en una organización o en un emprendimiento propio.
+
+\input{generado/tasa_empleo}
+
+\subsection{Tiempo Medio para Obtener el Primer Empleo}
+
+El criterio 3.2.3 pide expresamente el tiempo medio para obtener el
+primer empleo. Como la encuesta obtiene ese dato de una muestra y no de
+todos los titulados, además de la media se calcula su intervalo de
+confianza del 95\%, con el procedimiento de la Sección~\ref{sec:ic}, para
+indicar entre qué valores se encuentra la media de toda la población.
+
+\input{generado/ic_tiempo_primer_empleo}
+
+\subsection{Años de Vida Profesional y de Desempleo}
+
+Los años de vida profesional describen la experiencia acumulada de los
+titulados que respondieron, y los años de desempleo complementan la
+tasa de empleo: una tasa alta puede ocultar períodos largos sin trabajo.
+Ambos se estiman con su intervalo de confianza.
+
+\paragraph{Años de vida profesional.}
+
+\input{generado/ic_vida_profesional}
+
+\paragraph{Años desempleado.}
+
+\input{generado/ic_desempleo}
+
+\subsection{Destino Laboral}
+
+El criterio 3.2.3 incluye el destino laboral y profesional de los
+graduados. Conocer en qué sector, rubro y cargo trabajan, y cuánto
+perciben, permite a la Carrera contrastar el perfil de egreso con los
+puestos que efectivamente ocupan. Solo responden quienes trabajan en una
+organización.
+
+\input{generado/destino_laboral}
+
+\subsection{Formación Continua y Fuentes de Financiamiento}
+
+Los criterios 2.4.1 y 1.1.5 piden que la institución ofrezca y promueva
+programas de actualización y posgrado afines a la carrera. Para que esa
+oferta responda a una demanda real se necesita saber qué formación ya
+tienen los titulados, qué les interesa estudiar, dónde lo harían y cómo
+financiaron lo que ya cursaron.
+
+\input{generado/formacion}
+
+\subsection{Valoración de la Formación Recibida}
+
+El criterio 3.2.1 pide evaluar el resultado del proceso formativo, y el
+2.1.7 actualizar el currículo según los desarrollos profesionales. La
+opinión de los titulados sobre su formación, sobre los aspectos útiles y
+a mejorar y sobre las asignaturas es la evidencia directa para ambos.
+Las escalas de acuerdo se codifican de 1 a 4 y se les aplica el mismo
+procedimiento del intervalo de confianza.
+
+\input{generado/valoracion}
+
+\section{Análisis de la Oferta Laboral y Requerimientos del Sector Productivo}\label{sec:empleadores}
+
+\avisoprueba
+
+El criterio 2.1.2 exige que el perfil de egreso sea coherente con las
+competencias que demandan los agentes sociales relevantes, y el 2.4.2
+que la Carrera mantenga relaciones con organizaciones públicas y
+privadas. Los empleadores son esos agentes: su opinión es la única
+fuente del estudio que mira a los titulados desde fuera de la
+universidad. Con pocas organizaciones encuestadas el análisis es solo
+descriptivo: se presentan las frecuencias de cada respuesta. En la
+escala de perfil profesional no se calcula media porque sus opciones no
+son simétricas.
+
+\input{generado/empleadores}
+
+\subsection{Áreas, Herramientas y Habilidades Demandadas}
+
+Las tres preguntas abiertas se agruparon en categorías y se contaron
+sus menciones. Las áreas emergentes más mencionadas fueron desarrollo
+móvil, internet de las cosas y ciberseguridad; las herramientas,
+Python y sus librerías de datos; y las habilidades, ética profesional y
+aprendizaje autónomo. \datosprueba
+
+\section{Diagnóstico y Síntesis de Resultados}
+
+\avisoprueba
+
+\subsection{Pruebas de Independencia}\label{sec:cruces}
+
+Los indicadores anteriores describen cada variable por separado; los
+cruces permiten saber si dos de ellas están relacionadas, lo que ayuda a
+explicar los resultados (por ejemplo, si quienes perciben una formación
+alineada al mercado consiguen empleo antes). Cada cruce de la
+Tabla~\ref{tab:cruces} se resuelve con los seis pasos de la prueba
+chi-cuadrada de la Sección~\ref{sec:chi}.
+
+\input{generado/cruce_C1}
+\input{generado/cruce_C2}
+\input{generado/cruce_C3}
+\input{generado/cruce_C4}
+\input{generado/cruce_C5}
+\input{generado/cruce_C6}
+\input{generado/cruce_C7}
+
+\subsubsection*{Síntesis de los cruces}
+
+\input{generado/resumen_cruces}
+
+\subsection{Resultados de la Simulación}\label{sec:simulacion}
+
+Los indicadores de la encuesta muestran la situación actual. La
+simulación permite estimar cómo cambiarían la tasa de empleo y el
+tiempo al primer empleo si la Carrera lograra mejoras concretas, lo que
+sirve de sustento cuantitativo para las acciones del plan de mejoras
+que pide la autoevaluación. Se aplica el modelo de la
+Sección~\ref{sec:modelo-sim} con $n = 1000$
+corridas, cohortes del mismo tamaño que la muestra de titulados, semilla
+$x_0 = 12345$ y el escenario modificado descrito allí.
+
+\subsubsection*{Tablas de Transformada Inversa}
+
+\input{generado/sim_tablas_ti}
+
+\subsubsection*{Tabla de simulación}
+
+\input{generado/sim_tabla_simulacion}
+
+\subsubsection*{Corridas y comparación de escenarios}
+
+\input{generado/sim_corridas}
+
+\subsection{Respuesta a los Criterios ARCU-SUR}\label{sec:criterios}
+
+La Guía de Autoevaluación ARCU-SUR pide, para cada componente, analizar
+la carrera en relación con sus criterios y mencionar los aspectos
+favorables y desfavorables (ARCU-SUR, 2016a). A continuación se resume,
+para cada criterio al que este estudio aporta evidencia, qué pide el
+criterio, qué resultado de este trabajo lo respalda y cómo se valora.
+Se considera favorable un indicador cuando la mayoría de los
+encuestados (más del 50\%) responde en el sentido que el criterio
+espera, y desfavorable en caso contrario; los indicadores que no tienen
+un valor de referencia se reportan como línea base.
+
+\input{generado/criterios_arcusur}
+
+\section{Conclusiones y Propuestas Estratégicas}
+
+\textit{[Pendiente: las conclusiones se redactan con los resultados
+reales. Las líneas de acción de abajo son las que pide el enunciado,
+asociadas al indicador que las sustentaría.]}
+
+\begin{itemize}
+  \item \textbf{Fomento de becas y alianzas de financiamiento}, si la
+  proporción que financia su formación con recursos propios es alta
+  (HU3, cruce C7).
+  \item \textbf{Posgrados modulares en las áreas de mayor interés},
+  priorizando aquellas en que la mayoría elige instituciones distintas
+  de la UMSS (U8, cruce C5, criterio 2.4.1).
+  \item \textbf{Vinculación empresarial}: pasantías y consulta periódica
+  a empleadores, si los criterios ``las autoridades consultan nuestra
+  opinión'' y ``consideran nuestra opinión en prácticas'' tienen bajo
+  acuerdo (U11, criterios 2.1.2 y 2.4.2), y si la concordancia
+  formación--mercado se asocia con un ingreso más rápido al empleo (C6).
+  \item \textbf{Observatorio permanente de titulados}: aplicar la encuesta
+  de forma periódica y procesarla con la herramienta desarrollada,
+  aprovechando el interés en la red de contactos (U10, criterio 3.2.2).
+\end{itemize}
+
+\subsection*{Limitaciones}
+
+\begin{itemize}
+  \item El formulario no pregunta el año de titulación, por lo que no se
+  pueden analizar resultados por cohorte.
+  \item El tiempo al primer empleo solo lo responde quien hoy trabaja en
+  una organización, y su media es una cota inferior.
+  \item La escala de empleadores no es simétrica y algunos de sus ítems
+  agrupan varias afirmaciones.
+  \item Con cinco organizaciones, el análisis de empleadores es solo
+  descriptivo.
+\end{itemize}
+
+\section*{Declaración de Uso de Inteligencia Artificial}
+\addcontentsline{toc}{section}{Declaración de Uso de Inteligencia Artificial}
+
+En la elaboración de este trabajo se utilizó el asistente de
+inteligencia artificial Claude (Anthropic, 2026), mediante la
+herramienta Claude Code, entre septiembre y octubre de 2026. La
+Tabla~\ref{tab:ia} detalla en qué tareas se usó y qué parte quedó a
+cargo del autor.
+
+\begin{mitabla}{Tareas en las que se usó inteligencia artificial\label{tab:ia}}
+\begin{tabular}{L{3.6cm}L{5.6cm}L{5.4cm}}
+\toprule
+Tarea & Uso de la IA & Revisión y decisiones del autor \\
+\midrule
+Material de referencia & Transcripción a LaTeX de los capítulos de Coss Bu y de los apuntes de clase a partir de los PDF, marcando los errores del original con notas al pie & Revisión de las transcripciones \textit{[Completar]} \\
+Criterios ARCU-SUR & Lectura de los documentos de Criterios, Autoevaluación y Pares, y propuesta de qué preguntas del formulario responden a cada indicador & Selección final de variables y cruces \textit{[Completar]} \\
+Revisión de las encuestas & Identificación de problemas de diseño del formulario y propuesta de decisiones de procesamiento (punto medio de rangos, agrupaciones, escala de empleadores) & Decisión de no modificar el formulario y de enviarlo solo a titulados de la UMSS; aprobación de las decisiones de procesamiento \\
+Herramienta de software & Generación del código del backend (Java) y del frontend (Vue, Naive UI, ECharts) & Pruebas de funcionamiento y ajustes \textit{[Completar]} \\
+Dataset de prueba & Generación de respuestas sintéticas para validar la herramienta & --- (no son resultados del estudio; están marcados en el informe) \\
+Modelo de simulación & Propuesta del modelo (generador congruencial mixto y Transformada Inversa discreta) y del escenario modificado & Validación del modelo según los métodos de la asignatura \textit{[Completar]} \\
+Redacción del informe & Borrador de las secciones 1 a 6 y de las tablas & Revisión y corrección del texto \textit{[Completar]} \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+No se usó inteligencia artificial para generar respuestas de las
+encuestas presentadas como reales: los resultados finales provienen
+exclusivamente de los datos recolectados y procesados con la
+herramienta. Tampoco se usó para \textit{[Completar: por ejemplo,
+aplicación de las encuestas, contacto con las organizaciones, reuniones
+con el docente]}.
+
+\section*{Referencias Bibliográficas}
+\addcontentsline{toc}{section}{Referencias Bibliográficas}
+
+\begin{hangparas}{1.27cm}{1}
+Ali Rodriguez, J. G. (2021). \textit{Simulación de Sistemas: apuntes de
+clases} [Apuntes de la materia dictada por H. F. Villarroel Tapia].
+Carrera de Ingeniería de Sistemas, Universidad Mayor de San Simón.
+
+Anthropic. (2026). \textit{Claude} (versión Opus 5.5) [Modelo de
+lenguaje de gran tamaño]. \url{https://claude.ai}
+
+ARCU-SUR. (2016a). \textit{Guía de autoevaluación para carreras de
+Ingeniería}. Red de Agencias Nacionales de Acreditación, Sector Educativo
+del MERCOSUR.
+\url{https://www.arcusur.org/wp-content/uploads/2024/02/Guia_de_Autoevaluacion_Ingenieria.pdf}
+
+ARCU-SUR. (2016b). \textit{Guía de evaluación para los comités de pares
+evaluadores: Titulación Ingeniería}. Red de Agencias Nacionales de
+Acreditación, Sector Educativo del MERCOSUR.
+\url{https://www.arcusur.org/wp-content/uploads/2024/02/Guia_de_Pares_Ingenieria.pdf}
+
+ARCU-SUR. (2019). \textit{Criterios de calidad para la acreditación
+ARCU-SUR: Ingeniería}. Red de Agencias Nacionales de Acreditación,
+Sector Educativo del MERCOSUR.
+\url{https://www.arcusur.org/wp-content/uploads/2024/03/Criterios_de_Ingenieria_Mayo_2019.pdf}
+
+Coss Bu, R. (1998). \textit{Simulación: un enfoque práctico}. Limusa.
+\end{hangparas}
+
+\appendix
+
+\section{Tabla de Homologación de Cargos}\label{anexo:homologacion}
+
+\begin{mitabla}{Homologación de los cargos de ambas encuestas}
+\begin{tabular}{lL{5.2cm}L{5.8cm}}
+\toprule
+Grupo & Encuesta a titulados & Encuesta a empleadores \\
+\midrule
+Soporte                 & Help Desk            & De apoyo / asistencia tecnológica \\
+Técnico / Desarrollo    & Técnico, Desarrollo  & Técnico \\
+Analista / Especialista & ---                  & Analista, especialista, consultor tecnológico \\
+Gestión / Jefatura      & Ejecutivo            & Supervisor / coordinador, jefatura o gerencial \\
+Otro                    & Otro                 & Otro \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
 \end{document}

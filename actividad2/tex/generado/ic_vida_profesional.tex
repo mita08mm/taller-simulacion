@@ -1,0 +1,58 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: dataset de prueba (respuestas sinteticas)
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Los valores son numéricos y se agrupan por valor repetido ($x_i$ con su frecuencia $f_i$). Se descartan las filas en que los años desempleado superan los años de vida profesional (0 en esta muestra). El tamaño de la muestra es $n = 100$.
+
+\begin{mitabla}{Cálculo de la media y la desviación estándar de años de vida profesional \datosprueba}
+\begin{tabular}{lccccc}
+\toprule
+Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
+\midrule
+0 años & 0 & 9 & 0.00 & 32.0356 & 288.3204 \\
+1 años & 1 & 13 & 13.00 & 21.7156 & 282.3028 \\
+2 años & 2 & 2 & 4.00 & 13.3956 & 26.7912 \\
+3 años & 3 & 15 & 45.00 & 7.0756 & 106.1340 \\
+4 años & 4 & 15 & 60.00 & 2.7556 & 41.3340 \\
+5 años & 5 & 3 & 15.00 & 0.4356 & 1.3068 \\
+6 años & 6 & 8 & 48.00 & 0.1156 & 0.9248 \\
+7 años & 7 & 7 & 49.00 & 1.7956 & 12.5692 \\
+8 años & 8 & 7 & 56.00 & 5.4756 & 38.3292 \\
+9 años & 9 & 2 & 18.00 & 11.1556 & 22.3112 \\
+10 años & 10 & 3 & 30.00 & 18.8356 & 56.5068 \\
+11 años & 11 & 4 & 44.00 & 28.5156 & 114.0624 \\
+12 años & 12 & 4 & 48.00 & 40.1956 & 160.7824 \\
+13 años & 13 & 2 & 26.00 & 53.8756 & 107.7512 \\
+14 años & 14 & 1 & 14.00 & 69.5556 & 69.5556 \\
+15 años & 15 & 2 & 30.00 & 87.2356 & 174.4712 \\
+20 años & 20 & 1 & 20.00 & 205.6356 & 205.6356 \\
+22 años & 22 & 1 & 22.00 & 266.9956 & 266.9956 \\
+24 años & 24 & 1 & 24.00 & 336.3556 & 336.3556 \\
+\midrule
+$\Sigma$ & & 100 & 566.00 & & 2312.4400 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Calcular la media muestral.}
+\[
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{566.00}{100} = 5.6600\ \text{años}
+\]
+
+\textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
+\[
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{2312.4400}{99}} = 4.8330
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 99$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{99,\,0.025} \approx z_{0.025} = 1.96$.
+
+\textit{Paso 5. Calcular el margen de error.}
+\[
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{4.8330}{\sqrt{100}}\times 1.960 = 0.4833 \times 1.960 = 0.9473
+\]
+
+\textit{Paso 6. Construir el intervalo y concluir.}
+\[
+5.6600 - 0.9473 \;\le\; \mu \;\le\; 5.6600 + 0.9473 \quad\Longrightarrow\quad 4.71 \le \mu \le 6.61
+\]
+
+Con un 95\% de confianza, la media de años de vida profesional de todos los titulados está entre 4.71 y 6.61 años. \datosprueba
+

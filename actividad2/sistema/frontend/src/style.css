@@ -1,0 +1,21 @@
+:root {
+  --fondo: #f7f7f8;
+  --texto: #18181b;
+  --suave: #71717a;
+  --borde: #e4e4e7;
+}
+* { box-sizing: border-box; }
+html, body, #app { margin: 0; height: 100%; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  -webkit-font-smoothing: antialiased;
+}
+.pagina { padding: 28px 32px 48px; max-width: 1280px; margin: 0 auto; }
+.pagina-titulo { font-size: 22px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+.pagina-sub { color: var(--suave); margin: 0 0 24px; font-size: 14px; }
+.grafico { height: 300px; width: 100%; }
+.grafico-alto { height: 380px; width: 100%; }
+.nota { color: var(--suave); font-size: 12.5px; margin-top: 8px; line-height: 1.5; }
+.etiqueta-criterio { font-size: 11px; color: var(--suave); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }

@@ -1,0 +1,60 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: dataset de prueba (respuestas sinteticas)
+En cada corrida se simulan $N = 100$ titulados y se calcula:
+\[
+\text{Tasa de empleo}_k = \frac{\text{empleados}_k}{N}, \qquad \text{Tiempo medio}_k = \frac{\sum \text{meses}}{\text{titulados en una organización}_k}
+\]
+
+\begin{mitabla}{Prueba de escritorio: primeras 25 corridas del escenario base ($N=100$) \datosprueba}
+\begin{tabular}{cccccc}
+\toprule
+Corrida $k$ & Empleados & Tasa de empleo & En organización & $\sum$ meses & Tiempo medio \\
+\midrule
+1 & 86 & $86/100 = 0.86$ & 72 & 415.5 & 5.771 \\
+2 & 82 & $82/100 = 0.82$ & 59 & 307.5 & 5.212 \\
+3 & 86 & $86/100 = 0.86$ & 61 & 335.0 & 5.492 \\
+4 & 89 & $89/100 = 0.89$ & 79 & 458.0 & 5.797 \\
+5 & 83 & $83/100 = 0.83$ & 71 & 327.5 & 4.613 \\
+6 & 87 & $87/100 = 0.87$ & 70 & 295.5 & 4.221 \\
+7 & 89 & $89/100 = 0.89$ & 71 & 339.5 & 4.782 \\
+8 & 90 & $90/100 = 0.90$ & 77 & 481.0 & 6.247 \\
+9 & 88 & $88/100 = 0.88$ & 69 & 386.5 & 5.601 \\
+10 & 88 & $88/100 = 0.88$ & 66 & 344.5 & 5.220 \\
+11 & 89 & $89/100 = 0.89$ & 69 & 427.0 & 6.188 \\
+12 & 89 & $89/100 = 0.89$ & 69 & 468.0 & 6.783 \\
+13 & 90 & $90/100 = 0.90$ & 78 & 401.0 & 5.141 \\
+14 & 87 & $87/100 = 0.87$ & 75 & 389.0 & 5.187 \\
+15 & 87 & $87/100 = 0.87$ & 61 & 332.5 & 5.451 \\
+16 & 84 & $84/100 = 0.84$ & 61 & 284.0 & 4.656 \\
+17 & 87 & $87/100 = 0.87$ & 70 & 384.5 & 5.493 \\
+18 & 86 & $86/100 = 0.86$ & 71 & 387.0 & 5.451 \\
+19 & 89 & $89/100 = 0.89$ & 70 & 390.0 & 5.571 \\
+20 & 87 & $87/100 = 0.87$ & 70 & 393.5 & 5.621 \\
+21 & 88 & $88/100 = 0.88$ & 68 & 354.0 & 5.206 \\
+22 & 87 & $87/100 = 0.87$ & 66 & 337.0 & 5.106 \\
+23 & 87 & $87/100 = 0.87$ & 72 & 390.0 & 5.417 \\
+24 & 88 & $88/100 = 0.88$ & 72 & 419.0 & 5.819 \\
+25 & 88 & $88/100 = 0.88$ & 70 & 373.5 & 5.336 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Con las $n = 1000$ corridas se calcula la media, la desviación estándar y el intervalo de confianza de cada indicador, con el mismo procedimiento de los Pasos 2 a 6 del intervalo de confianza ($n - 1 > 30$, por lo que $t \approx 1.96$):
+
+\begin{mitabla}{Resumen de las 1000 corridas por escenario \datosprueba}
+\begin{tabular}{llcccc}
+\toprule
+Indicador & Escenario & $\bar{x}$ & $S$ & $\frac{S}{\sqrt{n}} \cdot 1.96$ & IC 95\% \\
+\midrule
+Tasa de empleo & Base & 0.8722 & 0.0334 & 0.0021 & $[0.8701,\ 0.8742]$ \\
+ & Modificado & 0.9353 & 0.0248 & 0.0015 & $[0.9338,\ 0.9369]$ \\
+Tiempo medio (meses) & Base & 5.348 & 0.541 & 0.034 & $[5.315,\ 5.382]$ \\
+ & Modificado & 4.315 & 0.478 & 0.030 & $[4.285,\ 4.344]$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Validación del modelo.} La media simulada del escenario base (tasa 87.2\%, tiempo 5.35 meses) coincide con lo observado en la encuesta (87.0\% y 5.32 meses), lo que indica que el modelo reproduce los datos de los que parte.
+
+\textit{Comparación de escenarios.} Diferencia en la tasa de empleo: $0.9353 - 0.8722 = 0.0632$ (6.3 puntos porcentuales). Diferencia en el tiempo medio: $4.315 - 5.348 = -1.034$ meses. \datosprueba
+

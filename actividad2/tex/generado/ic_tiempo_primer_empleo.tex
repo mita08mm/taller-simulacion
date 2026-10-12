@@ -1,0 +1,45 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: dataset de prueba (respuestas sinteticas)
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Solo responden quienes trabajan en una organización. Cada rango se reemplaza por su punto medio en meses ($x_i$); ``más de 12 meses'' se toma como 12, por lo que la media es una cota inferior. El tamaño de la muestra es $n = 68$.
+
+\begin{mitabla}{Cálculo de la media y la desviación estándar de tiempo hasta el primer empleo \datosprueba}
+\begin{tabular}{lccccc}
+\toprule
+Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
+\midrule
+Ya trabajaba & 0 & 7 & 0.00 & 28.2617 & 197.8321 \\
+$<$ 1 mes & 0.5 & 12 & 6.00 & 23.1956 & 278.3467 \\
+1–4 meses & 2.5 & 15 & 37.50 & 7.9308 & 118.9627 \\
+4–8 meses & 6 & 11 & 66.00 & 0.4676 & 5.1438 \\
+8–12 meses & 10 & 12 & 120.00 & 21.9382 & 263.2584 \\
+$>$ 12 meses & 12 & 11 & 132.00 & 44.6735 & 491.4085 \\
+\midrule
+$\Sigma$ & & 68 & 361.50 & & 1354.9522 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Calcular la media muestral.}
+\[
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{361.50}{68} = 5.3162\ \text{meses}
+\]
+
+\textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
+\[
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{1354.9522}{67}} = 4.4970
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 67$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{67,\,0.025} \approx z_{0.025} = 1.96$.
+
+\textit{Paso 5. Calcular el margen de error.}
+\[
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{4.4970}{\sqrt{68}}\times 1.960 = 0.5453 \times 1.960 = 1.0689
+\]
+
+\textit{Paso 6. Construir el intervalo y concluir.}
+\[
+5.3162 - 1.0689 \;\le\; \mu \;\le\; 5.3162 + 1.0689 \quad\Longrightarrow\quad 4.25 \le \mu \le 6.39
+\]
+
+Con un 95\% de confianza, la media de tiempo hasta el primer empleo de todos los titulados está entre 4.25 y 6.39 meses. \datosprueba
+

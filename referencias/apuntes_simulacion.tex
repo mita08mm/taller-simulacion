@@ -1,0 +1,2541 @@
+\documentclass[11pt,letterpaper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,provide=*]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xurl}
+\usepackage{pifont}
+\usepackage{xcolor}
+
+\renewcommand{\arraystretch}{1.15}
+
+% Recuadro para algoritmos/pseudocódigo (en el original van dentro de un marco)
+\newenvironment{algoritmo}
+  {\begin{center}\begin{tabular}{|p{0.85\textwidth}|}\hline\vspace{-0.2cm}\begin{tabbing}\hspace{0.6cm}\=\hspace{0.6cm}\=\hspace{0.6cm}\=\hspace{0.6cm}\=\hspace{0.6cm}\=\kill}
+  {\end{tabbing}\vspace{-0.4cm}\\\hline\end{tabular}\end{center}}
+
+% Líneas en blanco del original para que el estudiante escriba
+\newcommand{\espacio}{\par\noindent\textit{[espacio en blanco para que el estudiante escriba]}\par}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\linespread{1.3}\selectfont SIMULACIÓN DE SISTEMAS --- APUNTES DE CLASES\par}
+\vspace{0.2cm}
+{\normalsize Docente: Henrry Frank Villarroel Tapia \quad·\quad Semestre 1-2021 \quad·\quad Por: Ali Rodriguez Julio Grover\par}
+\end{center}
+\vspace{0.5cm}
+
+%==========================================================
+\section*{Introducción}
+
+El estudio de la Simulación de Sistemas requiere que el estudiante de pregrado tenga fundamentos académicos en:
+
+\textbf{Informática:} Fundamentos sólidos en elaboración de algoritmos.
+
+\textbf{Matemáticas:} Fundamentos Matemáticos en Algebra, Cálculo, Estadística, Investigación de Operaciones.
+
+¿Cuál es la necesidad de aprender Simulación de Sistemas?
+\espacio
+
+En el desarrollo de esta materia se espera que el estudiante sea participativo, con sentido crítico-constructivo, dinámico, ordenado, perseverante, con actitud reflexiva y objetiva.
+
+\textbf{Recomendaciones para tener éxito en la materia:}
+
+Paso 1. No faltar a clases.
+
+Paso 2. En el mismo día de clase hacer un repaso de lo que aprendió.
+
+Paso 3. Debes ser consciente de que por cada hora de clases es necesito que el estudiante le dedique el doble de tiempo al estudio de la materia en lo posible dentro de la misma semana.
+
+\begin{center}
+\rule{0.6\textwidth}{0.4pt}\\[0.2cm]
+\textit{``No dejes para mañana lo que debes hacer hoy''}\\[-0.1cm]
+\rule{0.6\textwidth}{0.4pt}
+\end{center}
+
+%==========================================================
+\section*{Conceptos y definiciones}
+
+\subsection*{¿Qué es una Computadora?}
+
+Máquina electrónica con capacidad de \underline{procesamiento de información}.
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\centering\small [Diagrama: \emph{Procesamiento de información} $\rightarrow$ Memoria. Dispositivos de entrada $\rightarrow$ Unidad Central de Procesamiento $\rightarrow$ Dispositivos de salida. Debajo, Hardware / Software. Cada bloque se corresponde con: Entrada de información $\rightarrow$ Procesamiento de información $\rightarrow$ Salida de información.]}}
+\end{center}
+
+Escribe un resumen de lo que entendiste:
+\espacio
+
+\subsection*{Definición de Sistema}
+
+Conjunto de partes o elementos que trabajan de manera conjunta para lograr un objetivo.
+
+De igual manera un sistema puede definirse como un conjunto en la que todas sus partes están ordenadas de tal manera que todas contribuyan a un determinado fin.
+
+Palabras clave:
+\begin{multicols}{2}
+\begin{itemize}
+\item Partes
+\item Relaciones
+\item Frontera
+\item Estructura
+\item Comportamiento
+\end{itemize}
+\end{multicols}
+
+\subsubsection*{Clasificación de Sistemas}
+
+Existen multitud de parámetros por los cuales podríamos clasificar a los sistemas, sin embargo, una dimensión útil para clasificar los sistemas, en el campo de la simulación de sistemas, es su dinamicidad. Según su dinamicidad los sistemas se clasifican en sistemas estáticos y dinámicos. La clave de la diferenciación entre estos dos sistemas se encuentra en su evolución en el tiempo.
+
+\[
+\text{Clasificación de sistemas}
+\begin{cases}
+\text{Estáticos}\\
+\text{Dinámicos}
+\end{cases}
+\]
+
+\subsubsection*{Sistemas estáticos}
+
+Decimos que un sistema es estático si no es capaz de evolucionar a medida que avanza en el tiempo, es decir, no existe un cambio de un estado a otro estado.
+
+Matemáticamente decimos que un sistema es estático si las variables que definen su comportamiento se mantienen invariables respecto al tiempo.
+
+Ejemplo:
+
+Una silla puede considerarse un sistema estático, al igual que un edificio.
+
+Ejemplo:
+\espacio
+
+\subsubsection*{Sistemas dinámicos}
+
+Un sistema es dinámico cuando va evolucionando a medida que avanza en el tiempo, es decir, existen cambios de estados.
+
+Ejemplo:
+
+El sistema solar puede considerarse como un sistema dinámico, al igual que una montaña rusa.
+
+Ejemplo:
+\espacio
+
+\subsection*{Definición de Modelo}
+
+Un modelo es una representación de la realidad desarrollada con el propósito de estudiarla. En la mayoría de los análisis no es necesario considerar todos los detalles de la realidad, entonces, el modelo no solo es un sustituto de la realidad sino también una simplificación de ella.
+
+Basado en esta definición inicial podría decirse que \emph{un modelo es la representación de un sistema}.
+
+\subsubsection*{Clasificación de Modelos}
+
+\[
+\text{Clasificación de modelos}
+\begin{cases}
+\text{Concretos}\\
+\text{Abstractos}
+\end{cases}
+\]
+
+Ejemplos modelos Concretos:
+\espacio
+
+Ejemplos modelos Abstractos:
+\espacio
+
+\subsection*{Definición de abstracción}
+
+La abstracción es una capacidad mental que consiste en separar un elemento de su contexto para analizarlo y construir modelos adecuados.
+
+Ejemplo:
+\espacio
+
+\subsection*{Definición de Variable}
+
+Las variables se puede representar matemáticamente como una relación entre dos conjuntos, donde a un elemento $x$ del conjunto Dominio le corresponde ninguno o muchos elementos del otro conjunto que se denomina Rango.
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Diagrama de conjuntos: Dominio $=\{x, y, z\}$, Rango $=\{3, -2, 11\}$.]}}
+\end{center}
+
+Otra definición de una variable matemática es: un símbolo utilizado para proponer fórmulas, algoritmos o ecuaciones que puede tomar diferentes valores, dependiendo estos de otras variables, así como de una serie de parámetros y de ciertas constantes.
+
+En el ámbito de los lenguajes de programación, una variable es un espacio reservado en la memoria que tiene la capacidad de cambiar de contenido mientras se ejecuta algún software.
+
+\begin{verbatim}
+public class Carro
+{
+    private int capacidad;
+    private boolean basuraEntregada;
+
+    public Carro(int capacidad){
+        ...
+    }
+    ...
+}
+\end{verbatim}
+
+En concreto, la tecnología de los lenguajes de programación está sustentada en los fundamentos teóricos matemáticos.
+
+En simulación aceptamos ambas definiciones, pero además diremos que las \emph{variables} son elementos descriptores de un sistema.
+
+\subsubsection*{Clasificación de las variables}
+
+\[
+\text{Clasificación de variables}
+\begin{cases}
+\text{Discretas}\\
+\text{Continuas}
+\end{cases}
+\]
+
+Ejemplo de variables discretas:
+\espacio
+
+Ejemplo de variables continuas:
+\espacio
+
+Por lo tanto, con todas estas definiciones definiremos ``Simulación'' como la construcción de modelos computacionales, acerca de sistemas de diversa índole, donde estos sistemas pueden ser de tipo matemático, físico, químico, financiero, social, etc., a fin de entender tanto su estructura o comportamiento para tomar decisiones y controlarlas.
+
+%==========================================================
+\section*{Capítulo 1. Simulación de sistemas}
+
+\subsection*{Definición}
+
+Es la construcción de modelos computacionales de sistemas de diferentes tipos a fin de entender su estructura y comportamiento, para controlar y tomar decisiones sobre cada uno de estos sistemas.
+
+\subsection*{Factores de estudio de simulación}
+
+\subsubsection*{Lenguajes de programación}
+
+Los lenguajes de propósito general como Java, Python, JavaScript, etc., nos pueden servir para hacer simulaciones, pero hay lenguajes especializados como: GPSS, \underline{\hspace{2.5cm}}, \underline{\hspace{2.5cm}}
+
+\subsubsection*{Generación de Variables Aleatorias}
+
+No olvidemos que las variables son elementos descriptores dentro de los sistemas, pero tienen mayor importancia para nosotros aquellas variables que están vinculadas al concepto de aleatoriedad.
+
+Estas variables asumirán formalidad a partir de los métodos que se irán conociendo en el transcurso de la materia como: la transformada inversa, rechazo\ldots{} Dichas variables suelen estar asociadas a diferentes tipos de distribuciones estadísticas.
+
+\subsubsection*{Diseños de experimentos}
+
+Los programas de simulación nos permiten experimentar con los sistemas en un ambiente virtual sobre la base de formalidades matemáticas para entender su estructura y comportamiento de los modelos computacionales. Los experimentos suelen tomar formalidad vinculada a formalidades matemáticas como por ejemplo los análisis de regresión, comparación de medidas estadísticas.
+
+\subsubsection*{Tamaño de la muestra}
+
+\begin{center}
+\begin{minipage}{0.75\textwidth}
+\centering\itshape
+\rule{\textwidth}{0.4pt}\\[0.2cm]
+Muestra es una porción de la totalidad de un fenómeno, producto o actividad que se considera representativa del total también llamada una muestra representativa.
+
+\vspace{0.2cm}
+Parte o cantidad pequeña de una cosa que se considera representativa del total y que se toma o se separa de ella con ciertos métodos para someterla a estudio, análisis o experimentación.
+
+\vspace{0.2cm}
+Una muestra estadística es un subconjunto de datos perteneciente a una población de datos. Estadísticamente hablando, debe estar constituido por un cierto número de observaciones que representen adecuadamente el total de los datos.\\[-0.1cm]
+\rule{\textwidth}{0.4pt}
+\end{minipage}
+\end{center}
+
+En simulación, se define como tamaño de la muestra: al número de corridas que permite obtener un resultado confiable en un programa de simulación.
+
+Es decir que la confiabilidad de los resultados de un programa de simulación depende de cierto número de corridas que permiten confiar en los resultados.
+
+Ejemplo:
+
+¿Cuál es la probabilidad de que en el lanzamiento de una moneda salga cara?
+
+En condiciones normales es el 50\%
+
+Pero sí ejecutamos un programa que simule el lanzamiento de una monera, observaremos que la probabilidad de que salga cara será: $\frac{1}{1} = 100\%$ ó $\frac{0}{1} = 0\%$, entonces con una sola ejecución del programa de simulación no obtendremos 50\% ya que será 100\% ó 0\% cara, por lo tanto, necesitamos hacer varias corridas para aproximarnos al 50\%.
+
+\subsubsection*{Condiciones iniciales}
+
+Veremos esto en la obtención de medidas validas cuando un sistema alcance un estado estable. Es decir, que cuando el sistema empieza su funcionamiento puede que no nos den resultados válidos, o medidas válidas, a este periodo de inestabilidad se denomina: ``periodo de estado transiente'', luego, en algún momento el sistema alcanzará un estado de estabilidad al cual se denomina ``periodo estable''.
+
+Hay diferentes factores que hacen que la variable sea transitoria o transiente, es decir que hay una transición de un estado inicial para llegar a un estado estable
+
+Ejemplo:
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\small [Figura: resorte con masa que oscila (curva sinusoidal amortiguada) hasta quedar en reposo. Primer tramo marcado como \emph{Transiente o Transitorio}, segundo tramo como \emph{Estable}.]}}
+\end{center}
+
+Ejemplo:
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\small [Figura: circuito RC (fuente, interruptor, resistencia, capacitor, salida $V_o$) y gráfica de $V_o$ vs.\ $t$ que crece y se estabiliza; zona \emph{Transitorio} y zona \emph{Permanente}.]}}
+
+\vspace{0.1cm}
+Transitorio de tensión en un filtro RC pasa bajo.
+\end{center}
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\small [Figura: circuito RLC ($R_1 = 1$, $L_1 = 1\,\text{m}$, $C_1 = 10\,\mu$) y simulación de $V_o$: pico inicial de $\approx 1.6$\,V que se amortigua oscilando entre 0 y 10\,ms.]}}
+
+\vspace{0.1cm}
+Simulación de un transitorio de tensión con sobre impulso.
+\end{center}
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\small [Gráfica: $H_p$ (m) vs.\ Tiempo (s), 0--50\,s, curvas n2-4, n3-4, n4-4, n5-4; fuertes fluctuaciones hasta $\approx 20$\,s y luego valores casi constantes entre 95 y 130\,m.]}}
+
+\vspace{0.1cm}
+Análisis transiente de la demanda de agua uniformemente distribuida
+\end{center}
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\small [Gráficas: frecuencia relativa de entrega de paquetes en un día vs.\ número de paquetes. (a) 0--50 paquetes: oscila mucho (p.\,ej.\ $\frac{9}{15}=0.60$, $\frac{5}{10}=0.50$). (b) 0--1000 paquetes: se estabiliza en una aproximación a 0.6.]}}
+
+\vspace{0.1cm}
+Comportamiento de la frecuencia relativa de entrega de paquetes (a) fluctuación inicial (b) estabilización a largo plazo
+\end{center}
+
+\subsection*{Etapas de proyectos de simulación}
+
+Para realizar una tarea o un programa partimos por: Entender el problema.
+
+Cuando uno plantea un problema de simulación se debe seguir las siguientes etapas:
+
+\textbf{Etapa 1: Definición del sistema}
+
+Entender a detalle el problema, definir cuáles son los componentes, relaciones entre cada uno de los componentes del sistema, con el exterior del sistema, con el interior del sistema, definir la frontera, estructura, dinámica. Es un nivel de detalle para entender el problema a resolver
+
+\textbf{Etapa 2: Colección de datos}
+
+Obtener datos relevantes que involucra al sistema, los valores que toman cada una de las variables
+
+\textbf{Etapa 3: Plantear un modelo de simulación}
+
+Representación del sistema en su cabalidad en forma de gráficos, bosquejos, fórmulas, o de forma algorítmica.
+
+\textbf{Etapa 4: Implementación del sistema}
+
+Para esto se usa un lenguaje de programación de propósito general o especializado.
+
+\textbf{Etapa 5: Validación del sistema (Verificación de resultados)}
+
+Comprobar si el sistema está funcionando correctamente.
+
+\textbf{Etapa 6: Experimentación.}
+
+Para ello se somete al programa en condiciones previstas o no previstas en situaciones extremas
+
+\textbf{Etapa 7: Interpretación de resultados}
+
+Para la toma de decisiones
+
+\textbf{Etapa 8: Documentación}
+
+Esta etapa debería acompañar a todo el desarrollo del sistema.
+\begin{itemize}[label=-]
+\item Manual de usuario
+\item Manual técnico usuario
+\item Manual de modelo de simulación, para que se pueda hacer mantenimiento del sistema
+\end{itemize}
+
+Todas estas etapas mantienen una relación secuencial a excepción de la documentación que va acompañar en todas las etapas.
+
+\subsubsection*{Ventajas/ Desventajas de la simulación}
+
+\textbf{Ventajas}
+
+Dada la virtualidad se permite hacer simulación para:
+\begin{itemize}
+\item Organización y configuración de una planta industrial
+\item Elevar la temperatura de una torre de destilación
+\item Probar una nueva torre de destilación para mejorar la producción, es mejor que hacer las pruebas con algo real ya que si falla no podríamos devolver por cuestiones de material, vidas humanas, costos.
+\end{itemize}
+
+\textbf{Desventajas}
+\begin{itemize}[label=-]
+\item Los modelos son simplificaciones de sistemas reales, los cuales requieren de alimentación al modelo para poder mejorar, pero nunca se llega a la perfección.
+\item No hay muchos profesionales especializados en estos temas
+\end{itemize}
+
+\subsection*{1.1. Aplicaciones de la simulación}
+
+\begin{itemize}
+\item Matemáticas
+\item Física
+\item Economía
+\item Diseño de software
+\item Redes de computadoras
+\item Juegos
+\item Educación
+\item Industria
+\end{itemize}
+
+\subsection*{Referencias}
+
+\begin{itemize}
+\item \url{https://es.wikipedia.org/wiki/R%C3%A9gimen_transitorio_(electr%C3%B3nica)}
+\item \url{https://scielo.conicyt.cl/scielo.php?script=sci_arttext&pid=S0718-28132019000200043}
+\end{itemize}
+
+%==========================================================
+\section*{Capítulo 2. Generación de números aleatorios (Números rectangulares)}
+
+Los números aleatorios nos van a permitir representar la realidad, donde los resultados muchas veces dependen de las circunstancias o del azar.
+
+En nuestro campo la generación de números aleatorios tiene que cumplir formalidades.
+
+Existen diferentes fuentes generadoras de números aleatorios. Estas fuentes de carácter externas generalmente se obtienen de fenómenos naturales, en otros casos es necesario medirlos de alguna manera con algún equipamiento especializado como fuente natural de números aleatorios.
+
+En la investigación y análisis de fenómenos se obtienen fuentes generadoras de números aleatoria hasta llegar a encontrar ciertos patrones, de donde dejan de ser fuentes generadoras de números aleatorios, por lo tanto, se busca nuevas fuentes generadoras de número aleatorios.
+
+Otra forma de obtener números aleatorios es a partir de entidades privadas que ofrecen números aleatorios con una certificación sobre los números, caso ejemplo: la empresa RAND que venden números aleatorios.
+
+Otra fuente generadora de números aleatorios son los generadores congruenciales que adopta la forma de relación de recurrencia y estudio de este capítulo será sobre generadores congruenciales lineales.
+
+En resumen, fuentes generadoras de números aleatorios son:
+\begin{enumerate}
+\item Medición de fuentes naturales, puramente aleatorios.
+\item De paga
+\item Relaciones de recurrencia o generadores congruenciales.
+\end{enumerate}
+
+\subsection*{Generador congruencial lineal.}
+
+Tercera forma de fuente de generación de números aleatorios, que adopta la forma de una relación de recurrencia (formula recursiva), este generador dado su formalidad adopta su forma matemática o algorítmica.
+
+\textbf{Propiedades generadoras congruencial lineal}
+
+Se categoriza tomando en cuenta la misma relación de recurrencia, tomando en cuenta los resultados que arroja esa relación de recurrencia y considerando su implementación a través de la computadora.
+
+Se considera 3 dimensiones al momento de extender las propiedades de los números aleatorios.
+\begin{enumerate}
+\item De qué cara a la misma relación.
+  \begin{enumerate}[label=\alph*.]
+  \item Estas relaciones deben ser sencillas.
+  \item Tiene que ser rápidamente calculadas.
+  \item Fáciles de aprender.
+  \end{enumerate}
+\item De cada a los resultados que arroja la relación
+  \begin{enumerate}[label=\alph*.]
+  \item Tienen que ser de periodo largo.
+  \item Tienen que ser reproducibles.
+  \item Tienen que cumplir con los principios de independencia y uniformidad
+  \end{enumerate}
+\item De cara a la implementación en computadora.
+  \begin{enumerate}[label=\alph*.]
+  \item Que sea implementable (se pueda codificar).
+  \item Económica en consumo de recursos de cómputo (ya que son fórmulas de tipo recursivo)
+  \end{enumerate}
+\end{enumerate}
+
+\subsection*{Generador congruencial mixto}
+
+\begin{center}
+\fbox{$x_{n+1} = (a x_n + c) \bmod m\,;\ x_0$}
+\end{center}
+
+\begin{tabular}{rl}
+$a$ & : Constate multiplicativa\\
+$c$ & : Constate aditiva\\
+$m$ & : Módulo\\
+$x_0$ & : Valor semilla\\
+$mod$ & : Operador módulo ``\%''
+\end{tabular}
+
+\vspace{0.3cm}
+Esta fórmula es fácilmente calculable y programable, pero ahora tenemos que prestarle atención a los resultados que vamos a obtener:
+
+\textbf{Ejemplo 1:}
+\[
+x_{n+1} = (5x_n + 7) \bmod 8;\quad x_0 = 4
+\]
+\[
+a = 5,\quad c = 7,\quad m = 8 \quad y \quad x_0 = 4
+\]
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$n$ & $x_0$ & $a \cdot x_n$ & $a \cdot x_n + c$ & $x_{n+1}$ & $u_n = x_{n+1}/m$\\
+\hline
+1 & 4 & 20 & 27 & \textbf{3} & 3/8\\
+2 & 3 & 15 & 22 & \textbf{6} & 6/8\\
+3 & 6 & 30 & 37 & \textbf{5} & 5/8\\
+4 & 5 & 25 & 32 & \textbf{0} & 0/8\\
+5 & 0 & 0 & 7 & \textbf{7} & 7/8\\
+6 & 7 & 35 & 42 & \textbf{2} & 2/8\\
+7 & 2 & 10 & 17 & \textbf{1} & 1/8\\
+8 & 1 & 5 & 12 & \textbf{4} & 4/8\\
+\hline
+9 & 4 & 20 & 27 & \textbf{3} & 3/8\\
+10 & 3 & 15 & 22 & \textbf{6} & 6/8\\
+11 & 6 & 30 & 37 & \textbf{5} & 5/8\\
+12 & 5 & 25 & 32 & \textbf{0} & 0/8\\
+13 & 0 & 0 & 7 & \textbf{7} & 7/8\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\small Conjunto de valores que se vuelve a repetir (3, 6, 5, 0, 7, 2, 1, 4). A esta longitud se llama \textbf{periodo}. Y a la cantidad de resultado se denomina \textbf{longitud de periodo} = 8, que coincide con $m$. [En la tabla original, flechas muestran que cada $x_{n+1}$ pasa a ser el $x_n$ de la fila siguiente.]}}
+\end{center}
+
+De donde concluimos que la longitud de periodo es 8.
+
+\textbf{Ejemplo 2:}
+\[
+x_{n+1} = (7x_n + 7) \bmod 10;\quad x_0 = 7
+\]
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$n$ & $x_0$ & $a \cdot x_n$ & $a \cdot x_n + c$ & $x_{n+1}$ & $u_n = x_{n+1}/m$\\
+\hline
+1 & 7 & 49 & 56 & \textbf{6} & 6/10\\
+2 & 6 & 42 & 49 & \textbf{9} & 9/10\\
+3 & 9 & 63 & 70 & \textbf{0} & 0/10\\
+4 & 0 & 0 & 7 & \textbf{7} & 7/10\\
+\hline
+5 & 7 & 49 & 56 & \textbf{6} & 6/10\\
+6 & 6 & 42 & 49 & \textbf{9} & 6/10\\
+7 & 9 & 63 & 70 & \textbf{0} & 0/10\\
+8 & 0 & 0 & 7 & \textbf{7} & 7/10\\
+\hline
+9 & 7 & 49 & 56 & \textbf{6} & 6/10\\
+\hline
+\end{tabular}
+\end{table}
+
+\textit{Longitud de periodo es} $4 \neq m$, donde $m = 8$\footnote{Nota de transcripción: así figura en el original; en este ejemplo $m = 10$. En la fila 6 el original también pone $u_n = 6/10$ cuando corresponde $9/10$.}
+
+\begin{center}
+\colorbox[gray]{0.92}{\parbox{0.9\textwidth}{\centering\itshape por lo tanto no cumple con la proiedad de generadores de periodo largo}}
+\end{center}
+
+\textbf{Otras consideraciones}
+
+Sí quisiéramos dividir entre 5: $\langle num \rangle \div 5 = [\,\text{¿?}\,]$
+
+¿Qué resultados posibles como residuos habría de dividir entre 5? El conjunto de valores para el residuo esta entre $[0,4]$ es decir 0,1,2,3,4
+
+Y de: $\langle num \rangle \div 8 = [\,\text{¿?}\,]$
+
+El conjunto de posibles residuos es $[0,7]$ es decir 0.1.2.3.4.5.6.7
+
+Si vemos el \textbf{ejercicio 1} ($x_{n+1}$: 3, 6, 5, 0, 7, 2, 1, 4):
+
+Notamos que, el rango de valores completos que corresponde a los posibles valores del resto de la división entre 8 están en la lista, por tanto, se dice que el generador congruencial es de \textbf{periodo completo.}
+
+En cambio, para el \textbf{ejercicio 2}, no lo es, ya que solo son 4 de los $m$ posibles valores
+
+\textbf{Propiedades:} Como puede apreciarse en los ejemplos anteriores, surge la necesidad de algunas reglas que nos brinden información acerca de que si el generador tiene periodo completo. Existen muchos parámetros a tomar en cuenta, sin embargo, nos concentramos en tres más importantes, las cuales nos aseguran un periodo completo si las cumplimos.
+
+\begin{enumerate}[label=\roman*)]
+\item \textit{``$c$'' y ``$m$'', deben ser primos entre sí.}
+\item \textit{Todo primo que divida a ``$m$'' también debe dividir a ``$a-1$''.}
+\item \textit{Si ``$m$'' es múltiplo de \textbf{4}, entonces ``$a-1$'' también debe serlo.}
+\end{enumerate}
+
+Si se cumple \textit{i) \& ii) \& iii)}, entonces, tendremos generadores de periodo completo.
+
+\textbf{Apliquemos las propiedades al ejercicio1:}
+\begin{enumerate}[label=\roman*)]
+\item $c = 7$, sus factores son: 7\\
+$m = 8$, sus factores son: $2 \times 2 \times 2$\\
+Al no haber factor común entre ambos decimos que \textbf{son primos entre sí}.
+\item $m = 8$, los primos que lo dividen es 2\\
+$a - 1 = 5 - 1 = 4$, ¿4 es divisible entre 2? \textbf{Resp}. Sí.
+\item $m = 8$, 8 es múltiplo de 4\\
+$a - 1 = 5 - 1 = 4$, ¿4 es múltiplo de 4? \textbf{Resp.} Sí.
+\end{enumerate}
+
+\textbf{Apliquemos las propiedades al ejercicio2:}
+
+Recordemos que $x_{n+1} = (7x_n + 7) \bmod 10;\ x_0 = 7$
+\begin{enumerate}[label=\roman*)]
+\item $c = 7$, sus factores son: 7\\
+$m = 10$, sus factores son: $2 \times 5$\\
+Al no haber factor común entre ambos decimos que \textbf{son primos entre sí}.
+\item $m = 10$, los primos que lo divide son: $2 \times 5$\\
+$a - 1 = 7 - 1 = 6$, ¿6 es divisible entre 2? \textbf{Resp}. Sí.\\
+\phantom{$a - 1 = 7 - 1 = 6$,} ¿6 es divisible entre 5? \textbf{Resp}. No.
+\item $m = 10$, ¿10 es múltiplo de 4? \textbf{Resp.} No\\
+$a - 1 = 7 - 1 = 6$, ¿6 es múltiplo de 4? \textbf{Resp.} No\\
+Si m no es múltiplo de cuatro, entonces no importar si a-1 es múltiplo de 4
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{p} & $\rightarrow$ & \textbf{q}\\
+\hline
+V & V & V\\
+V & F & F\\
+F & V & V\\
+F & V & F\\
+\hline
+\end{tabular}
+\end{center}
+\end{enumerate}
+
+Por tanto, si m no es múltiplo de 4, a-1 tampoco es múltiplo de cuatro, entonces iii) se cumple
+\begin{center}
+i) \& ii) \& iii)\\
+V $\wedge$ F $\wedge$ V = F
+\end{center}
+
+\subsection*{Generador congruencial multiplicativo}
+
+\[
+x_{n+1} = a x_n \bmod m;\ x_0
+\]
+
+$a$, es la constante multiplicativa
+
+$m$, es el módulo
+
+$x_0$, es la semilla
+
+\textbf{Ejemplo:}
+\[
+x_{n+1} = 3x_n \bmod 100;\ x_0 = 17
+\]
+Con: $a = 3,\ m = 100\ y\ x_0 = 17$
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$\boldsymbol{n}$ & $\boldsymbol{x_0}$ & $\boldsymbol{a \cdot x_n}$ & $\boldsymbol{x_{n+1}}$ & $\boldsymbol{u_n = x_{n+1}/m}$\\
+\hline
+0 & 17 & 51 & \textbf{51} & 51/100\\
+1 & 51 & 153 & \textbf{53} & 53/100\\
+2 & 53 & 159 & \textbf{59} & 59/100\\
+3 & 59 & 177 & \textbf{77} & 77/100\\
+4 & 77 & 231 & \textbf{31} & 31/100\\
+5 & 31 & 93 & \textbf{93} & 93/100\\
+6 & 93 & 279 & \textbf{79} & 79/100\\
+7 & 79 & 237 & \textbf{37} & 37/100\\
+8 & 37 & 111 & \textbf{11} & 11/100\\
+9 & 11 & 33 & \textbf{33} & 33/100\\
+10 & 33 & 99 & \textbf{99} & 99/100\\
+11 & 99 & 297 & \textbf{97} & 97/100\\
+12 & 97 & 291 & \textbf{91} & 91/100\\
+13 & 91 & 273 & \textbf{73} & 73/100\\
+14 & 73 & 219 & \textbf{19} & 19/100\\
+15 & 19 & 57 & \textbf{57} & 57/100\\
+16 & 57 & 171 & \textbf{71} & 71/100\\
+17 & 71 & 213 & \textbf{13} & 13/100\\
+18 & 13 & 39 & \textbf{39} & 39/100\\
+19 & 39 & 117 & \textbf{17} & 17/100\\
+\hline
+20 & 17 & 51 & \textbf{51} & 51/100\\
+21 & 51 & 153 & \textbf{53} & 53/100\\
+22 & 53 & 159 & \textbf{59} & 59/100\\
+23 & 59 & 177 & \textbf{77} & 77/100\\
+24 & 77 & 231 & \textbf{31} & 31/100\\
+\hline
+\end{tabular}
+\end{table}
+
+\textit{Longitud de periodo es} $20 \neq m$, donde $m = 100$. Por lo tanto, el generador congruencial multiplicativo \textbf{no} es de \textbf{periodo completo}
+
+\textbf{Propiedades Generador Congruencial Multiplicativo}
+\[
+x_{n+1} = a x_n \bmod m;\ x_0
+\]
+\begin{enumerate}[label=\roman*)]
+\item La semilla $x_0$ debe ser un número entero impar. No divisible entre 2, ni 5. Además, debe ser relativamente primo a ``m''.
+\item El valor de ``$a$'' obedece a la siguiente relación:
+\[
+a = 200\,t \pm p\,,\ donde\ t \in \mathbb{Z}^+ \geqq 0
+\]
+\[
+y\ donde\ p = \{3,11,13,19,21,27,29,37,53,59,61,67,69,77,83,91\}
+\]
+\item Siendo $m = 10^d$
+
+\begin{algoritmo}
+\>Si $d \geq 5$ entonces\\
+\>\>$P = 5 \times 10^{d-2}$ donde ``P'' es el periodo\\
+\>sino\\
+\>\>$P = mcm\{\lambda(P_i^{d_i})\} = mcm\{\lambda(P_1^{d_1}), \lambda(P_2^{d_2}), \ldots, \lambda(P_n^{d_n})\}$\\
+\>FinSi
+\end{algoritmo}
+\end{enumerate}
+
+\begin{center}
+\fbox{i) \& ii) $\rightarrow$ iii)}
+\end{center}
+
+\textbf{Ejemplo}: si observamos el ejemplo anterior.
+\[
+x_{n+1} = 3x_n \bmod 100;\ x_0 = 17
+\]
+\begin{center}
+Con $a = 3,\ m = 100\ y\ x_0 = 17$
+\end{center}
+
+Ahora verificamos las propiedades:
+\begin{enumerate}[label=\roman*)]
+\item La semilla $x_0$ debe ser un número entero impar. No divisible entre 2, ni 5. Además, debe ser relativamente primo a ``m''.
+
+$x_0 = 17$, ¿Es entero y par?\footnote{Nota de transcripción: así figura en el original; por el enunciado de la propiedad, la pregunta es si es entero e \emph{impar}.} Resp. Sí
+
+¿Es divisible entre 2? Resp. No
+
+¿Es divisible entre 5? Resp. No
+
+¿Es relativamente primo a $m = 100$?
+
+$x_0 = 17$: 17
+
+$m = 100 : 2 \times 2 \times 5 \times 5$
+
+\textbf{Resp. Sí}, son relativamente primos entre sí
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\small -Si $x_0 = 34$, su descomposición es $2 \times 17$. Y al haber en $m$ el factor común 2, entonces quiere decir que \textbf{no} son primos entre sí.\\
+-Pero si $x_0 = 51$: $3 \times 17$, ni 3, ni 17 están entre los factores de m, por tanto, son primos entre sí.}}
+\end{center}
+
+\item El valor de ``$a$'' obedece a la siguiente relación:
+\[
+a = 200\,t \pm p\,,\ donde\ t \in \mathbb{Z}^+ \geqq 0
+\]
+\[
+y\ donde\ p = \{3,11,13,19,21,27,29,37,53,59,61,67,69,77,83,91\}
+\]
+El valor de $a = 3$ e igualando a la fórmula:
+
+$3 = 200\,t \pm p$, y para cumplir la igualdad, $t = 0$ y por otro lado $p = 3$, un elemento del conjunto de $p$
+
+Por lo tanto, tendríamos de $3 = 200\,t \pm p$:
+
+$a = 200\,(0) + 3 = +3$ \checkmark
+
+$a = 200\,(0) - 3 = -3$ $\times$
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\small Y según las propiedades de los generadores congruenciales los valores de los parámetros siempre tienen que ser mayores que cero.}}
+\end{center}
+
+Por lo tanto $a = 3$ \textbf{si} obedece a la relación
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\small Sí t=1 y p=13 entonces 200(1)+13=213 y 200(1)-13=187, en este caso se escoge cualquiera de los $a$.}}
+\end{center}
+
+\item Siendo $m = 10^d$
+
+\begin{algoritmo}
+\>Si $d \geq 5$ entonces\\
+\>\>$P = 5 \times 10^{d-2}$ donde ``P'' es el periodo\\
+\>sino\\
+\>\>$P = mcm\{\lambda(P_i^{d_i})\} = mcm\{\lambda(P_1^{d_1}), \lambda(P_2^{d_2}), \ldots, \lambda(P_n^{d_n})\}$\\
+\>FinSi
+\end{algoritmo}
+
+Se sabe que $m = 100$ y se puede representar por $10^2$ entonces se puede decir que $d = 2$
+
+\begin{algoritmo}
+\>Si $2 \geq 5$ entonces\\
+\>\>$P = 5 \times 10^{d-2}$ donde ``P'' es el periodo\\
+\>sino\\
+\>\>$P = mcm\{\lambda(P_i^{d_i})\} = mcm\{\lambda(P_1^{d_1}), \lambda(P_2^{d_2}), \ldots, \lambda(P_n^{d_n})\}$\\
+\>FinSi
+\end{algoritmo}
+
+$m = 100$ puede descomponerse en: $2 \times 2 \times 5 \times 5 = 2^2 \times 5^2$
+\[
+donde\ 2^2 es\ P_1^{d_1}\ y\ 5^2 es\ P_2^{d_2}
+\]
+
+Por tanto, de $\lambda(P^d) = (P-1)P^{d-1}$ se tiene:
+\begin{align*}
+\lambda(P_1^{d_1}) &= \lambda(2^2) = (2-1)2^{2-1} = 1 \times 2 = 2\\
+\lambda(P_2^{d_2}) &= \lambda(5^2) = (5-1)5^{2-1} = 4 \times 5 = 20
+\end{align*}
+\[
+P = mcm\{\lambda(2^2), \lambda(5^2)\} = mcm\{2, 20\}
+\]
+
+Por tanto $P = 20$, y este valor es coincidente a la longitud de periodo de la tabla.
+\end{enumerate}
+
+\begin{center}
+i) \& ii) $\rightarrow$ iii)
+\end{center}
+
+Al cumplir la propiedad i) y la propiedad ii) entonces se procede a verificar la propiedad iii) de donde se cumple la Propiedad de predecibilidad.
+
+Si bien no es de periodo completo, si son generadores predecibles.
+
+%==========================================================
+\section*{Capítulo 3. Pruebas Estadísticas}
+
+\begin{itemize}
+\item Uniformidad
+\item Independencia
+\end{itemize}
+
+\subsection*{Prueba de los promedios}
+
+La suma de los elementos dividido entre la cantidad de elementos nos da como resultado el promedio
+
+\subsection*{Prueba de la normal}
+
+Nos acordamos de la campana de Gauss
+
+Son funciones del área de estadística llamadas funciones de distribución de probabilidad
+
+También se lo puede encontrar con test de la prueba normal
+
+\begin{center}
+\textbf{La intención es: verificar el principio de uniformidad}
+\end{center}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+$\boldsymbol{x_{n+1}}$ & $\boldsymbol{u_n = \frac{x_{n+1}}{m}}$\\
+\hline
+51 ($x_1$) & 51/100 ($\mu_0$)\\
+53 & 53/100\\
+59 & 59/100\\
+77 ($x_{n+1}$) & 77/100 ($\mu_n$)\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Figura: \emph{Población Uniforme} $\rightarrow$ \emph{Muestra uniforme}.]}}
+\end{center}
+
+Lo que se quiere es verificar que la muestra cumple con el principio de uniformidad, cuyo origen de datos es a partir de una población(uniforme)
+
+Si la población es uniforme la muestra también lo es.
+
+¿Cómo demostramos esto?
+
+Tiene que cumplir con características compartidas por la muestra y por la población.
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Figura: \emph{Población Uniforme, Edad} $\cong 21$ $\rightarrow$ \emph{Muestra uniforme}, $\bar{x} \cong 23$.]}}
+\end{center}
+
+Si la muestra tiene una medida similar a la de la población, entonces hay una forma matemática definida que permita decir que la población es uniforme:
+\[
+f(x) = \begin{cases}
+1 & ;\quad 0 < x < 1\\
+0 & ;\quad 0 > x > 1
+\end{cases}
+\]
+
+La cual es la distribución uniforme. Y a partir de esta población se puede trabajar con algunas medidas como: medidas de tendencia central (media poblacional) o medidas de dispersión (media muestral)
+\[
+\text{Media}
+\begin{cases}
+\text{Tendencia central}\\
+\text{dispersión}
+\end{cases}
+\]
+
+Entonces tenemos que ver cual es la diferencia entre la media muestral y la media poblacional $\mu - \bar{x}$, por lo tanto, hay que estandarizar con el estadístico calculado:
+\[
+Z_0 = \frac{(\bar{x} - \mu)\sqrt{n}}{\sigma}
+\]
+
+Donde de $\mu_0, \ldots, \mu_n$:
+\begin{align*}
+&\text{Sale}\quad \bar{x} = \frac{\mu_0 + \cdots + \mu_n}{n} &&\leftarrow \text{Media muestral}\\
+&\mu = \int_a^b x f(x)\,dx &&\leftarrow \text{Media poblacional}
+\end{align*}
+
+También se puede establecer la varianza con:
+\[
+VAR(x) = \int_a^b (x - \mu)^2 f(x)\,dx
+\]
+
+Ejemplo: si se calcula $\mu$
+\[
+\mu = \int_0^1 x(1)\,dx = \left.\frac{x^2}{2}\right|_0^1 = \frac{1^2}{2} - \frac{0^2}{2} = \frac{1}{2}
+\]
+\[
+VAR(x) = \int_0^1 \left(x - \frac{1}{2}\right)^2 (1)\,dx
+\]
+\[
+VAR(x) = \int_0^1 \left(x^2 - x + \frac{1}{4}\right)dx = \int_0^1 x^2\,dx - \int_0^1 x\,dx + \int_0^1 \frac{1}{4}\,dx = \left.\frac{x^3}{3}\right|_0^1 - \left.\frac{x^2}{2}\right|_0^1 + \left.\frac{1}{4}x\right|_0^1
+\]
+\[
+VAR(x) = \frac{1}{3} - \frac{1}{2} + \frac{1}{4} = \frac{1}{12}
+\]
+
+Ahora estandarizamos la diferencia de medias con:
+\[
+|Z_0| = \frac{(\bar{x} - \mu)\sqrt{n}}{\sigma} = \frac{\left(\bar{x} - \frac{1}{2}\right)\sqrt{n}}{\sqrt{\frac{1}{2}}}
+\]
+\footnote{Nota de transcripción: así figura en el original; como $VAR(x) = \frac{1}{12}$, el denominador correcto es $\sigma = \sqrt{1/12}$, que es el que se usa en el ejercicio resuelto más abajo.}
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\centering\small [Figura: campana de Gauss con el área sombreada desde 0 hacia la derecha marcada $z_0$, y los valores críticos $-z_{\alpha/2}$ y $z_{\alpha/2}$ en ambas colas.]}}
+\end{center}
+
+$z_0$, puede estar entre 0 y $z_{\alpha/2}$ ó
+
+$z_0$, puede estar entre $z_{\alpha/2}$ y 0 ó
+
+$z_0$, puede estar entre $z_{\alpha/2}$ e Infinito ó
+
+$z_0$, puede estar entre infinito y $z_{\alpha/2}$
+
+\begin{algoritmo}
+\>Si ($z_0 < z_{\alpha/2}$)\\
+\>\>Uniformidad\\
+\>Sino\\
+\>\>No ``uniformidad''\\
+\>FinSi
+\end{algoritmo}
+
+\textbf{Algoritmo}
+
+Paso1. Contar con la muestra y determinar su tamaño\\
+Paso2. Calcular la media muestral\\
+Paso3. Calcular el estadístico $z_0$\\
+Paso 4. Determinar el estadístico teórico\\
+Paso 5. Establecer la relación entre estadísticos\\
+Paso 6. Conclusión
+
+Se procede con todos estos pasos para determinar si se cumple o no con el principio de la uniformidad.
+
+\textbf{Ejercicio. Sea:} 0.51\ 0.43\ 0.89\ 0.22\ 0.74\ 0.09\ 0.62\ 0.37\ 0.15\ 0.94 \quad (elementos 1 al 10)
+
+Aplicar la prueba de los promedios con $\alpha = 5\%$. Plantear el algoritmo y concluir.
+
+Solución:
+
+\textit{Paso1. Contar con la muestra y determinar su tamaño}
+
+La muestra está especificada en el enunciado y su tamaño es: $n = 10$
+
+\textit{Paso2. Calcular la media muestral}
+\[
+\bar{x} = \frac{\mu_0 + \cdots + \mu_n}{n}
+\]
+\[
+\bar{x} = \frac{0.51 + 0.43 + 0.89 + 0.22 + 0.74 + 0.09 + 0.62 + 0.37 + 0.15 + 0.94}{10} = 0.496
+\]
+
+\textit{Paso3. Calcular el estadístico $z_0$}
+\[
+|Z_0| = \left|\frac{(\bar{x} - \mu)\sqrt{n}}{\sigma}\right|
+\]
+\[
+|Z_0| = \left|\frac{(0.496 - 0.5)\sqrt{10}}{\sqrt{1/12}}\right| = 0.04381
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico}
+\[
+z_{\alpha/2} = z_{0.05/2} = z_{0.025} =
+\]
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\small [Figura: mitad derecha de la campana (área 0.5), dividida en $0.5 - 0.025 = 0.475$ y la cola $\alpha/2 = \frac{0.05}{2} = 0.025$.]\\
+Luego buscando en tabla de distribución normal 0.475, encontramos en fila 1.9 y en columna .06 lo que da 1.96 que sería el valor de $z_{0.025}$}}
+\end{center}
+\[
+z_{0.025} = 1.96
+\]
+
+\textit{Paso 5. Establecer la relación entre estadísticos}
+\[
+z_0 < z_{\alpha/2}
+\]
+
+\textit{Paso 6. Conclusión}
+
+\begin{algoritmo}
+\>$0.04381 < 1.96 \rightarrow$ verdad\\
+\>Si ( $z_0 < z_{\alpha/2}$ )\\
+\>\>\fbox{Uniformidad}\\
+\>Sino\\
+\>\>No ``uniformidad''\\
+\>FinSi
+\end{algoritmo}
+
+La muestra proviene de una población uniforme con media igual a ½. Por tanto, cumple con ``uniformidad''.
+
+\subsection*{Prueba de las Frecuencias (Chi-Cuadrado)}
+
+El objetivo es verificar la uniformidad.
+
+Hay 2 particularidades de frecuencia: Frecuencia esperada (FE) y Frecuencia observada (FO).
+
+\textbf{Ejemplo:}
+
+Si tenemos 10 manzanas y queremos distribuir entre 2 personas, entonces el resultado será 10/2=5.
+
+10 representa al tamaño de la muestra y 2 representa a las categorías
+\[
+\textit{y tenemos que la Frecuencia Esperada} \rightarrow FE = \frac{10}{2} = \frac{n}{k}
+\]
+
+Pero ¿qué sucede si se deja las 10 manzanas y se dice a las dos personas que se agarren las manzanas?
+
+De repente uno agarraría 3 manzanas y el otro 7,
+\[
+\textit{entonces la Frecuencia Observada podría ser: } FO_1 = 3\ y\ FO_2 = 7
+\]
+
+La idea es comparar cuan diferentes puede ser lo que ocurre en la \textbf{realidad} con lo que se \textbf{espera} $\rightarrow FE - FO$ pero estandarizado de tal manera que se pueda comparar con un patrón, {\small\itshape ``en el anterior el patrón era la distribución normal''} en este caso el patrón es la distribución de la $chi^2$.
+\[
+\boldsymbol{x_0^2 = \sum_{i=1}^{k} \frac{(FE_i - FO_i)^2}{FE_i} < x_{\alpha,k-1}^2}
+\]
+
+\begin{algoritmo}
+\>Si ($x_0^2 < x_{\alpha,k-1}^2$)\\
+\>\>``Uniformidad''\\
+\>Sino\\
+\>\>No ``Uniformidad''\\
+\>FinSi
+\end{algoritmo}
+
+\textbf{Algoritmo}
+
+Paso 1. Contar con la muestra y determinar su tamaño.
+
+Paso 2. Calcular la frecuencia esperada.
+
+Paso 3. Calcular el estadístico Chi cuadrado
+\[
+x_0^2 = \sum_{i=1}^{k} \frac{(FE_i - FO_i)^2}{FE_i}
+\]
+
+Paso 4. Determinar el estadístico teórico
+\[
+x_{\alpha,k-1}^2
+\]
+
+Paso 5. Establecer relación entre estadísticos
+\[
+x_0^2 < x_{\alpha,k-1}^2
+\]
+
+Paso 6. Conclusión
+
+\begin{algoritmo}
+\>Si ($x_0^2 < x_{\alpha,k-1}^2$)\\
+\>\>``Uniformidad''\\
+\>Sino\\
+\>\>No ``Uniformidad''\\
+\>FinSi
+\end{algoritmo}
+
+\textbf{Ejemplo.} Sea: 0.12\ 0.54\ 0.81\ 0.02\ 0.73\ 0.95\ 0.33\ 0.68\ 0.48\ 0.21
+
+Aplicar las pruebas de las frecuencias con alfa 5\% y k=4
+
+\textbf{Solución.}
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.}
+
+La muestra está especificada en el enunciado y su tamaño es n=10
+
+\textit{Paso 2. Calcular la frecuencia esperada.}
+\[
+FE = \frac{n}{k} = \frac{10}{4} = 2.5
+\]
+
+\textit{Paso 3. Calcular el estadístico Chi cuadrado}
+\[
+x_0^2 = \sum_{i=1}^{k} \frac{(FE - FO_i)^2}{FE}
+\]
+
+Se posicionan los valores 0.12\ 0.54\ 0.81\ 0.02\ 0.73\ 0.95\ 0.33\ 0.68\ 0.48\ 0.21 en la gráfica (recta de 0 a 1 dividida en $k = 4$ intervalos) y se los contabiliza:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+$FO_1$: $[0, 0.25)$ & $FO_2$: $[0.25, 0.50)$ & $FO_3$: $[0.50, 0.75)$ & $FO_4$: $[0.75, 1]$\\
+\hline
+0.12, 0.02, 0.21 & 0.33, 0.48 & 0.54, 0.73, 0.68 & 0.81, 0.95\\
+(3) & (2) & (3) & (2)\\
+\hline
+\end{tabular}
+\end{table}
+
+\[
+x_0^2 = \sum_{i=1}^{k} \frac{(FO_i - FE_i)^2}{FE_i} = \frac{(3-2.5)^2 + (2-2.5)^2 + (3-2.5)^2 + (2-2.5)^2}{0.25} = 4
+\]
+\footnote{Nota de transcripción: así figura en el original. Con $FE = 2.5$ el denominador debería ser $2.5$ y el resultado $x_0^2 = 1/2.5 = 0.4$; la conclusión (uniformidad) no cambia, porque $0.4 < 7.81$ igual que $4 < 7.81$.}
+
+\textit{Paso 4. Determinar el estadístico teórico}
+\[
+\boldsymbol{x_{\alpha,k-1}^2 = x_{0.05,4-1}^2 = x_{0.05,3}^2 = 7.81}
+\]
+
+\textit{Paso 5. Establecer relación entre estadísticos}
+\[
+\boldsymbol{x_0^2 < x_{\alpha,k-1}^2 \rightarrow \textbf{\textit{sí}}}
+\]
+
+\textit{Paso 6. Conclusión}
+
+\begin{algoritmo}
+\>$4 < 7.81$\\
+\>Si ($x_0^2 < x_{\alpha,k-1}^2$)\\
+\>\>\fbox{``Uniformidad''}\\
+\>Sino\\
+\>\>No ``Uniformidad''\\
+\>FinSi
+\end{algoritmo}
+
+\subsection*{Prueba de las series.}
+
+Esta prueba es para verificar el principio de independencia
+
+Se trabaja con el concepto de frecuencias y se toma en cuenta los elementos de la muestra para construir pares ordenados consecutivos.
+\[
+u_1, u_2, \ldots, u_n
+\]
+\[
+\underbrace{(u_1, u_2), (u_2, u_3), \ldots, (u_{n-1}, u_n)}_{n-1,\ \text{pares ordenados}}
+\]
+\[
+\left.\begin{array}{l}
+FE = \dfrac{n-1}{k^2}\\[0.3cm]
+FO_{i,j}
+\end{array}\right\}
+\quad x_0^2 = \frac{k^2}{n-1}\sum_{i=1}^{k}\sum_{j=1}^{k}(FO_{ij} - FE)^2 \rightarrow \textit{Estadístico calculado chi-cuadrado}
+\]
+\[
+\overbrace{\frac{k^2}{n-1}\sum_{i=1}^{k}\sum_{j=1}^{k}(FO_{ij} - FE)^2}^{x_0^2} < x_{\alpha,k^2-1}^2
+\]
+
+\begin{algoritmo}
+\>Si ($x_0^2 < x_{\alpha,k^2-1}^2$)\\
+\>\>``Independencia''\\
+\>Sino\\
+\>\>No ``Independencia''\\
+\>FinSi
+\end{algoritmo}
+
+\textbf{Algoritmo}
+
+Paso 1. Contar con la muestra, formar pares ordenados consecutivos, y determinar el número de pares.
+
+Paso 2. Calcular la frecuencia esperada
+
+Paso 3. Determinar la frecuencia observada
+
+Paso 4. Calcular el estadístico Chi-cuadrado
+
+Paso 5. Determinar el estadístico teórico Chi-cuadrado
+
+Paso 6. Establecer relación
+
+Paso 7. Conclusión
+
+\textbf{Ejemplo.} Sea: 0.25\ 0.32\ 0.15\ 0.08\ 0.97\ 0.12\ 0.44\ 0.67\ 0.71\ 0.82
+
+Aplicar la prueba de las series con alfa 5\% y k=4
+
+\textbf{Solución:}
+
+\textit{Paso 1. Contar con la muestra, formar pares ordenados consecutivos, y determinar el número de pares.}
+
+La muestra esta especificada en el enunciado y los pares ordenados son:
+
+(0.25,0.32)(0.32,0.15)(0.15,0.08)(0.08,0.97)(0.97,0.12)
+
+(0.12,0.44)(0.44,0.67)(0.67,0.71)(0.71,0.82)
+\[
+n - 1 = 10 - 1 = 9
+\]
+
+\textit{Paso 2. Calcular la frecuencia esperada}
+\[
+FE = \frac{n-1}{k^2} = \frac{9}{4^2} = \frac{9}{16}
+\]
+
+\textit{Paso 3. Determinar la frecuencia observada}
+
+Se posicionan los pares ordenados en la gráfica (cuadrado $[0,1]\times[0,1]$ dividido en $k^2 = 16$ celdas de $0.25 \times 0.25$) y se los contabiliza:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{c|c|c|c|c|}
+\multicolumn{1}{c}{} & \multicolumn{1}{c}{$[0,0.25)$} & \multicolumn{1}{c}{$[0.25,0.50)$} & \multicolumn{1}{c}{$[0.50,0.75)$} & \multicolumn{1}{c}{$[0.75,1]$}\\
+\cline{2-5}
+$[0.75,1]$ & (0.08,0.97) [1] & & (0.71,0.82) [1] & \\
+\cline{2-5}
+$[0.50,0.75)$ & & (0.44,0.67) [1] & (0.67,0.71) [1] & \\
+\cline{2-5}
+$[0.25,0.50)$ & (0.12,0.44) [1] & (0.25,0.32) [1] & & \\
+\cline{2-5}
+$[0,0.25)$ & (0.15,0.08) [1] & (0.32,0.15) [1] & & (0.97,0.12) [1]\\
+\cline{2-5}
+\end{tabular}
+\end{table}
+
+\textit{Paso 4. Calcular el estadístico Chi-cuadrado}
+\[
+x_0^2 = \frac{4^2}{9}\sum_{i=1}^{k}\sum_{j=1}^{k}\left(FO_{ij} - \frac{9}{16}\right)^2 = \frac{16}{9}\left[9\left(1 - \frac{9}{16}\right)^2 + 7\left(0 - \frac{9}{16}\right)^2\right] = 7
+\]
+
+\textit{Paso 5. Determinar el estadístico teórico Chi-cuadrado}
+\[
+x_{\alpha,k^2-1}^2 = x_{0.05,4^2-1}^2 = x_{0.05,15}^2 = 25
+\]
+
+\begin{center}
+\fbox{\parbox{0.7\textwidth}{\small Se busca en la tabla de chi-cuadrado, el $\alpha = 5\% = 0.05$ y el $\gamma = k^2 - 1 = 15$ y como resultado se obtiene 25}}
+\end{center}
+
+\textit{Paso 6. Establecer relación}
+\[
+x_0^2 < x_{0.05,15}^2
+\]
+
+\textit{Paso 7. Conclusión}
+
+\begin{algoritmo}
+\>$7 < 25$\\
+\>Si ($x_0^2 < x_{\alpha,k^2-1}^2$)\\
+\>\>\fbox{``Independencia''}\\
+\>Sino\\
+\>\>No ``Independencia''\\
+\>FinSi
+\end{algoritmo}
+
+\subsection*{Prueba de Kolmogórov-Smirnov}
+
+Nos ayuda a verificar el principio de \textbf{uniformidad}, trabaja sobre el concepto de frecuencias, pero acumuladas (frecuencias acumuladas).
+
+Paso 1. Contar con la muestra (generarla)
+
+Paso 2. Ordenar la muestra en orden ascendente
+
+Paso 3. Se calcula la frecuencia acumulada de acuerdo a la siguiente relación:
+\[
+F_n(x) = \frac{i}{n}
+\]
+Donde:
+
+$n$, es el tamaño de la muestra
+
+$i$, es el número de elementos menores iguales al elemento de la muestra $x_i$
+
+Paso 4. Se calcula el estadístico K-S
+\[
+D_n = max|F_n(x_i) - x_i|
+\]
+
+Paso 5. Establecer relación
+\[
+D_n < d_{\alpha,n}
+\]
+
+Paso 6. Conclusión
+
+\begin{algoritmo}
+\>Si ($D_n < d_{\alpha,n}$)\\
+\>\>``Uniformidad''\\
+\>Sino\\
+\>\>No ``Uniformidad''\\
+\>FinSi
+\end{algoritmo}
+
+\textbf{Ejemplo.} Sea 0.24\ 0.36\ 0.07\ 0.82\ 0.99\ 0.16\ 0.66\ 0.42\ 0.77\ 0.57
+
+Aplicar la prueba K-S con alfa 5\%
+
+Solución:
+
+\textit{Paso 1. Contar con la muestra (generarla)}
+\[
+n = 10
+\]
+
+\textit{Paso 2. Ordenar la muestra en orden ascendente}
+
+0.07\ \ 0.16\ \ 0.24\ \ 0.36\ \ 0.42\ \ 0.57\ \ 0.66\ \ 0.77\ \ 0.82\ \ 0.99
+
+\textit{Paso 3. Se calcula la frecuencia acumulada de acuerdo a la siguiente relación:}
+\[
+F_n(x) = \frac{i}{n}
+\]
+\[
+\frac{1}{10}\quad \frac{2}{10}\quad \frac{3}{10}\quad \frac{4}{10}\quad \frac{5}{10}\quad \frac{6}{10}\quad \frac{7}{10}\quad \frac{8}{10}\quad \frac{9}{10}\quad 1
+\]
+
+\textit{Paso 4. Se calcula el estadístico K-S}
+\[
+D_n = max|F_n(x_i) - x_i|
+\]
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l|cccccccccc}
+$F_n(x_i)$ & $\frac{1}{10}$ & $\frac{2}{10}$ & $\frac{3}{10}$ & $\frac{4}{10}$ & $\frac{5}{10}$ & $\frac{6}{10}$ & $\frac{7}{10}$ & $\frac{8}{10}$ & $\frac{9}{10}$ & 1\\
+$x_i$ & 0.07 & 0.16 & 0.24 & 0.36 & 0.42 & 0.57 & 0.66 & 0.77 & 0.82 & 0.99\\
+\hline
+$|F_n(x_i) - x_i|$ & 0,03 & 0,04 & 0,06 & 0,04 & \fbox{0,08} & 0,03 & 0,04 & 0,03 & \fbox{0,08} & 0,01\\
+\end{tabular}
+\end{table}
+\[
+D_n = 0.08
+\]
+
+\textit{Paso 5. Establecer relación}
+\[
+D_n < d_{\alpha,n}
+\]
+\[
+d_{\alpha,n} = d_{0.05,10} = 0.409
+\]
+\begin{center}
+\fbox{Se busca $\alpha$ y $n$ en la tabla 3.5 para hallar $d_{\alpha,n}$}
+\end{center}
+
+\textit{Paso 6. Conclusión}
+
+\begin{algoritmo}
+\>$0.08 < 0.409$\\
+\>Si ($D_n < d_{\alpha,n}$)\\
+\>\>\fbox{``Uniformidad''}\\
+\>Sino\\
+\>\>No ``Uniformidad''\\
+\>FinSi
+\end{algoritmo}
+
+\subsection*{Prueba de Poker}
+
+Se asocia a la prueba de frecuencias, pero trabaja sobre números estandarizados aleatorios con 5 dígitos significativos y permite verificar el principio de independencia
+
+Ejemplo:
+
+0.25874
+
+0.22533
+\[
+FE = \frac{n}{k} = n \cdot \underbrace{\frac{1}{k}}_{p,\ \text{probabilidad}}
+\]
+
+Ejemplo: Se tiene las siguientes configuraciones
+\begin{itemize}
+\item Todos diferentes (TD)
+\item 1 par (1P)
+\item 2 pares (2P)
+\item Tercia (T)
+\item Full (F)
+\item Póker (P)
+\item Quintilla (Todos iguales) (Q)
+\end{itemize}
+
+¿Cuál será más fácil sacar, un par o quintilla?
+\[
+FE_i = n \cdot p_i
+\]
+\[
+FO_i
+\]
+\[
+\boldsymbol{x_0^2 = \sum_{i=1}^{7} \frac{(FE_i - FO_i)^2}{FE_i}}
+\]
+
+\begin{algoritmo}
+\>Si( $\sum_{i=1}^{7}\frac{(FE_i - FO_i)^2}{FE_i} < x_{\alpha,k-1}^2$ )\\
+\>\>``Independencia''\\
+\>Sino\\
+\>\>No ``Independencia''
+\end{algoritmo}
+
+\textbf{Ejemplo}. Se calcula la probabilidad de:
+\begin{align*}
+P(TD)&\quad \frac{10 \cdot 9 \cdot 8 \cdot 7 \cdot 6}{10^5} = 0.30240\\[0.2cm]
+P(1P)&\quad \frac{10 \cdot 1 \cdot 9 \cdot 8 \cdot 7}{10^5}\binom{5}{2} = 0.50400\\[0.2cm]
+P(2P)&\quad \frac{1}{2}\,\frac{10 \cdot 1 \cdot 9 \cdot 1 \cdot 8}{10^5}\binom{5}{2}\binom{3}{2} = 0.10800\\[0.2cm]
+P(T)&\quad \frac{10 \cdot 1 \cdot 1 \cdot 9 \cdot 8}{10^5}\binom{5}{3} = 0.07200\\[0.2cm]
+P(F)&\quad \frac{10 \cdot 1 \cdot 1 \cdot 9 \cdot 1}{10^5}\binom{5}{3}\binom{2}{2} = 0.00900\\[0.2cm]
+P(P')&\quad \frac{10 \cdot 1 \cdot 1 \cdot 1 \cdot 9}{10^5}\binom{5}{4} = 0.00450\\[0.2cm]
+P(Q)&\quad \frac{10 \cdot 1 \cdot 1 \cdot 1 \cdot 1}{10^5}\binom{5}{5} = 0.00010
+\end{align*}
+
+\textbf{Algoritmo}
+
+Paso1. Contar con la muestra y determinar su tamaño
+
+\qquad Ref. Tabla 3.1 Pág. 34 y el valor de n=100
+
+Paso2. Calcular la frecuencia esperada:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|r|}
+\hline
+Casos & $FE_i = n \cdot P_i$\\
+\hline
+TD & 30.24\\
+1P & 50.40\\
+2P & 10.80\\
+T & 7.20\\
+F & 0.90\\
+P & 0.45\\
+Q & 0.01\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{center}
+\fbox{\small T, F, P y Q se agrupan: lo suma $= 8.56$}
+\end{center}
+
+Paso3. Determinamos la frecuencia observada:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|r|}
+\hline
+Casos & $FO_i = n \cdot P_i$\\
+\hline
+TD & $||$=23\\
+1P & $||||||$=58\\
+2P & $|$=8\\
+T & $|$=10\\
+F & =1\\
+P & =0\\
+Q & =0\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{center}
+\fbox{\small T, F, P y Q se agrupan: lo suma $= 11$}
+\end{center}
+
+\begin{center}
+\fbox{\parbox{0.8\textwidth}{\small Aquí hay que hacer un conteo en la tabla 3.1 (Tabla de números pseudoaleatorios) son 100 números. 1) Para el primer número vemos si todos son diferentes, si es así entonces anotamos, sino vemos hay un par, sino vemos si hay dos pares, \ldots}}
+\end{center}
+
+Paso4. Calcular el estadístico
+\[
+x^2 = \sum_{i=1}^{7}\frac{(FE_i - FO_i)^2}{FE_i}
+\]
+\begin{multline*}
+\frac{(30.24-23)^2}{30.24} + \frac{(50.40-58)^2}{50.40} + \frac{(10.80-8)^2}{10.80}\\
++ \underbrace{\frac{(7.20-10)^2}{7.20} + \frac{(0.90-1)^2}{0.90} + \frac{(0.45-0)^2}{0.45} + \frac{(0.01-0)^2}{0.01}}_{\text{lo suma } = 0.47111} = 4.02248
+\end{multline*}
+
+Paso 5. Determinar el estadístico teórico:
+\[
+X_{\alpha,k-1}^2 = X_{0.05,6}^2 = 12.59
+\]
+
+Paso 6. Establecer Relación
+\[
+X_0^2 < X_{0.05,6}^2
+\]
+
+Paso7- Conclusión
+
+\begin{algoritmo}
+\>$4.02248 < 12.59$\\
+\>Si ($x_0^2 < X_{0.05,6}^2$)\\
+\>\>\fbox{``Independencia''}\\
+\>Sino\\
+\>\>No ``Independencia''\\
+\>FinSi
+\end{algoritmo}
+
+%==========================================================
+\section*{Capítulo 4. Generación de Variables Aleatorias}
+
+Las variables son elementos descriptores
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Diagrama: conjunto \emph{Números aleatorios} $\xrightarrow{\ f\ }$ conjunto \emph{Variables aleatorias}.]}}
+\end{center}
+
+Donde hay una relación $f$ entre ambos conceptos, con las técnicas de: Transformada inversa, rechazo y composición
+
+\subsection*{Método de Transformada Inversa}
+
+\[
+\underbrace{\mu \in [0 - 1]}_{\substack{\text{Número uniforme}\\ 0 < R < 1}}
+\quad\longrightarrow\quad
+\underbrace{0 < F(x) < 1}_{\substack{\text{Función acumulada de una distribución}\\ \text{de tipo estadístico, es un valor que esta entre 0 y 1}}}
+\]
+
+\[
+\overset{\text{\ding{172}}}{f(x)} \longrightarrow \underbrace{\overset{\text{\ding{173}}}{F(x)} = R}_{\text{\ding{174}}}
+\]
+\[
+\text{\ding{175}}\ F^{-1}(F(x)) = F^{-1}(R) \qquad \textit{Algoritmo}
+\]
+\[
+\text{\ding{176}}\ x = F^{-1}(R)
+\]
+
+Paso 1.- Contar con la función $f(x)$:
+
+Paso 2.- Definir la función acumulada $F(x)$:
+
+Paso 3.- Igualar $F(x)$ y $R \implies F(x) = R$
+
+Paso 4.- Aplicar función inversa $F^{-1}$: $F^{-1}(F(x)) = F^{-1}(R)$
+
+Paso 5.- Implementar algoritmo correspondiente: $x = F^{-1}(R)$
+
+\subsubsection*{Ejercicio 1.}
+
+Sea:
+\[
+f(x) = \begin{cases}
+\lambda e^{-\lambda x} & ;\quad x \geq 0\\
+0 & ;\quad x < 0
+\end{cases}
+\]
+Formalizar la variable e implementar su algoritmo
+
+\textbf{Solución:}
+
+Paso 1.- La $f(x)$ esta especificada en el enunciado
+\[
+f(x) = \lambda e^{-\lambda x}
+\]
+
+Paso 2.- $F(x) = ?$
+\[
+F(x) = \int_\lambda^x f(x)\,dx = \int_\lambda^x \lambda e^{-\lambda x}\,dx
+\]
+\footnote{Nota de transcripción: así figura en el original; el límite inferior correcto es $0$ (como se usa en la línea siguiente).}
+
+Aplicando cambio de variable
+\[
+-\lambda x = u \implies -\lambda\,dx = du \implies dx = -\frac{du}{\lambda}
+\]
+\[
+F(x) = \int_0^x \lambda e^{u}\left(-\frac{du}{\lambda}\right) = -\int_0^x e^u\,du = -[e^u]_0^x = -[e^{-\lambda x}]_0^x
+\]
+\[
+= -[e^{-\lambda x} - e^{-\lambda \cdot 0}] = 1 - e^{-\lambda x}
+\]
+\[
+F(x) = \begin{cases}
+1 - e^{-\lambda x} & ;\quad x \geq 0\\
+0 & ;\quad x < 0
+\end{cases}
+\]
+
+Paso 3.
+\[
+F(x) = R
+\]
+\[
+1 - e^{-\lambda x} = R\,;\quad x \geq 0
+\]
+
+Paso 4.
+\begin{gather*}
+1 - e^{-\lambda x} = R\\
+-e^{-\lambda x} = R - 1\\
+e^{-\lambda x} = 1 - R\\
+\ln e^{-\lambda x} = \ln(1 - R)\\
+x = -\frac{\ln(1 - R)}{\lambda}
+\end{gather*}
+
+Paso 5.
+
+\begin{algoritmo}
+\textit{real funcion variableExponencial(real lambda, real R)}\\
+\>\textit{real x}\\
+\>$x \leftarrow \left(-\frac{1}{lambda}\right) * (\ln(1 - R))$\\
+\>\textit{return x}\\
+\textit{finFuncion}
+\end{algoritmo}
+
+\subsubsection*{Ejemplo 2:}
+
+Sea.
+\[
+f(x) = \begin{cases}
+\frac{1}{b-a} & ;\quad a \leq x \leq b\\
+0 & ;\quad a > x > b
+\end{cases}
+\]
+Implementa el algoritmo correspondiente con la base del método de transformada inversa.
+
+\textbf{Solución.}
+
+Paso1. Contar con la fdp correspondiente
+\[
+f(x) = \begin{cases}
+\dfrac{1}{b-a} & ;\quad a \leq x \leq b\\
+0 & ;\quad a > x > b
+\end{cases}
+\]
+La $f(x)$ se encuentra especificada en el enunciado
+
+Paso2. Determinar la F(x)
+\[
+F(x) = \int_{\lim inf}^x f(x)\,dx
+\]
+\[
+F(x) = \int_a^x \frac{1}{b-a}\,dx = \left.\frac{x}{b-a}\right|_a^x = \frac{x}{b-a} - \frac{a}{b-a}
+\]
+\[
+= \frac{x-a}{b-a}\,;\quad a \leq x \leq b
+\]
+\[
+F(x) = \begin{cases}
+\dfrac{x-a}{b-a} & ;\quad a \leq x \leq b\\
+0 & ;\quad \text{otro caso}
+\end{cases}
+\]
+
+Paso 3. Igualar $F(x)$ y $R$
+\[
+F(x) = R
+\]
+\[
+\frac{x-a}{b-a} = R
+\]
+
+Paso 4. Aplicar función inversa de $F$
+\[
+F^{-1}(F(x)) = F^{-1}(R)
+\]
+\[
+x = F^{-1}(R) \Rightarrow x \textit{ se obtendra de } F^{-1}(R)
+\]
+Entonces de:
+\begin{gather*}
+\frac{x-a}{b-a} = R\\
+x - a = (b-a)R\\
+x = a + (b-a)R\ ;\quad 0 < R < 1
+\end{gather*}
+\[
+F(x) = \begin{cases}
+a + (b-a)R & ;\quad 0 \leq R \leq 1\\
+0 & ;\quad 0 > R > 1
+\end{cases}
+\]
+
+Paso 5. Implementamos propuesta de algoritmo.
+
+\begin{algoritmo}
+\textit{real funcion variableUniforme(entero a, entero b)}\\
+\>\textit{real x}\\
+\>$x \leftarrow a + (b - a) * R$\\
+\>\textit{return x}\\
+\textit{finFuncion}
+\end{algoritmo}
+
+\subsubsection*{Ejemplo 3:}
+
+Sea:
+\[
+f(x) = \begin{cases}
+x & ;\quad 0 \leq x \leq 1\\
+1/2 & ;\quad 1 < x \leq 2
+\end{cases}
+\]
+Aplicar el método de la trasformada inversa y proponer su algoritmo correspondiente.
+
+Paso 1.- Contar con la función $f(x)$:
+
+La función $f(x)$ se encuentra especificada en el enunciado
+
+Paso 2.- Definir la función acumulada $F(x)$:
+\[
+F(x) = \int_{\lim inf}^x f(x)\,dx
+\]
+
+Hay que tomar en cuenta que: $f(x) = \begin{cases} x & ;\ 0 \leq x \leq 1\\ 1/2 & ;\ 1 < x \leq 2\end{cases}$
+
+Es una única función, pero en dos intervalos, no son dos funciones
+
+Considerando la 1ra parte
+\[
+(I)\ F(x) = \int_0^x x\,dx = \left.\frac{x^2}{2}\right]_0^x = \frac{x^2}{2} - \frac{0^2}{2} = \frac{x^2}{2}
+\]
+
+Para la 2da parte de la función
+\[
+(II)\ F(x) = \left.\frac{x^2}{2}\right]_0^1 + \int_1^x \frac{1}{2}\,dx = \frac{1^2}{2} - \frac{0^2}{2} + \left[\frac{x}{2}\right]_1^x = \frac{1}{2} + \frac{x}{2} - \frac{1}{2} = \frac{x}{2}
+\]
+\[
+F(x) = \begin{cases}
+\dfrac{x^2}{2} & ;\quad 0 \leq x \leq 1\\[0.3cm]
+\dfrac{x}{2} & ;\quad 1 < x \leq 2
+\end{cases}
+\]
+
+Paso 3.- Igualar $F(x)$ y $R \implies F(x) = R$
+
+Analizando la 1ra parte
+\[
+\frac{x^2}{2} = R
+\]
+Analizando la 2da parte
+\[
+\frac{x}{2} = R
+\]
+
+Paso 4.- Aplicar función inversa $F^{-1}$: $F^{-1}(F(x)) = F^{-1}(R)$
+
+Sobre la 1ra parte:
+\[
+\frac{x^2}{2} = R \Rightarrow \sqrt{x^2} = \sqrt{2R} \Rightarrow x = \sqrt{2R}
+\]
+\[
+\textit{Cuando } 0 \leq x \leq 1 \quad\Rightarrow\quad 0 \leq R \leq \frac{1}{2}
+\]
+
+Sobre la 2da parte:
+\[
+\frac{x}{2} = R \quad\Rightarrow\quad x = 2R
+\]
+\[
+\textit{Cuando } 1 < x \leq 2 \ \Rightarrow\ 1/2 \leq R \leq 1
+\]
+\[
+x = \begin{cases}
+\sqrt{2R} & ;\quad 0 \leq x \leq 1\\
+2R & ;\quad 1 < x \leq 2
+\end{cases}
+\]
+
+Paso 5.- Implementar algoritmo correspondiente: $x = F^{-1}(R)$
+
+\begin{algoritmo}
+\textit{real funcion variableEmpirica(real R)}\\
+\>\textit{real x}\\
+\>\textit{Si}$(z \leq 1/2)$\footnotemark\\
+\>\>$x \longleftarrow raizCuadrada(2 * R)$\\
+\>\textit{sino}\\
+\>\>$x \longleftarrow 2 * R$\\
+\>\textit{FinSi}\\
+\\
+\>\textit{retornar x}\\
+\textit{finFuncion}
+\end{algoritmo}
+\footnotetext{Nota de transcripción: así figura en el original; la condición es sobre $R$, es decir $R \leq 1/2$.}
+
+\subsection*{Método del Rechazo}
+
+Paso 1. Generar dos números aleatorios $R_1$ y $R_2$
+
+Paso 2. Determinar una variable aleatoria $x$ uniforme
+\[
+x \leftarrow a + (b - a) * R_1
+\]
+
+Paso 3. Definir la función $f(x(R_1))$
+
+Paso 4. Determinar la siguiente desigualdad:
+\[
+R_2 \leq f(x(R_1)) * c\,,\qquad donce\ c = 1/f_{max}(x)
+\]
+
+Paso 5. Si la relación se cumple se acepta el valor de $x$.
+
+\qquad Repetir los pasos anteriores, cuantas veces considere necesario.
+
+\subsubsection*{Ejemplo.}
+
+Sea:
+\[
+f(x) = \begin{cases}
+2x & ;\quad \overset{a}{0} \leq x \leq \overset{b}{1}\\
+0 & ;\quad 0 > x > 1
+\end{cases}
+\]
+Aplicar el método del rechazo
+
+\textbf{Solución}
+
+Paso 1. Generar dos números aleatorios $R_1$ y $R_2$
+\begin{gather*}
+R_1 \leftarrow GeneradorCongruencialMixto()\\
+R_2 \leftarrow GeneradorCongruencialMixto()
+\end{gather*}
+
+Paso 2. Definir la variable uniforme $x$, en el intervalo [a, b]:
+\begin{gather*}
+x \leftarrow a + (b - a) * R_1\\
+x \leftarrow 0 + (1 - 0) * R_1\\
+x \leftarrow R_1
+\end{gather*}
+
+Paso 3. Evaluar la función de probabilidad en x uniforme.
+\begin{gather*}
+f(x(R_1)) = ?\\
+f(x = R_1) = 2R_1\,,\qquad 0 \leq R_1 \leq 1
+\end{gather*}
+
+Paso 4. Establecer la siguiente desigualdad:
+\begin{gather*}
+R_2 \leq f(x(R_1)) * c\,,\qquad donce\ c = 1/f_{max}(x)\\
+R_2 \leq 2R_1 * c
+\end{gather*}
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Gráfica: recta $f(x) = 2x$ de $(0,0)$ a $(1,2)$; recuadro de altura $f_{max}(x) = 2$ sobre $[0,1]$.]}}
+\end{center}
+
+\[
+\textit{Tomando en cuenta que: } c = \frac{1}{f_{max}(x)} \Rightarrow c = \frac{1}{2}
+\]
+\[
+R_2 \leq 2R_1 * \frac{1}{2}
+\]
+\[
+\boxed{R_2 \leq R_1}
+\]
+
+Paso 5. Verificar el cumplimiento de la desigualdad y si este se cumple se acepta el valor de $x$, caso contrario se rechaza.
+
+\qquad Repetir los pasos anteriores cuantas veces sea necesario.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ccc}
+$\boldsymbol{R_1}$ & $\boldsymbol{R_2}$ & $\boldsymbol{x}$\\
+0.24 & 0.87 & \\
+0.65 & 0.04 & 0.65\\
+\ldots & \ldots & \ldots
+\end{tabular}
+\end{table}
+
+\subsubsection*{Ejercicio.}
+
+Sea:
+\[
+f(x) = 20x(1-x)^3;\ 0 \leq x \leq 1
+\]
+Aplicar el método del rechazo.
+
+\textbf{Solución}
+
+Paso 1. Generar $R_1$ y $R_2$
+\begin{gather*}
+R_1 \leftarrow GeneradosCongruencialMixto()\\
+R_2 \leftarrow GeneradorCongruencialMixto()
+\end{gather*}
+
+Paso 2. Determinar $x$ uniforme en el intervalo $[a, b]$
+\begin{gather*}
+x \leftarrow a + (b - a) * R_1\\
+x \leftarrow 0 + (1 - 0) * R_1\\
+\boxed{x \leftarrow R_1}
+\end{gather*}
+
+Paso 3. Definir la función $f(x)$ \textit{con x uniforme}
+\[
+\underbrace{f(x = R_1) = 20R_1(1 - R_1)^3}_{f(x(R_1))};\quad 0 \leq R_1 \leq 1
+\]
+
+Paso 4. Determinar la siguiente desigualdad:
+\begin{gather*}
+R_2 \leq f(x(R_1)) * c\,,\qquad donce\ c = 1/f_{max}(x)\\
+R_2 \leq 20R_1(1 - R_1)^3 * c\,,\qquad donce\ c = 1/f_{max}(x)
+\end{gather*}
+
+Si lo graficamos:
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Gráfica: curva de $f(x) = 20x(1-x)^3$ en $[0,1]$, que sube hasta un máximo cerca de $x = 0.25$ y luego desciende hacia 0; una recta horizontal marca el máximo.]}}
+\end{center}
+
+Y para hallar el punto máximo
+\begin{gather*}
+\frac{df(x)}{dx} = 20x(1-x)^3\\
+\frac{df(x)}{dx} = 20(1-x)^3 + \left(3(1-x)^2 \cdot (0 - 1)\right) \cdot 20x\\
+\frac{df(x)}{dx} = 20(1-x)^3 - 60x(1-x)^2\\
+\frac{df(x)}{dx} = 20(1-x)^2(1 - 4x)\\
+\frac{df(x)}{dx} = -20(x-1)^2(4x - 1)\\
+-20(x-1)^2(4x-1) = 0\\
+(x-1)^2 = 0\\
+x = 1\\
+(4x - 1) = 0\\
+\boxed{x = 1/4}
+\end{gather*}
+
+\textit{Reemplazamos los valores de x encontrados, en: $f(x) = 20x(1-x)^3$ para hallar el punto máximo.}
+
+Con $x = 1$
+\[
+f_{max}(x) = 20 \cdot 1(1-1)^3 = 0 \quad \times
+\]
+
+Con $x = \frac{1}{4}$
+\[
+f_{max}(x) = 20 \cdot \frac{1}{4}\left(1 - \frac{1}{4}\right)^3 = 5\left(\frac{3}{4}\right)^3 = \frac{135}{64} \quad \checkmark
+\]
+\begin{gather*}
+c = 1/f_{max}(x)\\
+si\ f_{max}(x) = \frac{135}{64} \Rightarrow c = \frac{64}{135}
+\end{gather*}
+\begin{center}
+\textit{Ahora continuamo con al desigualdad $R_2 \leq 20R_1(1 - R_1)^3 * c$}
+\end{center}
+\begin{gather*}
+R_2 \leq 20R_1(1 - R_1)^3 * \frac{64}{135}\\
+R_2 \leq 4R_1(1 - R_1)^3 * \frac{64}{27}\\
+\boxed{R_2 \leq \frac{256}{27}R_1(1 - R_1)^3}
+\end{gather*}
+
+Paso 5. Si la relación se cumple, se acepta el valor de x, caso contrario se rechaza.
+
+Repetir los pasos anteriores cuantas veces considere necesario.
+
+\subsection*{Método de composición}
+
+Este método también se lo denomina como método de las mesclas, donde se tiene una curva y se la divide en varias partes, tal que la función $f(x)$ es dividida en subfunciones $f_1(x), f_2(x), \ldots, f_n(x)$ para determinar las variables $x_1, x_2, \ldots, x_n$
+
+La función original $f(x)$ puede ser muy compleja tal que es necesario dividirla para así hallar de cada subfunción su variable correspondiente.
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\centering\small [Figura: curva $f(x)$ tipo campana dividida en subáreas $A_1, A_2, \ldots, A_n$ bajo las subfunciones $f_1(x), f_2(x), \ldots, f_n(x)$; de cada $f_i(x)$ sale, por \emph{TI o R}, su variable $x_i$. Al lado: $\sum_{1}^{n} A_i = 1$.]}}
+\end{center}
+
+$\boldsymbol{f(x)}$ es una función compleja que tiene diferentes comportamientos en sus intervalos y además es una función estadística valida. Así también las subfunciones tienen que ser funciones estadísticas validas
+\[
+f(x) = \sum_{i=1}^{n} A_i = 1
+\]
+$f_i(x) = fdp$ (funciones de densidad de probabilidad)
+
+\textbf{Algoritmo del método de composición}
+
+Paso 1. Contar con la $f(x)$ y dividirla en subáreas.
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Figura: $f(x)$ dividida en subáreas $A_1, A_2, \ldots, A_n$.]}}
+\end{center}
+
+Paso 2. Determinar las subfunciones $f_i(x)$ correspondientes a cada subárea en la que se dividió la función original $f(x)$.
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Figura: igual que la anterior, rotulando $f_1(x), f_2(x), \ldots, f_n(x)$ sobre cada subárea.]}}
+\end{center}
+
+Paso 3. Re expresar la función original $f(x)$ en términos de las subfunciones y las áreas que cubren la función original:
+\[
+f(x) = \sum_{i=1}^{n} A_i f_i(x)
+\]
+Tomar en cuenta que:
+\[
+\sum_{i=1}^{n} A_i = 1
+\]
+
+Paso 4. Establecer relación gráfica entre las subfunciones y sus correspondientes acumuladas de área:
+
+\begin{center}
+\fbox{\parbox{0.7\textwidth}{\centering\small [Gráfica: eje vertical con las acumuladas $0,\ A_1,\ A_1 + A_2,\ \ldots,\ A_1 + \cdots + A_{n-1},\ A_1 + \cdots + A_n = 1$; el tramo $[0, A_1]$ corresponde a $f_1(x)$, $[A_1, A_1 + A_2]$ a $f_2(x)$, \ldots, y el último tramo a $f_n(x)$.]}}
+\end{center}
+
+Paso 5. Generar dos números aleatorios $R_1$ y $R_2$
+
+Paso 6. Escoger con $R_1$ una subfunción $f_i(x)$
+
+Paso 7. Con la subfunción escogida determinar su variable correspondiente, ya sea aplicando el método de la transformación inversa o el método de rechazo.
+
+Repetimos los pasos anteriores cuantas veces sea necesaria
+
+\subsubsection*{Ejemplo.}
+
+\begin{center}
+\fbox{\parbox{0.7\textwidth}{\centering\small [Figura: distribución triangular con base en $a$ y $c$, vértice en $b$ con altura $2/(c-a)$. Lado izquierdo $f_1(x)$ con área $A_1$; lado derecho $f_2(x)$ con área $A_2$.]}}
+\end{center}
+
+Paso 1. Divida la $f_n(x)$ en subáreas.
+\[
+A_1 = \frac{1}{2}\left((b-a) * \frac{2}{c-a}\right) = \frac{b-a}{c-a}
+\]
+\[
+\boxed{A_1 = \frac{b-a}{c-a}}
+\]
+\[
+A_2 = \frac{1}{2}\left((c-b) * \frac{2}{c-a}\right) = \frac{c-b}{c-a}
+\]
+\[
+\boxed{A_2 = \frac{c-b}{c-a}}
+\]
+
+Paso 2. Determinar $f_i(x)$:
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\small [Figura: triángulo de $a$ a $b$ con vértice $\left(b, \frac{2}{b-a}\right)$, área $A'_1$, lado $f_1(x)$.]\\
+\textit{Se sabe que $A'_1 = 1$ y el área del triangulo se calcula con base $*$ altura}
+\[
+A'_1 = 1 = \frac{1}{2}(b-a) * h_1 \qquad h_1 = \frac{2}{b-a}
+\]}}
+\end{center}
+
+Y si usamos la ecuación de la recta que pasa por dos puntos, obtendremos $f_1(x)$:
+\[
+\frac{y - 0}{x - a} = \frac{\frac{2}{b-a} - 0}{b - a} \Rightarrow y = \frac{2(x-a)}{(b-a)^2} = f_1(x)
+\]
+\[
+f_1(x) = \frac{2(x-a)}{(b-a)^2}
+\]
+
+Ahora hacemos lo mismo para la segunda área, para encontrar $f_2(x)$:
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\small [Figura: triángulo de $b$ a $c$ con vértice $\left(b, \frac{2}{c-b}\right)$, área $A'_2$, lado $f_2(x)$.]\\
+\textit{Se sabe que $A'_2 = 1$ y el área del triangulo se calcula con base $*$ altura}
+\[
+A'_2 = 1 = \frac{1}{2}(c-b) * h_1 \qquad h_1 = \frac{2}{c-b}
+\]}}
+\end{center}
+
+Haciendo uso de la ecuación de la recta que pasa por un punto tenemos:
+\[
+\frac{y - 0}{x - c} = \frac{\frac{2}{c-b} - 0}{b - c} \Rightarrow y = -\frac{2(x-c)}{(c-b)^2} = f_2(x)
+\]
+
+Paso 3. Re expresar la función original en termino de las subfunciones y las correspondientes subáreas de la función original
+\[
+f(x) = \sum A_i f_i(x)\ ;\qquad \sum A_i = 1
+\]
+\[
+f(x) = \frac{b-a}{c-a} * \frac{2(x-a)}{(b-a)^2} + \frac{c-b}{c-a} * \frac{2(x-c)}{(c-b)^2}
+\]
+
+Ahora debemos verificar que $A_1 + A_2 = 1$
+\[
+entonces\ \frac{b-a}{c-a} + \frac{c-b}{c-a} = 1
+\]
+\[
+\frac{b - a + c - b}{c-a} = \frac{c-a}{c-a} = 1 \quad \checkmark
+\]
+Por tanto, queda verificado.
+
+Paso 4. Establecer la relación gráfica entre las subfunciones y las acumuladas de área.
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\centering\small [Gráfica: eje vertical con $A_1 = \frac{b-a}{c-a}$ y $A_1 + A_2 = 1$; el tramo $[0, A_1]$ corresponde a $f_1$ y el tramo $[A_1, 1]$ a $f_2$.]}}
+\end{center}
+
+Paso 5. Generar $R_1$ y $R_2$
+\begin{gather*}
+R_1 \leftarrow GeneradosCongruencialMixto()\\
+R_2 \leftarrow GeneradorCongruencialMixto()
+\end{gather*}
+
+Paso 6. Con $R_1$ escoger una subfunción
+
+\begin{algoritmo}
+\>\textit{Si} $\left(R_1 < \frac{b-a}{c-a}\right)$\\
+\>\>\textit{escoger} $f_1(x) \xrightarrow{\text{TI ó R}} x_1$\\
+\>\textit{sino}\\
+\>\>\textit{escoger} $f_2(x) \xrightarrow{\text{TI ó R}} x_2$\\
+\>\textit{FinSi}
+\end{algoritmo}
+
+Paso 7. Determinar la variable correspondiente:
+\[
+f(x) \longrightarrow F(x) = R
+\]
+\[
+F^{-1}(F(x)) = F^{-1}(R)
+\]
+\[
+x = F^{-1}(R) \Rightarrow x \textit{ se obtendra de } F^{-1}(R)
+\]
+\begin{gather*}
+f_1(x) \longrightarrow \frac{2(x-a)}{(b-a)^2}\\
+f_2(x) \longrightarrow -\frac{2(x-c)}{(c-b)^2}
+\end{gather*}
+
+\[
+f_1(x) \longrightarrow F_1(x)
+\]
+\[
+F_1(x) = \int_a^x f_1(x)\,dx = \int_a^x \frac{2(x-a)}{(b-a)^2}\,dx = \frac{2}{(b-a)^2}\int_a^x (x-a)\,dx = \frac{2}{(b-a)^2}\left[\frac{(x-a)^2}{2}\right]_a^x
+\]
+\[
+F_1(x) = \frac{2}{(b-a)^2}\left[\frac{(x-a)^2}{2} - \frac{(a-a)^2}{2}\right] = \frac{(x-a)^2}{(b-a)^2}
+\]
+\[
+F_1(x) = \frac{(x-a)^2}{(b-a)^2}
+\]
+
+\[
+f_2(x) \longrightarrow F_2(x)
+\]
+\[
+F_2(x) = \int_b^x f_2(x)\,dx = \int_b^x -\frac{2(x-c)}{(c-b)^2}\,dx = -\frac{2}{(c-b)^2}\int_b^x (x-c)\,dx
+\]
+\[
+= -\frac{2}{(c-b)^2}\left[\frac{(x-c)^2}{2}\right]_b^x = -\frac{2}{(c-b)^2}\left[\frac{(x-c)^2}{2} - \frac{(b-c)^2}{2}\right] = -\frac{(x-c)^2}{(c-b)^2} + 1
+\]
+\[
+F_2(x) = 1 - \frac{(x-c)^2}{(c-b)^2}
+\]
+
+\[
+\frac{(x-a)^2}{(b-a)^2} = R_1 \Rightarrow x = a + (b-a)\sqrt{R_1}
+\]
+\[
+1 - \frac{(x-c)^2}{(c-b)^2} = R_2 \Rightarrow x = c + (c-b)\sqrt{1 - R_2}
+\]
+\footnote{Nota de transcripción: así figura en el original; al despejar debe tomarse la raíz negativa, $x = c - (c-b)\sqrt{1 - R_2}$, para que $b \leq x \leq c$ (igual que en el ejemplo del camión transportador del Capítulo 5).}
+
+\begin{algoritmo}
+\>\textit{Si} $\left(R_1 < \frac{b-a}{c-a}\right)$\\
+\>\>$x = a + (b-a)\sqrt{R_1}$\\
+\>\textit{sino}\\
+\>\>$x = c + (c-b)\sqrt{1 - R_2}$\\
+\>\textit{FinSi}
+\end{algoritmo}
+
+Repetir los pasos anteriores cuantas veces considere necesario.
+
+%==========================================================
+\section*{Capítulo 5. Aplicaciones de Simulación}
+
+\subsection*{Juego de apuestas}
+
+Una persona tiene la opción de ganar o perder 10 bolivianos en cada jugada. Puede ganar hasta 50Bs o perder hasta 50Bs. La persona también puede apostar todo.
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\small [Diagrama: persona con 10Bs. que \emph{Apuesta}. Con 50\% \emph{Gana} $\rightarrow$ sigue apostando 10Bs (meta: 50Bs). Con 50\% \emph{Pierde} $\rightarrow$ sigue apostando 2 veces la apuesta anterior; si no hay saldo suficiente apuesta lo que tiene (fin: 0Bs).]}}
+\end{center}
+
+Condiciones iniciales, periodo transigente o estable, estable, es cuando podemos dar una opinión certera, tamaño de la muestra está relacionado con el número de corridas. Por lo tanto, es muy probable que se pueda resolver por simulación.
+
+Condiciones iniciales: se habla del periodo transiente o del periodo estable, en el que podemos dar una opinión más certera a la que ya se podría realizar una simulación.
+
+En el ejemplo hay 50\% para ganar o perder por lo tanto lo podemos representar se la siguiente manera
+\[
+R
+\begin{cases}
+G: [0 - 0.5] & \leftarrow 50\%\\
+P: [0.5 - 1] & \leftarrow 50\%
+\end{cases}
+\]
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{\begin{tabular}{@{}c@{}}Nro. de\\corridas\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Apuesta\\inicial\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Valor de la\\apuesta\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Suerte\\(R=Random)\end{tabular}} & \textbf{Saldo} & \textbf{¿Gano?}\\
+\hline
+1 & 10 & 10 & 0.24(Gano) & 10+10= 20 & \\
+ & & 10 & 0.75(Perdió) & 20-10=10 & \\
+ & & 10 & 0.47(Gano) & 10+10=20 & \\
+ & & 10 & 0.38(Gano) & 20+10=30 & \\
+ & & 10 & 0.61(perdió) & 30-10=20 & \\
+ & & 20 & 0.57(Perdió) & 0 & No\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{\begin{tabular}{@{}c@{}}Nro. de\\corridas\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Apuesta\\inicial\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Valor de la\\apuesta\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Suerte\\(R=Random)\end{tabular}} & \textbf{Saldo} & \textbf{¿Gano?}\\
+\hline
+2 & 10 & 10 & 0.24(Gano) & 10+10= 20 & \\
+ & & 10 & 0.35(Gano) & 20+10=30 & \\
+ & & 10 & 0.47(Gano) & 30+10=40 & \\
+ & & 10 & 0.68(Perdió) & 40-10=30 & \\
+ & & 20 & 0.05(Gano) & 30+20=50 & Sí\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{\begin{tabular}{@{}c@{}}Nro. de\\corridas\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Apuesta\\inicial\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Valor de la\\apuesta\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Suerte\\(R=Random)\end{tabular}} & \textbf{Saldo} & \textbf{¿Gano?}\\
+\hline
+3 & 10 & 10 & 0.34(Gano) & 10+10= 20 & \\
+ & & 10 & 0.35(Gano) & 20+10=30 & \\
+ & & 10 & 0.47(Gano) & 30+10=40 & \\
+ & & 10 & 0.68(Perdió) & 40-10=30 & \\
+ & & 20 & 0.85(Perdió) & 30-20=10 & \\
+ & & 10 & 0.51(Perdió) & 10-10=0 & No\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{\begin{tabular}{@{}c@{}}Nro. de\\corridas\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Apuesta\\inicial\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Valor de la\\apuesta\end{tabular}} & \textbf{\begin{tabular}{@{}c@{}}Suerte\\(R=Random)\end{tabular}} & \textbf{Saldo} & \textbf{¿Gano?}\\
+\hline
+4 & 10 & 10 & 0.68(Perdió) & 10-10= 0 & No\\
+\hline
+\end{tabular}
+\end{table}
+
+Se ha realizado 4 corridas, por lo tanto, al observar el comportamiento, podemos determinar que la probabilidad de que el jugador gane es del 25\%, ya que se observó que de 4 corridas solo gano 1:
+\[
+P(G) = \frac{1}{4} \approx 25\%
+\]
+
+Entonces a partir de esta observación se puede programar una aplicación que haga este proceso con valores de $n = 10, 20, 50, 100, 200, 500, 1000$ y a partir de ahí se puede hacer un análisis de a partir de que $n$ los valores son iguales para poder encontrar el \textbf{estado transiente} y el \textbf{estado estable}.
+\[
+n = \underbrace{10, 20, 50, 100}_{ET},\underbrace{200, 500, 1000}_{EE}
+\]
+
+\subsection*{Camión transportador.}
+
+El objetivo es simular los pesos $p_i$ de modo que la suma de los pesos no sobre pase los 1000kg que es la capacidad máxima del camión. Se sabe que el peso mínimo registrado es de 190kg, el peso máximo de un producto fue de 230kg y también se observó que el producto que más se ha registrado es de 210kg.
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\small [Figura: camión con cinco cajas $p_1, \ldots, p_5$; los productos tienen un peso entre [190 -- 230]. Tabla de \emph{Registros}: Producto/Peso --- A 190, C 205, B 210, D 221, B 210, \ldots, C 205, E 230, B 210, \ldots]}}
+\end{center}
+
+Entonces tenemos $p_{min}, p_{max}, moda$
+
+\[
+\left.\begin{array}{l}
+\text{Peso mínimo } p_{min} = 190Kg\\
+\text{Peso máximo } p_{max} = 230Kg\\
+\text{Peso que se repite } moda \equiv 210Kg
+\end{array}\right\}
+\ \text{Esto sigue el comportamiento de una } \textit{distribución Triangular}
+\]
+
+¿Cuál es la probabilidad de que la suma de los pesos no exceda la capacidad de carga del camión?
+\[
+P(p_1 + p_1 + p_1 + p_1 + p_1 > 1000) = ?
+\]
+P probabilidad \qquad $p_i$: \textit{peso del producto}
+\[
+p_i
+\begin{cases}
+190Kg\\
+\ldots\\
+230Kg
+\end{cases}
+\]
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{\small [Figura: triángulo con vértices $(190,0)$, $(210, 1/20)$ y $(230,0)$; áreas $A_1$ (izquierda) y $A_2$ (derecha); $f_n(x) = ?$; altura $h = 1/20$.]
+\begin{gather*}
+A_1 + A_2 = 1\\
+\frac{1}{2}(210 - 190)h + \frac{1}{2}(230 - 210)h = 1\\
+10h + 10h = 1\\
+20h = 1\\
+h = 1/20
+\end{gather*}}}
+\end{center}
+
+$f_n(x)$ \textit{esta conformada por dos funciones} $\begin{cases} f_1(x)\\ f_2(x)\end{cases}$ y para hallar la ecuación de esas funciones recurriremos a la ecuación de la recta que pasa por dos puntos:
+
+Ecuación de la recta.
+\[
+\frac{y - y_1}{x - x_1} = \frac{y_2 - y_1}{x_2 - x_1}
+\]
+
+\textbf{1ra Parte} \quad [$(x_1, y_1) = (190, 0)$, $(x_2, y_2) = (210, 1/20)$]
+\[
+\frac{y - 0}{x - 190} = \frac{\frac{1}{20} - 0}{210 - 190} \Longrightarrow y = \frac{1}{400}(x - 190)
+\]
+
+\textbf{2da Parte} \quad [$(x_1, y_1) = (230, 0)$, $(x_2, y_2) = (210, 1/20)$]
+\[
+\frac{y - 0}{x - 230} = \frac{\frac{1}{20} - 0}{210 - 230} \Longrightarrow y = -\frac{1}{400}(x - 300)
+\]
+\footnote{Nota de transcripción: así figura en el original; debe ser $(x - 230)$, como se usa en la $f(x)$ que sigue.}
+
+De esta manera se formaliza nuestra función $f_n(x)$
+\[
+f(x) = \begin{cases}
+\dfrac{1}{400}(x - 190) & ;\quad 190 \leq x < 210\\[0.3cm]
+-\dfrac{1}{400}(x - 230) & ;\quad 210 \leq x \leq 230
+\end{cases}
+\]
+
+\textbf{Para este caso vamos a continuar aplicando la transformada inversa.}
+
+Revisar ejercicio 3 del capítulo 4. Ejercicio de transformada inversa.
+
+De $f(x) \rightarrow F(x) = R \rightarrow x = F^{-1}(R)$
+
+1ra Parte
+\[
+F(x) = \int f(x)\,dx
+\]
+\[
+F(x) = \int_{190}^x \frac{1}{400}(x - 190)\,dx = \frac{1}{400}\left[\frac{(x-190)^2}{2}\right]_{190}^x
+\]
+\[
+= \frac{1}{400}\left[\frac{(x-190)^2}{2} - \frac{(190-190)^2}{2}\right] = \frac{1}{800}(x - 190)^2
+\]
+\[
+\boxed{F(x) = \frac{1}{800}(x - 190)^2\,;\quad 190 \leq x < 210}
+\]
+
+2da Parte
+\[
+F(x) = \int f(x)\,dx
+\]
+\[
+F(x) = \int_{190}^{210} \frac{1}{400}(x - 190)\,dx + \int_{210}^x -\frac{1}{400}(x - 230)\,dx
+\]
+\[
+= \frac{1}{400}\left[\frac{(x-190)^2}{2}\right]_{190}^{210} - \frac{1}{400}\left[\frac{(x-230)^2}{2}\right]_{210}^x
+\]
+\[
+= \frac{1}{400}\left[\frac{(210-190)^2}{2} - \frac{(190-190)^2}{2}\right] - \frac{1}{400}\left[\frac{(x-230)^2}{2} - \frac{(210-230)^2}{2}\right]
+\]
+\[
+= \frac{1}{800}\left[(20)^2 - (0)^2\right] - \frac{1}{800}\left[(x-230)^2 - (-20)^2\right]
+\]
+\[
+= \frac{1}{800}[400] - \left[\frac{1}{800}(x-230)^2 - \frac{1}{800}400\right]
+\]
+\[
+= 1 - \frac{1}{800}(x - 230)^2
+\]
+\[
+\boxed{F(x) = 1 - \frac{1}{800}(x - 230)^2\,;\quad 210 \leq x \leq 230}
+\]
+
+Entonces se tiene lo siguiente:
+\[
+F(x) = \begin{cases}
+\dfrac{1}{800}(x - 190)^2 & ;\quad 190 \leq x < 210\\[0.3cm]
+1 - \dfrac{1}{800}(x - 230)^2 & ;\quad 210 \leq x \leq 230
+\end{cases}
+\]
+
+\textbf{\textit{Ahora según el método de transformada inversa igualamos a $R$, es decir:}} \quad $F(x) = R$
+
+Para la 1ra parte:
+\[
+\frac{1}{800}(x - 190)^2 = R
+\]
+\[
+(x - 190)^2 = 800R \Longrightarrow \sqrt{(x - 190)^2} = \sqrt{800R}
+\]
+\[
+\boxed{x = 190 + \sqrt{800R}}
+\]
+
+Para la 2ra parte:
+\[
+1 - \frac{1}{800}(x - 230)^2 = R
+\]
+\[
+(x - 230)^2 = -800(1 - R) \Longrightarrow \sqrt{(x - 230)^2} = -\sqrt{800(1 - R)} \Longrightarrow x - 230 = -\sqrt{800(1 - R)}
+\]
+\[
+\boxed{x = 230 - \sqrt{800(1 - R)}}
+\]
+
+Ahora tenemos las ecuaciones en función de R:
+\[
+F(x) = \begin{cases}
+x = 190 + \sqrt{800R}\\
+x = 230 - \sqrt{800(1 - R)}
+\end{cases}
+\]
+
+Y para determinar en qué rango se encuentra $R$, en $\frac{1}{800}(x - 190)^2 = R$ reemplazamos los valores $x$ de $190 \leq x < 210$
+
+Es decir que sí $x = 190$ entonces $R = 0$; y si $x = 210$ entonces $R = \frac{1}{2}$.
+
+Lo mismo hacemos para hallar el rango de $R$, en $1 - \frac{1}{800}(x - 230)^2 = R$ con $210 \leq x \leq 230$.
+
+Entonces, ahora tenemos la formalidad matemática
+\[
+x = \begin{cases}
+x = 190 + \sqrt{800R} & ;\quad 0 \leq R < 1/2\\
+x = 230 - \sqrt{800(1 - R)} & ;\quad 1/2 \leq R \leq 1
+\end{cases}
+\]
+para representa la simulación del peso $p$ de un producto.
+
+\textbf{Planteando la formalidad algorítmica:}
+
+\begin{algoritmo}
+\textit{ProgramaCamionTransportador}\\
+\>$i \leftarrow 1;\ e \leftarrow 0;\ nc \leftarrow 0;$\\
+\>\textit{Leer n}\\
+\>\textit{mientras}$(nc \leq n)$\\
+\>\>$az \leftarrow 0$\\
+\>\>\textit{mientras}$(i \leq 5)$\\
+\>\>\>\textit{Si}$(R < 0.5)$\\
+\>\>\>\>$x \leftarrow 190 + raizcuadrada(800 * R)$\\
+\>\>\>\textit{Sino}\\
+\>\>\>\>$x \leftarrow 230 - raizcuadrada(800 * (1 - R))$\\
+\>\>\>\textit{FinSi}\\
+\>\>\>$ax \leftarrow ax + x$\\
+\>\>\textit{FinMientras}\\
+\>\>\textit{Si}$(ax > 1000)$\\
+\>\>\>$e \leftarrow e + 1$\\
+\>\>\textit{FinSi}\\
+\>\>$nc \leftarrow nc + 1$\\
+\>\textit{FinMientras}\\
+\>$prob \leftarrow e/n$\\
+\>\textit{mostrar prob}\\
+\textit{FinPrograma}
+\end{algoritmo}
+
+\subsection*{Cálculo de constantes importantes: PI}
+
+\begin{center}
+\fbox{\parbox{0.5\textwidth}{\centering\small [Figura: cuarto de círculo de radio $r = 1$ centrado en $(0,0)$, inscrito en un cuadrado de lado 1.]}}
+\end{center}
+\[
+probabilidad = \frac{\text{Área cuarto de circulo}}{\text{Área del cuadrado}} = \frac{\frac{pi * r^2}{4}}{r * r} = \frac{\frac{pi}{4}}{1} = \frac{pi}{4}
+\]
+Esta es una forma de determinar la probabilidad sobre relación de áreas
+
+\begin{center}
+\fbox{\parbox{0.5\textwidth}{\centering\small [Figura: el mismo cuadrado con $n$ puntos lanzados al azar; los que caen dentro del cuarto de círculo se denominan $e$.]}}
+\end{center}
+
+Otra forma de determinar esta probabilidad seria lanzar punto sobre la relación del cuarto de circulo y cuadrado, algunos caerán sobre el cuarto de circunferencia, a estos puntos denominaremos $e$
+\[
+Probabilidad \cong \frac{e}{n}
+\]
+La relación de puntos que caigan en el cuarto de circunferencia del total de punto, determina el valor de la probabilidad.
+\[
+\frac{\pi}{4} \cong \lim_{n \to \infty}\frac{e}{n} \Longrightarrow \tilde{\pi} = \frac{4e}{n}
+\]
+
+Donde cada punto está representado por el par $(x, y)$ y estos pares son valores que van a estar entre $[0, 1]$ que son representados por $R_1$ y $R_2$ (números aleatorios).
+
+Los puntos $e$ son valores que van a cumplir con la restricción de ser menores o iguales al \textit{radio} es decir aquellos puntos que cumplan con la ecuación de la circunferencia $\sqrt{R_1^2 + R_2^2} \leq 1$.
+
+\begin{algoritmo}
+\textit{ProgramaCalculoPI}\\
+\>$i \leftarrow 1;\ e \leftarrow 0$\\
+\>\textit{leer n}\\
+\>\textit{mientras}$(i \leq n)$\\
+\>\>$R_1 \leftarrow generadorcongruencialmixto()$\\
+\>\>$R_2 \leftarrow generadorcongruencialmixto()$\\
+\>\>\textit{Si}$(raizcuadrada(R_1 * R_1 + R_2 * R_2) \leq 1)$\\
+\>\>\>$e \leftarrow e + 1$\\
+\>\>\textit{FinSi}\\
+\>\>$i \leftarrow i + 1$\\
+\>\textit{FinMientras}\\
+\>$pi \leftarrow 4 * \frac{e}{n}$\\
+\>\textit{mostrar pi}\\
+\textit{finPrograma}
+\end{algoritmo}
+
+Al final lo que se quiere con los algoritmos es tener un valor de confianza que nos de confiabilidad.
+\[
+P\{|\tilde{\pi} - \pi| \leq 0.1\} = 95\% = 0.95
+\]
+\[
+P\{\pi - 0.1 \leq \underbrace{\tilde{\pi}}_{\frac{4e}{n}} \leq \pi + 0.1\} = 0.95
+\]
+\[
+P\left\{\frac{\pi - 0.1}{4} \leq \frac{4e}{n} \leq \frac{\pi + 0.1}{4}\right\} = 0.95
+\]
+
+Dado el comportamiento de estos puntos es posible observar que sigue una distribución estadística.
+
+$e$ sigue una distribución estadística de Bernoulli
+
+Y como son varios puntos siguen una distribución Binomial
+\[
+p = \frac{\pi}{4}
+\]
+
+Esperanza de la variable $e$
+\[
+E(e) = np = n\frac{\pi}{4}
+\]
+
+Varianza
+\[
+VAR(e) = npq = np(1-p) = n\frac{\pi}{4}\left(1 - \frac{\pi}{4}\right)
+\]
+
+Pero hay que tomar en cuenta que la esperanza de una variable es:
+\[
+E\left(\frac{e}{n}\right) = \frac{1}{n}E(e) = \frac{1}{n} \cdot \frac{n\pi}{4} = \frac{\pi}{4}
+\]
+\[
+VAR\left(\frac{e}{n}\right) = \frac{1}{n^2}VAR(e) = \frac{1}{n^2} \cdot \frac{n\pi}{4}\left(1 - \frac{\pi}{4}\right)
+\]
+
+Y dada la cantidad de puntos $E\left(\frac{e}{n}\right)$ también se puede estandarizar como una normal:
+\[
+Z_{\alpha/2} = \frac{x - \mu}{\sigma}
+\]
+Donde $x$ puede ser:
+\[
+\frac{\pi - 0.1}{4} \leq \tilde{\pi} \leq \boxed{\frac{\pi + 0.1}{4}}
+\]
+\[
+Z_{\alpha/2} = \frac{x - \mu}{\sigma} = \frac{\frac{\pi + 0.1}{4} - \frac{\pi}{4}}{\sqrt{\frac{1}{n}\frac{\pi}{4}\left(1 - \frac{\pi}{4}\right)}}
+\]
+\[
+\textit{tomando en cuanta un } \alpha = 0.5 \textit{ como nivel de confianza se tiene que } Z_{\alpha/2} = 1.96
+\]
+\footnote{Nota de transcripción: así figura en el original; para $Z_{\alpha/2} = 1.96$ el valor es $\alpha = 0.05$ (confianza del 95\%).}
+\[
+\frac{\frac{\pi + 0.1}{4} - \frac{\pi}{4}}{\sqrt{\frac{1}{n}\frac{\pi}{4}\left(1 - \frac{\pi}{4}\right)}} = 1.96
+\]
+
+De donde se tiene que despejar $n$
+\[
+n = \frac{1.96^2\,\frac{\pi}{4}\left(1 - \frac{\pi}{4}\right)}{0.000625} \cong 1035.99 \approx 1036 \textit{ corridas}
+\]
+
+Esto nos permite hacer una corrección a nuestro algoritmo
+
+\begin{algoritmo}
+\textit{ProgramaCalculoPI}\\
+\>$i \leftarrow 1;\ e \leftarrow 0$\\
+\>\textit{leer n}\\
+\>\textit{mientras}$(i \leq 1036)$\\
+\>\>$R_1 \leftarrow generadorcongruencialmixto()$\\
+\>\>$R_2 \leftarrow generadorcongruencialmixto()$\\
+\>\>\textit{Si}$(raizcuadrada(R_1 * R_1 + R_2 * R_2) \leq 1)$\\
+\>\>\>$e \leftarrow e + 1$\\
+\>\>\textit{FinSi}\\
+\>\>$i \leftarrow i + 1$\\
+\>\textit{FinMientras}\\
+\>$pi \leftarrow 4 * \frac{e}{n}$\\
+\>\textit{mostrar pi}\\
+\textit{finPrograma}
+\end{algoritmo}
+
+\begin{center}
+\fbox{\parbox{0.6\textwidth}{\small Este análisis garantiza que el algoritmo funciona con una confiabilidad del 95\% con una precisión de una decima}}
+\end{center}
+
+%==========================================================
+\section*{Referencias:}
+
+\begin{itemize}[label=-]
+\item Villarroel, H. (Semestre 1-2021), Simulación de Sistemas, Clases magistrales por video conferencia, Ingeniería de Sistemas, Universidad Mayor de San Simón.
+\item Coss, R., Simulación. Un enfoque Práctico.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,43 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: dataset de prueba (respuestas sinteticas)
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Los valores son numéricos y se agrupan por valor repetido ($x_i$ con su frecuencia $f_i$). Se descartan las filas en que los años desempleado superan los años de vida profesional (0 en esta muestra). El tamaño de la muestra es $n = 100$.
+
+\begin{mitabla}{Cálculo de la media y la desviación estándar de años desempleado \datosprueba}
+\begin{tabular}{lccccc}
+\toprule
+Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
+\midrule
+0 años & 0 & 42 & 0.00 & 1.0404 & 43.6968 \\
+1 años & 1 & 26 & 26.00 & 0.0004 & 0.0104 \\
+2 años & 2 & 20 & 40.00 & 0.9604 & 19.2080 \\
+3 años & 3 & 12 & 36.00 & 3.9204 & 47.0448 \\
+\midrule
+$\Sigma$ & & 100 & 102.00 & & 109.9600 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Calcular la media muestral.}
+\[
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{102.00}{100} = 1.0200\ \text{años}
+\]
+
+\textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
+\[
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{109.9600}{99}} = 1.0539
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 99$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{99,\,0.025} \approx z_{0.025} = 1.96$.
+
+\textit{Paso 5. Calcular el margen de error.}
+\[
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{1.0539}{\sqrt{100}}\times 1.960 = 0.1054 \times 1.960 = 0.2066
+\]
+
+\textit{Paso 6. Construir el intervalo y concluir.}
+\[
+1.0200 - 0.2066 \;\le\; \mu \;\le\; 1.0200 + 0.2066 \quad\Longrightarrow\quad 0.81 \le \mu \le 1.23
+\]
+
+Con un 95\% de confianza, la media de años desempleado de todos los titulados está entre 0.81 y 1.23 años. \datosprueba
+
