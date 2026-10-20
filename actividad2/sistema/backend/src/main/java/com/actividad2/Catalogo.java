@@ -105,6 +105,75 @@ public class Catalogo {
         ITEMS_PERFIL.put("perfil_competencias_laborales", "Evidencian competencias laborales");
         ITEMS_PERFIL.put("perfil_valores", "Demuestran valores y ética profesional");
         ITEMS_PERFIL.put("perfil_participo_retroalimentacion", "He participado en procesos de retroalimentación");
+        ITEMS_PERFIL.put("perfil_vinculos_oportunidades", "La Carrera mantiene vínculos que generan oportunidades");
+        ITEMS_PERFIL.put("perfil_participo_vinculacion_entorno", "He participado en vinculación con el entorno laboral");
+        ITEMS_PERFIL.put("perfil_participo_difusion", "He participado en difusión de oportunidades laborales");
+        ITEMS_PERFIL.put("perfil_participo_vinculacion_profesionales", "He participado en vinculación entre profesionales");
+        ITEMS_PERFIL.put("perfil_consultado_desempeno", "He sido consultado sobre el desempeño de los titulados");
+        ITEMS_PERFIL.put("perfil_consultada_pertinencia", "Han consultado nuestra opinión sobre la pertinencia");
+        ITEMS_PERFIL.put("perfil_recurre_umss", "Recurrimos a la UMSS cuando requerimos profesionales");
+        ITEMS_PERFIL.put("perfil_consultado_autoevaluacion", "He sido consultado en la autoevaluación de la Carrera");
+    }
+
+    /**
+     * Preguntas de opción única de la encuesta a titulados que se pueden cruzar
+     * libremente (las de elección múltiple y las de texto libre no entran).
+     */
+    public static final Map<String, String> PREGUNTAS_CRUZABLES = new LinkedHashMap<>();
+    static {
+        PREGUNTAS_CRUZABLES.put("edad", "Edad");
+        PREGUNTAS_CRUZABLES.put("genero", "Género");
+        PREGUNTAS_CRUZABLES.put("formacion_complementaria", "Tiene formación complementaria");
+        PREGUNTAS_CRUZABLES.put("programa_nivel", "Nivel del programa cursado");
+        PREGUNTAS_CRUZABLES.put("programa_donde", "Dónde cursó el programa");
+        PREGUNTAS_CRUZABLES.put("programa_financiamiento", "Financiamiento del programa cursado");
+        PREGUNTAS_CRUZABLES.put("interes_posgrado", "Interés en un posgrado");
+        PREGUNTAS_CRUZABLES.put("area_interes_posgrado", "Área de interés del posgrado");
+        PREGUNTAS_CRUZABLES.put("organizacion_interes_posgrado", "Institución elegida para el posgrado");
+        PREGUNTAS_CRUZABLES.put("likert_oferta_posgrado_fcyt", "Oferta de posgrado FCyT afín");
+        PREGUNTAS_CRUZABLES.put("situacion_laboral", "Situación laboral");
+        PREGUNTAS_CRUZABLES.put("rubro", "Rubro de la organización");
+        PREGUNTAS_CRUZABLES.put("sector_publico_privado", "Sector (público / privado)");
+        PREGUNTAS_CRUZABLES.put("departamento_bolivia", "Departamento donde trabaja");
+        PREGUNTAS_CRUZABLES.put("cargo", "Cargo");
+        PREGUNTAS_CRUZABLES.put("likert_pertinencia_puesto", "Pertinencia del puesto");
+        PREGUNTAS_CRUZABLES.put("antiguedad_trabajo", "Antigüedad en el trabajo actual");
+        PREGUNTAS_CRUZABLES.put("medio_obtuvo_trabajo", "Medio por el que obtuvo el trabajo");
+        PREGUNTAS_CRUZABLES.put("remuneracion_promedio", "Remuneración mensual");
+        PREGUNTAS_CRUZABLES.put("primer_empleo", "Es su primer empleo");
+        PREGUNTAS_CRUZABLES.put("tiempo_primer_trabajo", "Tiempo hasta el primer empleo");
+        PREGUNTAS_CRUZABLES.put("cantidad_empleos", "Empleos desde la titulación");
+        PREGUNTAS_CRUZABLES.put("likert_satisfaccion_global_formacion", "Satisfacción con la formación");
+        PREGUNTAS_CRUZABLES.put("likert_concordancia_requerimientos", "Concordancia formación–mercado");
+        PREGUNTAS_CRUZABLES.put("red_contactos_interes", "Interés en la red de contactos");
+    }
+
+    /**
+     * Agrupación de categorías para que las celdas de la tabla tengan datos
+     * suficientes (PLAN.md 5.3). Devuelve null si la pregunta no tiene agrupación.
+     */
+    public static java.util.function.Function<String, String> agrupacion(String columna) {
+        if (columna.startsWith("likert_") && !columna.endsWith("_negocio")) return Catalogo::likertAgrupado;
+        return switch (columna) {
+            case "remuneracion_promedio" -> Catalogo::remuneracionAgrupada;
+            case "tiempo_primer_trabajo" -> Catalogo::tiempoAgrupado;
+            case "organizacion_interes_posgrado", "programa_donde" -> Catalogo::organizacionAgrupada;
+            case "programa_nivel" -> Catalogo::nivelAgrupado;
+            case "edad" -> Catalogo::edadAgrupada;
+            case "cargo" -> Catalogo::cargoHomologado;
+            default -> null;
+        };
+    }
+
+    /** Orden de las categorías agrupadas (en el mismo orden de la escala o del formulario). */
+    public static java.util.List<String> ordenAgrupado(String columna) {
+        java.util.function.Function<String, String> g = agrupacion(columna);
+        java.util.List<String> orden = new java.util.ArrayList<>();
+        for (String codigo : etiquetas(columna).keySet()) {
+            String grupo = g.apply(codigo);
+            if (!grupo.isEmpty() && !orden.contains(grupo)) orden.add(grupo);
+        }
+        return orden;
     }
 
     /** Punto medio en meses de cada rango de tiempo_primer_trabajo (PLAN.md 5.6, T4). */

@@ -53,9 +53,11 @@ public class Analisis {
 
         // U4: destino laboral (solo rama "trabaja en una organización")
         Map<String, Object> destino = new LinkedHashMap<>();
-        for (String col : List.of("rubro", "sector_publico_privado", "departamento_bolivia", "area_organizacion", "cargo", "remuneracion_promedio", "antiguedad_trabajo", "medio_obtuvo_trabajo")) {
+        for (String col : List.of("rubro", "sector_publico_privado", "departamento_bolivia", "cargo", "remuneracion_promedio", "antiguedad_trabajo", "medio_obtuvo_trabajo")) {
             destino.put(col, Estadistica.frecuencias(col, d.valores(col, TRABAJA_EN_ORGANIZACION)));
         }
+        // el área es de elección múltiple: cada persona puede aportar más de una área
+        destino.put("area_organizacion", Estadistica.frecuencias("area_organizacion", d.valoresMultiples("area_organizacion", TRABAJA_EN_ORGANIZACION)));
         r.put("destinoLaboral", destino);
 
         // U5: concordancia titulación–empleo
@@ -221,6 +223,29 @@ public class Analisis {
         return CRUCES.stream().map(c -> cruce(d, c)).toList();
     }
 
+    /**
+     * Cruce elegido por el usuario entre dos preguntas cualesquiera de opción única.
+     * Con agrupar = true se aplican las mismas agrupaciones de los cruces C1–C7.
+     */
+    public static Map<String, Object> cruceLibre(Dataset d, String colA, String colB, boolean agrupar) {
+        if (!Catalogo.PREGUNTAS_CRUZABLES.containsKey(colA) || !Catalogo.PREGUNTAS_CRUZABLES.containsKey(colB)) {
+            throw new IllegalArgumentException("Pregunta no disponible para cruzar");
+        }
+        if (colA.equals(colB)) throw new IllegalArgumentException("Elija dos preguntas distintas");
+        Function<String, String> gA = agrupar && Catalogo.agrupacion(colA) != null ? Catalogo.agrupacion(colA) : c -> Catalogo.etiqueta(colA, c);
+        Function<String, String> gB = agrupar && Catalogo.agrupacion(colB) != null ? Catalogo.agrupacion(colB) : c -> Catalogo.etiqueta(colB, c);
+        List<String> ordenA = agrupar && Catalogo.agrupacion(colA) != null ? Catalogo.ordenAgrupado(colA)
+            : Catalogo.etiquetas(colA).keySet().stream().map(c -> Catalogo.etiqueta(colA, c)).toList();
+        List<String> ordenB = agrupar && Catalogo.agrupacion(colB) != null ? Catalogo.ordenAgrupado(colB)
+            : Catalogo.etiquetas(colB).keySet().stream().map(c -> Catalogo.etiqueta(colB, c)).toList();
+        String a = Catalogo.PREGUNTAS_CRUZABLES.get(colA);
+        String b = Catalogo.PREGUNTAS_CRUZABLES.get(colB);
+        Cruce c = new Cruce("libre", a + " × " + b,
+            "Determinar si " + a.toLowerCase() + " y " + b.toLowerCase() + " están relacionadas (cruce definido por el usuario).",
+            "—", colA, a, gA, ordenA, colB, b, gB, ordenB, f -> true, "Titulados que respondieron ambas preguntas");
+        return cruce(d, c);
+    }
+
     // ---------------- Empleadores (solo descriptivo, PLAN.md 5.3) ----------------
     public static Map<String, Object> empleadores(Dataset d) {
         Map<String, Object> r = new LinkedHashMap<>();
@@ -241,10 +266,9 @@ public class Analisis {
         r.put("perfil", perfilEmpleadores(d));
 
         Map<String, Object> abiertas = new LinkedHashMap<>();
+        // Texto libre: se codifica en categorías por palabras clave (Abiertas.java)
         for (String col : List.of("areas_emergentes", "herramientas", "habilidades")) {
-            List<String> menciones = new ArrayList<>();
-            for (String v : d.valores(col)) for (String p : v.split(";")) if (!p.isBlank()) menciones.add(p.trim());
-            abiertas.put(col, ordenarDesc(Estadistica.frecuencias(col, menciones), d.n()));
+            abiertas.put(col, Abiertas.codificar(col, d.valores(col)));
         }
         r.put("preguntasAbiertas", abiertas);
         return r;

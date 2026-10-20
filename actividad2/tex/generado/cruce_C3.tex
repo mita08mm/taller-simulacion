@@ -1,57 +1,57 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: dataset de prueba (respuestas sinteticas)
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C3. Formación complementaria $\times$ remuneración}
 
 \textit{Propósito.} Determinar si la formación complementaria se asocia con el nivel de remuneración, como sustento para la oferta de actualización profesional y posgrado. Respalda el criterio ARCU-SUR 2.4.1 / 3.2.3. Se aplica sobre: trabajan en una organización, con nivel de significancia $\alpha = 0.05$.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 68$).
+\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 108$).
 
-\begin{mitabla}{C3: frecuencia observada $FO_{ij}$ \datosprueba}
+\begin{mitabla}{C3: frecuencia observada $FO_{ij}$}
 \begin{tabular}{lcc|c}
 \toprule
 Formación complementaria & Hasta Bs 5.000 & Más de Bs 5.000 & Total fila \\
 \midrule
-Sí & 18 & 19 & 37 \\
-No & 10 & 21 & 31 \\
+Sí & 21 & 52 & 73 \\
+No & 13 & 22 & 35 \\
 \midrule
-Total columna & 28 & 40 & $N=68$ \\
+Total columna & 34 & 74 & $N=108$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Sí -- Hasta Bs 5.000'': $FE_{11} = 37 \times 28 / 68 = 15.2353$.
+\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Sí -- Hasta Bs 5.000'': $FE_{11} = 73 \times 34 / 108 = 22.9815$.
 
-\begin{mitabla}{C3: frecuencia esperada $FE_{ij}$ \datosprueba}
+\begin{mitabla}{C3: frecuencia esperada $FE_{ij}$}
 \begin{tabular}{lcc}
 \toprule
 Formación complementaria & Hasta Bs 5.000 & Más de Bs 5.000 \\
 \midrule
-Sí & $37\cdot28/68 = 15.24$ & $37\cdot40/68 = 21.76$ \\
-No & $31\cdot28/68 = 12.76$ & $31\cdot40/68 = 18.24$ \\
+Sí & $73\cdot34/108 = 22.98$ & $73\cdot74/108 = 50.02$ \\
+No & $35\cdot34/108 = 11.02$ & $35\cdot74/108 = 23.98$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
 
-\begin{mitabla}{C3: cálculo de $X_0^2$ celda por celda \datosprueba}
+\begin{mitabla}{C3: cálculo de $X_0^2$ celda por celda}
 \begin{tabular}{L{5.4cm}cccc}
 \toprule
 Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
 \midrule
-Sí -- Hasta Bs 5.000 & 18 & 15.2353 & 7.6436 & 0.5017 \\
-Sí -- Más de Bs 5.000 & 19 & 21.7647 & 7.6436 & 0.3512 \\
-No -- Hasta Bs 5.000 & 10 & 12.7647 & 7.6436 & 0.5988 \\
-No -- Más de Bs 5.000 & 21 & 18.2353 & 7.6436 & 0.4192 \\
+Sí -- Hasta Bs 5.000 & 21 & 22.9815 & 3.9263 & 0.1708 \\
+Sí -- Más de Bs 5.000 & 52 & 50.0185 & 3.9263 & 0.0785 \\
+No -- Hasta Bs 5.000 & 13 & 11.0185 & 3.9263 & 0.3563 \\
+No -- Más de Bs 5.000 & 22 & 23.9815 & 3.9263 & 0.1637 \\
 \midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 1.8709 \\
+\multicolumn{4}{r}{$X_0^2 = \sum$} & 0.7694 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 4. Determinar el estadístico teórico.} Con $k = 2$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (2-1)(2-1) = 1$. De la tabla de chi-cuadrada: $X_{0.05,\,1}^2 = 3.841$.
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 1.8709 < 3.841$.
+\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 0.7694 < 3.841$.
 
 \textit{Paso 6. Conclusión.}
 
@@ -65,5 +65,5 @@ FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que formación complementaria y remuneración sean independientes. \datosprueba
+No se puede rechazar que formación complementaria y remuneración sean independientes.
 

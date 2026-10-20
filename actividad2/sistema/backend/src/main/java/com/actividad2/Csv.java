@@ -9,7 +9,12 @@ import java.util.Map;
 public class Csv {
 
     public static List<Map<String, String>> leer(String texto) {
-        List<List<String>> registros = registros(texto.replace("\r\n", "\n").replace('\r', '\n'));
+        String limpio = texto.replace("\r\n", "\n").replace('\r', '\n');
+        if (limpio.startsWith("\uFEFF")) limpio = limpio.substring(1);
+        // Excel en español guarda los CSV con ';': se detecta por el encabezado
+        String primeraLinea = limpio.contains("\n") ? limpio.substring(0, limpio.indexOf('\n')) : limpio;
+        char sep = primeraLinea.chars().filter(ch -> ch == ';').count() > primeraLinea.chars().filter(ch -> ch == ',').count() ? ';' : ',';
+        List<List<String>> registros = registros(limpio, sep);
         List<Map<String, String>> filas = new ArrayList<>();
         if (registros.isEmpty()) return filas;
 
@@ -27,7 +32,7 @@ public class Csv {
         return filas;
     }
 
-    private static List<List<String>> registros(String texto) {
+    private static List<List<String>> registros(String texto, char sep) {
         List<List<String>> registros = new ArrayList<>();
         List<String> actual = new ArrayList<>();
         StringBuilder campo = new StringBuilder();
@@ -46,7 +51,7 @@ public class Csv {
                 }
             } else if (c == '"') {
                 enComillas = true;
-            } else if (c == ',') {
+            } else if (c == sep) {
                 actual.add(campo.toString());
                 campo.setLength(0);
             } else if (c == '\n') {
@@ -66,18 +71,23 @@ public class Csv {
     }
 
     public static String escribir(List<String> columnas, List<List<String>> filas) {
+        return escribir(columnas, filas, ',');
+    }
+
+    /** Con separador ';' el archivo se abre en columnas en Excel configurado en español. */
+    public static String escribir(List<String> columnas, List<List<String>> filas, char separador) {
         StringBuilder sb = new StringBuilder();
-        sb.append(linea(columnas));
-        for (List<String> fila : filas) sb.append(linea(fila));
+        sb.append(linea(columnas, separador));
+        for (List<String> fila : filas) sb.append(linea(fila, separador));
         return sb.toString();
     }
 
-    private static String linea(List<String> valores) {
+    private static String linea(List<String> valores, char separador) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < valores.size(); i++) {
-            if (i > 0) sb.append(',');
+            if (i > 0) sb.append(separador);
             String v = valores.get(i) == null ? "" : valores.get(i);
-            if (v.contains(",") || v.contains("\"") || v.contains("\n")) {
+            if (v.indexOf(separador) >= 0 || v.contains("\"") || v.contains("\n")) {
                 sb.append('"').append(v.replace("\"", "\"\"")).append('"');
             } else {
                 sb.append(v);

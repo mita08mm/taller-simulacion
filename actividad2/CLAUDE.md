@@ -58,29 +58,66 @@
   de Sistemas de la UMSS (2026-10-12). Los problemas de diseño que tiene se
   resuelven como decisiones de análisis o limitaciones declaradas: ver
   `PLAN.md` sección 5.6. No proponer cambios de preguntas.
+- **Formulario propio y base de datos (2026-10-19, el docente aprobó empezar
+  con un formulario):** el sistema tiene su propio formulario público
+  (`#/encuesta/titulados`, `#/encuesta/empleadores`), editor de preguntas
+  (CRUD) y CRUD de respuestas. Base: **PostgreSQL 18** (instalado en la Mac
+  del usuario, `/Library/PostgreSQL/18`) con diseño mixto, elegido por el
+  usuario tras analizar los parámetros del problema: estructura de encuestas
+  relacional (FK) + respuestas como documentos **JSONB** (dispersas por las
+  ramas, con listas, y la forma cambia al editar preguntas). La integridad
+  respuesta→opción no la da una FK: se controla con SQL antes de borrar
+  (con respuestas → se desactiva). Driver en `sistema/backend/lib/`,
+  credenciales en `sistema/backend/db.properties` (gitignored). Única pregunta
+  agregada respecto de Forms: `anio_titulacion` (decisión del usuario; conviene
+  confirmarla con el docente). El resto replica el formulario de Forms.
 
 ## Archivos clave
 - `actvidad2.tex` — enunciado original transcrito (fuente de verdad del
   enunciado, no editar como informe).
 - `tex/Informe.tex` — el informe entregable (portada + entornos reutilizables
   de `actividad1/`: `mitabla`, `lstset`, tikz). MVP completo (2026-10-12):
-  metodología según ARCU-SUR, modelo de simulación, herramienta y resultados.
-  Los resultados de las secciones 3–5 salen del **dataset de prueba** y están
-  marcados con `\datosprueba` / `\avisoprueba` (en negrita): hay que
-  reemplazarlos con los resultados reales y vaciar esos comandos antes de
-  entregar. Las secciones 3–5 incluyen con `\input` los fragmentos de
+  metodología según ARCU-SUR, herramienta y resultados. El modelo de
+  simulación (generador congruencial + Transformada Inversa discreta,
+  escenario base vs. modificado) se quitó del informe y del sistema
+  (2026-10-19): el docente indicó que implica proyectar/predecir con otras
+  variables y datos que no se trabajan en esta actividad (ver `PLAN.md`
+  sección 5.4).
+  **Datos reales (2026-10-19):** el dataset de prueba se eliminó. Los datos
+  son los CSV reales exportados de Forms (148 titulados de Microsoft Forms,
+  53 empleadores de Google Forms con 18 ítems de perfil), que se cargan a la
+  base con `FormsImport.java` (traduce texto de pregunta/opción a códigos e
+  informa lo no reconocido). Los CSV tienen datos personales: viven solo en
+  `sistema/backend/src/main/resources/` y están gitignored. El informe ya
+  está con los datos reales (2026-10-19): se quitaron `\datosprueba` /
+  `\avisoprueba`, se escribieron resumen y conclusiones.
+  `Ejemplo_Criterio_323.tex` (borrador aparte para probar el criterio 3.2.3
+  antes de meterlo al informe) y `PREGUNTA_DOCENTE_CHI_CUADRADA.md` (ya
+  resuelto) se borraron por no usarse más (2026-10-20). Las preguntas
+  abiertas de empleadores (10–12) se codifican
+  en categorías por palabras clave (`Abiertas.java`; revisar con
+  `java ... com.actividad2.Abiertas`, que lista lo que quedó sin categoría);
+  la regla se publica en el informe. Las celdas `[Completar]` de la
+  declaración de IA las llena el autor. Las secciones 3–5 incluyen con `\input` los fragmentos de
   `tex/generado/`, que genera `sistema/backend/.../ReporteTex.java` con el
   procedimiento paso a paso (formato de `referencias/apuntes_simulacion.tex`,
   pedido del usuario: cada número tiene que mostrar de dónde sale). No editar
   `tex/generado/` a mano; regenerar (ver `sistema/README.md`). El informe va
-  en **blanco y negro** (sin colores: marcas en negrita, `hidelinks`). Las conclusiones (sección 6) quedan pendientes de datos reales.
+  en **blanco y negro** (sin colores: marcas en negrita, `hidelinks`).
 - `PLAN.md` — plan de arquitectura + explicación detallada de las fórmulas
   estadísticas que se van a usar, con preguntas pendientes para el docente.
 - `sistema/` — backend Java (sin Maven, `com.sun.net.httpserver` nativo del
   JDK, sin dependencias externas) + frontend Vue 3 con Naive UI (componentes)
-  y ECharts (gráficos: barras, dona, mapas de calor, radar). Una pantalla por
-  Historia de Usuario + empleadores + simulación + importar/exportar. Ver
-  `sistema/README.md` para cómo correrlo y la tabla HU → pantalla → endpoint.
+  y ECharts (gráficos: barras, dona, mapas de calor, radar). **Panel organizado
+  por criterio ARCU-SUR** (decisión del usuario, 2026-10-19): Inicio (resumen
+  de criterios) → una pantalla por criterio (2.1.2, 2.1.7, 2.4.1, 2.4.2, 3.2.1,
+  3.2.2, 3.2.3) con la misma estructura: qué pide → valoración (favorable si
+  > 50%) → 3 indicadores → máximo 3 gráficos → relaciones entre preguntas
+  (chi-cuadrada) → "Más detalle" plegado. Luego "Comparar dos preguntas" y
+  Administración. La valoración la calcula `Criterios.java` (`/api/criterios`).
+  No mostrar códigos internos (C1–C7, U1…, HU…) en la interfaz: los cruces se
+  nombran por su título. Cada pantalla tiene su URL (`#/empleo`, `#/perfil`…).
+  Ver `sistema/README.md` para cómo correrlo.
 - `GLOSARIO.md` — glosario personal de términos (estadística, metodología,
   software), no es parte del informe.
 

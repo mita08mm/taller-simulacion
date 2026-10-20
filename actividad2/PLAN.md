@@ -231,21 +231,19 @@ frecuentes como "Otros", o qué criterio prefiere.
 4. "Tiempo hasta primer empleo" es una pregunta de rangos (ej. "entre 1-4 meses"), no un número exacto — para calcular una media hay que convertir cada rango a su punto medio. ¿Está bien esa aproximación, o la tratamos solo como variable categórica (sin media, solo frecuencias)?
 
 ### Sobre las variables a cruzar
-5. ¿Validan los cruces que proponemos, o tienen cruces específicos que quieren ver sí o sí? **(Reemplazado por la sección 5, cruces C1–C6 basados en ARCU-SUR; la lista de abajo es la propuesta anterior.)**
-   - Titulados: financiamiento × tipo de posgrado (objetivo 3); situación
-     laboral × satisfacción con la formación (objetivo 2); sector
-     público/privado × pertinencia del puesto (objetivo 2); género × área
-     de interés en posgrado (objetivo 2).
-   - Empleadores: tipo de organización × nivel de formación demandado
-     (objetivo 4); rubro × probabilidad de contratación futura (objetivo
-     4); tamaño de organización × contrató en últimos 5 años (objetivo 4).
+5. ¿Validan los cruces C1–C6 de la sección 5.3 (basados en los criterios
+   ARCU-SUR), o tienen cruces específicos que quieren ver sí o sí? Nota:
+   los cruces de empleadores y el cruce con "probabilidad de contratación
+   futura" ya se descartaron (ver 5.3 y 5.5) — el docente confirmó que no
+   corresponde proyectar/predecir con las variables y datos que se están
+   trabajando.
 
 ### Sobre las Historias de Usuario / el sistema
 6. "Sistema propio" — ¿incluye construir nosotros el formulario de captura (en vez de Google Forms), o el sistema propio empieza desde que se importan los datos ya capturados?
 7. Para el dashboard (HU5: "mapas de calor y diagramas de radar") — ¿son obligatorios esos dos tipos de gráfico, o sirve cualquier visualización que comunique bien el cruce de variables?
 
 ### Sobre la base de datos y las fechas (agregadas 2026-10-12)
-9. ¿El sistema debe guardar las respuestas en una base de datos propia que acumule el histórico, o basta con importar el CSV cada vez? (El filtro por fecha ya está implementado sobre el CSV importado; falta decidir la persistencia.)
+9. ~~¿El sistema debe guardar las respuestas en una base de datos propia que acumule el histórico, o basta con importar el CSV cada vez?~~ **Resuelto (2026-10-19):** sí, base de datos propia que acumula el histórico de respuestas; el sistema analiza consumiendo de ahí, no reimportando el CSV cada vez. Ya implementado (PostgreSQL, `schema.sql`, `Respuestas.java`).
 10. ¿El formulario queda abierto permanentemente o se aplica por períodos (gestión/semestre)? ¿Qué define un dato "nuevo": fecha de respuesta o período de aplicación?
 11. ¿Se puede agregar "año de titulación" al formulario? Sin ella no hay análisis por cohorte (criterio 3.2.1). Va contra la decisión de no modificar el formulario: preguntarlo explícitamente.
 12. Si un titulado responde dos veces, ¿se reemplaza o se guardan ambas? Para reconocerlo hace falta un identificador (el email, que hoy se borra).
@@ -349,17 +347,18 @@ Notas:
   $FE<5$. Se presentan las frecuencias tal cual (U11), empresa por empresa
   si hace falta, y se dice explícitamente en el informe por qué.
 
-### 5.4. Qué entra en la simulación
+### 5.4. Simulación — descartada
 
-Los dos indicadores literales de 3.2.3 son los candidatos naturales para
-simular con Transformada Inversa discreta (tabla de probabilidades
-acumuladas a partir de las frecuencias observadas, como en p3/p4 de
-Actividad 1):
-- **Tiempo hasta el primer empleo** (U2): generar cohortes simuladas de
-  titulados y estimar el tiempo medio con su IC.
-- **Tasa de empleo** (U1): escenario base frente a escenarios modificados
-  (ej. más titulados con pasantías o con posgrado), para ver cuánto
-  cambiaría el indicador.
+Se había planteado simular escenarios de inserción laboral (U1, U2) con
+Transformada Inversa discreta y un generador congruencial mixto, comparando
+un escenario base contra uno modificado hipotético. El docente indicó que
+eso implica proyectar/predecir con otras variables y datos que no se están
+trabajando en esta actividad, y que no corresponde aplicar simulación para
+ese fin. Se sacó de `Informe.tex`, del backend (`Simulacion.java`, la ruta
+`/api/simulacion` y los métodos de `ReporteTex.java` que generaban los
+fragmentos `sim_*.tex`) y del frontend (`Simulacion.vue`). U1 y U2 siguen
+calculándose, pero solo como indicadores descriptivos con su IC (Sección
+5.2), sin componente de simulación.
 
 ### 5.5. Huecos detectados al hacer este mapa
 

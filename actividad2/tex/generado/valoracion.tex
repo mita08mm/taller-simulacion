@@ -1,217 +1,217 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: dataset de prueba (respuestas sinteticas)
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \paragraph{Grado de acuerdo con estar satisfecho con la formación.}
 
-\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Cada respuesta se codifica de 1 (totalmente en desacuerdo) a 4 (totalmente de acuerdo). El tamaño de la muestra es $n = 100$.
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Cada respuesta se codifica de 1 (totalmente en desacuerdo) a 4 (totalmente de acuerdo). El tamaño de la muestra es $n = 147$.
 
-\begin{mitabla}{Cálculo de la media y la desviación estándar de la satisfacción con la formación (escala 1--4) \datosprueba}
+\begin{mitabla}{Cálculo de la media y la desviación estándar de la satisfacción con la formación (escala 1--4)}
 \begin{tabular}{lccccc}
 \toprule
 Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
 \midrule
-Totalmente en desacuerdo & 1 & 8 & 8.00 & 4.8841 & 39.0728 \\
-En desacuerdo & 2 & 9 & 18.00 & 1.4641 & 13.1769 \\
-De acuerdo & 3 & 37 & 111.00 & 0.0441 & 1.6317 \\
-Totalmente de acuerdo & 4 & 46 & 184.00 & 0.6241 & 28.7086 \\
+Totalmente en desacuerdo & 1 & 5 & 5.00 & 3.1766 & 15.8832 \\
+En desacuerdo & 2 & 33 & 66.00 & 0.6120 & 20.1964 \\
+De acuerdo & 3 & 98 & 294.00 & 0.0474 & 4.6440 \\
+Totalmente de acuerdo & 4 & 11 & 44.00 & 1.4828 & 16.3104 \\
 \midrule
-$\Sigma$ & & 100 & 321.00 & & 82.5900 \\
+$\Sigma$ & & 147 & 409.00 & & 57.0340 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 2. Calcular la media muestral.}
 \[
-\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{321.00}{100} = 3.2100\ \text{puntos}
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{409.00}{147} = 2.7823\ \text{puntos}
 \]
 
 \textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
 \[
-S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{82.5900}{99}} = 0.9134
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{57.0340}{146}} = 0.6250
 \]
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 99$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{99,\,0.025} \approx z_{0.025} = 1.96$.
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 146$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{146,\,0.025} \approx z_{0.025} = 1.96$.
 
 \textit{Paso 5. Calcular el margen de error.}
 \[
-\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{0.9134}{\sqrt{100}}\times 1.960 = 0.0913 \times 1.960 = 0.1790
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{0.6250}{\sqrt{147}}\times 1.960 = 0.0516 \times 1.960 = 0.1010
 \]
 
 \textit{Paso 6. Construir el intervalo y concluir.}
 \[
-3.2100 - 0.1790 \;\le\; \mu \;\le\; 3.2100 + 0.1790 \quad\Longrightarrow\quad 3.03 \le \mu \le 3.39
+2.7823 - 0.1010 \;\le\; \mu \;\le\; 2.7823 + 0.1010 \quad\Longrightarrow\quad 2.68 \le \mu \le 2.88
 \]
 
-Con un 95\% de confianza, la media de la satisfacción con la formación (escala 1--4) de todos los titulados está entre 3.03 y 3.39 puntos. \datosprueba
+Con un 95\% de confianza, la media de la satisfacción con la formación (escala 1--4) de todos los titulados está entre 2.68 y 2.88 puntos.
 
 \paragraph{Concordancia entre la formación y los requerimientos del mercado.}
 
-\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Misma codificación de 1 a 4. El tamaño de la muestra es $n = 100$.
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Misma codificación de 1 a 4. El tamaño de la muestra es $n = 147$.
 
-\begin{mitabla}{Cálculo de la media y la desviación estándar de la concordancia formación--mercado (escala 1--4) \datosprueba}
+\begin{mitabla}{Cálculo de la media y la desviación estándar de la concordancia formación--mercado (escala 1--4)}
 \begin{tabular}{lccccc}
 \toprule
 Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
 \midrule
-Totalmente en desacuerdo & 1 & 10 & 10.00 & 3.3856 & 33.8560 \\
-En desacuerdo & 2 & 22 & 44.00 & 0.7056 & 15.5232 \\
-De acuerdo & 3 & 42 & 126.00 & 0.0256 & 1.0752 \\
-Totalmente de acuerdo & 4 & 26 & 104.00 & 1.3456 & 34.9856 \\
+Totalmente en desacuerdo & 1 & 5 & 5.00 & 2.6434 & 13.2169 \\
+En desacuerdo & 2 & 51 & 102.00 & 0.3917 & 19.9761 \\
+De acuerdo & 3 & 85 & 255.00 & 0.1400 & 11.8990 \\
+Totalmente de acuerdo & 4 & 6 & 24.00 & 1.8883 & 11.3297 \\
 \midrule
-$\Sigma$ & & 100 & 284.00 & & 85.4400 \\
+$\Sigma$ & & 147 & 386.00 & & 56.4218 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 2. Calcular la media muestral.}
 \[
-\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{284.00}{100} = 2.8400\ \text{puntos}
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{386.00}{147} = 2.6259\ \text{puntos}
 \]
 
 \textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
 \[
-S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{85.4400}{99}} = 0.9290
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{56.4218}{146}} = 0.6217
 \]
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 99$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{99,\,0.025} \approx z_{0.025} = 1.96$.
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 146$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{146,\,0.025} \approx z_{0.025} = 1.96$.
 
 \textit{Paso 5. Calcular el margen de error.}
 \[
-\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{0.9290}{\sqrt{100}}\times 1.960 = 0.0929 \times 1.960 = 0.1821
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{0.6217}{\sqrt{147}}\times 1.960 = 0.0513 \times 1.960 = 0.1005
 \]
 
 \textit{Paso 6. Construir el intervalo y concluir.}
 \[
-2.8400 - 0.1821 \;\le\; \mu \;\le\; 2.8400 + 0.1821 \quad\Longrightarrow\quad 2.66 \le \mu \le 3.02
+2.6259 - 0.1005 \;\le\; \mu \;\le\; 2.6259 + 0.1005 \quad\Longrightarrow\quad 2.53 \le \mu \le 2.73
 \]
 
-Con un 95\% de confianza, la media de la concordancia formación--mercado (escala 1--4) de todos los titulados está entre 2.66 y 3.02 puntos. \datosprueba
+Con un 95\% de confianza, la media de la concordancia formación--mercado (escala 1--4) de todos los titulados está entre 2.53 y 2.73 puntos.
 
 \paragraph{Pertinencia de las labores del puesto actual.}
 
-\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Solo responden quienes trabajan en una organización; misma codificación de 1 a 4. El tamaño de la muestra es $n = 68$.
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Solo responden quienes trabajan en una organización; misma codificación de 1 a 4. El tamaño de la muestra es $n = 108$.
 
-\begin{mitabla}{Cálculo de la media y la desviación estándar de la pertinencia del puesto (escala 1--4) \datosprueba}
+\begin{mitabla}{Cálculo de la media y la desviación estándar de la pertinencia del puesto (escala 1--4)}
 \begin{tabular}{lccccc}
 \toprule
 Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
 \midrule
-Totalmente en desacuerdo & 1 & 8 & 8.00 & 3.6548 & 29.2388 \\
-En desacuerdo & 2 & 15 & 30.00 & 0.8313 & 12.4697 \\
-De acuerdo & 3 & 20 & 60.00 & 0.0078 & 0.1557 \\
-Totalmente de acuerdo & 4 & 25 & 100.00 & 1.1843 & 29.6064 \\
+Totalmente en desacuerdo & 1 & 5 & 5.00 & 5.0625 & 25.3125 \\
+En desacuerdo & 2 & 5 & 10.00 & 1.5625 & 7.8125 \\
+De acuerdo & 3 & 56 & 168.00 & 0.0625 & 3.5000 \\
+Totalmente de acuerdo & 4 & 42 & 168.00 & 0.5625 & 23.6250 \\
 \midrule
-$\Sigma$ & & 68 & 198.00 & & 71.4706 \\
+$\Sigma$ & & 108 & 351.00 & & 60.2500 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 2. Calcular la media muestral.}
 \[
-\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{198.00}{68} = 2.9118\ \text{puntos}
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{351.00}{108} = 3.2500\ \text{puntos}
 \]
 
 \textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
 \[
-S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{71.4706}{67}} = 1.0328
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{60.2500}{107}} = 0.7504
 \]
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 67$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{67,\,0.025} \approx z_{0.025} = 1.96$.
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 107$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{107,\,0.025} \approx z_{0.025} = 1.96$.
 
 \textit{Paso 5. Calcular el margen de error.}
 \[
-\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{1.0328}{\sqrt{68}}\times 1.960 = 0.1252 \times 1.960 = 0.2455
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{0.7504}{\sqrt{108}}\times 1.960 = 0.0722 \times 1.960 = 0.1415
 \]
 
 \textit{Paso 6. Construir el intervalo y concluir.}
 \[
-2.9118 - 0.2455 \;\le\; \mu \;\le\; 2.9118 + 0.2455 \quad\Longrightarrow\quad 2.67 \le \mu \le 3.16
+3.2500 - 0.1415 \;\le\; \mu \;\le\; 3.2500 + 0.1415 \quad\Longrightarrow\quad 3.11 \le \mu \le 3.39
 \]
 
-Con un 95\% de confianza, la media de la pertinencia del puesto (escala 1--4) de todos los titulados está entre 2.67 y 3.16 puntos. \datosprueba
+Con un 95\% de confianza, la media de la pertinencia del puesto (escala 1--4) de todos los titulados está entre 3.11 y 3.39 puntos.
 
-\paragraph{Aspectos de la Carrera, asignaturas.} Son preguntas de elección múltiple: cada titulado puede marcar varias opciones, por lo que $f_i/n$ se calcula sobre el número de titulados ($n = 100$) y los porcentajes pueden sumar más de 100.
+\paragraph{Aspectos de la Carrera, asignaturas.} Son preguntas de elección múltiple: cada titulado puede marcar varias opciones, por lo que $f_i/n$ se calcula sobre el número de titulados ($n = 148$) y los porcentajes pueden sumar más de 100.
 
-\begin{mitabla}{Aspectos de mayor utilidad ($n=100$) \datosprueba}
+\begin{mitabla}{Aspectos de mayor utilidad ($n=148$)}
 \begin{tabular}{lccc}
 \toprule
 Aspecto & $f_i$ & $f_i / n$ & \% \\
 \midrule
-Distribución de horarios & 55 & $55/100 = 0.550$ & 55.0 \\
-Equipos multidisciplinarios & 55 & $55/100 = 0.550$ & 55.0 \\
-Pasantías o prácticas & 49 & $49/100 = 0.490$ & 49.0 \\
-Habilidades analíticas & 47 & $47/100 = 0.470$ & 47.0 \\
-Aplicación práctica en proyectos reales & 46 & $46/100 = 0.460$ & 46.0 \\
-Herramientas de la industria & 43 & $43/100 = 0.430$ & 43.0 \\
+Habilidades analíticas & 82 & $82/148 = 0.554$ & 55.4 \\
+Aplicación práctica en proyectos reales & 66 & $66/148 = 0.446$ & 44.6 \\
+Equipos multidisciplinarios & 62 & $62/148 = 0.419$ & 41.9 \\
+Herramientas de la industria & 50 & $50/148 = 0.338$ & 33.8 \\
+Pasantías o prácticas & 45 & $45/148 = 0.304$ & 30.4 \\
+Distribución de horarios & 32 & $32/148 = 0.216$ & 21.6 \\
 \midrule
-Menciones & 295 & & 295.0 \\
+Menciones & 337 & & 227.7 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Lectura:} la respuesta más frecuente es ``Distribución de horarios'' ($f_i = 55$, 55.0\% de 100).
+\textit{Lectura:} la respuesta más frecuente es ``Habilidades analíticas'' ($f_i = 82$, 55.4\% de 148).
 
-\begin{mitabla}{Aspectos que pueden mejorarse ($n=100$) \datosprueba}
+\begin{mitabla}{Aspectos que pueden mejorarse ($n=148$)}
 \begin{tabular}{lccc}
 \toprule
 Aspecto & $f_i$ & $f_i / n$ & \% \\
 \midrule
-Distribución de horarios & 52 & $52/100 = 0.520$ & 52.0 \\
-Actividades extracurriculares & 49 & $49/100 = 0.490$ & 49.0 \\
-Relación con empresas (prácticas) & 48 & $48/100 = 0.480$ & 48.0 \\
-Actualizar el plan de estudios & 48 & $48/100 = 0.480$ & 48.0 \\
-Integrar teoría y práctica & 46 & $46/100 = 0.460$ & 46.0 \\
-Más opciones de especialización & 43 & $43/100 = 0.430$ & 43.0 \\
+Actualizar el plan de estudios & 106 & $106/148 = 0.716$ & 71.6 \\
+Relación con empresas (prácticas) & 92 & $92/148 = 0.622$ & 62.2 \\
+Integrar teoría y práctica & 88 & $88/148 = 0.595$ & 59.5 \\
+Más opciones de especialización & 78 & $78/148 = 0.527$ & 52.7 \\
+Actividades extracurriculares & 55 & $55/148 = 0.372$ & 37.2 \\
+Distribución de horarios & 46 & $46/148 = 0.311$ & 31.1 \\
 \midrule
-Menciones & 286 & & 286.0 \\
+Menciones & 465 & & 314.2 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Lectura:} la respuesta más frecuente es ``Distribución de horarios'' ($f_i = 52$, 52.0\% de 100).
+\textit{Lectura:} la respuesta más frecuente es ``Actualizar el plan de estudios'' ($f_i = 106$, 71.6\% de 148).
 
-\begin{mitabla}{Asignaturas con ventaja competitiva ($n=100$) \datosprueba}
+\begin{mitabla}{Asignaturas con ventaja competitiva ($n=148$)}
 \begin{tabular}{lccc}
 \toprule
 Asignatura & $f_i$ & $f_i / n$ & \% \\
 \midrule
-Base de Datos & 65 & $65/100 = 0.650$ & 65.0 \\
-Redes de Computadora & 60 & $60/100 = 0.600$ & 60.0 \\
-T.I.S. & 59 & $59/100 = 0.590$ & 59.0 \\
-Básicas & 57 & $57/100 = 0.570$ & 57.0 \\
-Introducción & 55 & $55/100 = 0.550$ & 55.0 \\
-Planif. de Proyectos y Gestión & 55 & $55/100 = 0.550$ & 55.0 \\
-Tecnología Redes Avanzadas & 52 & $52/100 = 0.520$ & 52.0 \\
-Inteligencia Artificial & 49 & $49/100 = 0.490$ & 49.0 \\
-Electivas & 48 & $48/100 = 0.480$ & 48.0 \\
+Base de Datos & 140 & $140/148 = 0.946$ & 94.6 \\
+T.I.S. & 110 & $110/148 = 0.743$ & 74.3 \\
+Redes de Computadora & 107 & $107/148 = 0.723$ & 72.3 \\
+Planif. de Proyectos y Gestión & 81 & $81/148 = 0.547$ & 54.7 \\
+Electivas & 75 & $75/148 = 0.507$ & 50.7 \\
+Inteligencia Artificial & 70 & $70/148 = 0.473$ & 47.3 \\
+Introducción & 65 & $65/148 = 0.439$ & 43.9 \\
+Tecnología Redes Avanzadas & 62 & $62/148 = 0.419$ & 41.9 \\
+Básicas & 30 & $30/148 = 0.203$ & 20.3 \\
 \midrule
-Menciones & 500 & & 500.0 \\
+Menciones & 740 & & 500.0 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Lectura:} la respuesta más frecuente es ``Base de Datos'' ($f_i = 65$, 65.0\% de 100).
+\textit{Lectura:} la respuesta más frecuente es ``Base de Datos'' ($f_i = 140$, 94.6\% de 148).
 
-\begin{mitabla}{Asignaturas poco útiles ($n=100$) \datosprueba}
+\begin{mitabla}{Asignaturas poco útiles ($n=148$)}
 \begin{tabular}{lccc}
 \toprule
 Asignatura & $f_i$ & $f_i / n$ & \% \\
 \midrule
-Contabilidad Básica & 58 & $58/100 = 0.580$ & 58.0 \\
-Taller Prog. Bajo Nivel & 49 & $49/100 = 0.490$ & 49.0 \\
-Básicas & 48 & $48/100 = 0.480$ & 48.0 \\
-Aplic. Interactivas TV Digital & 47 & $47/100 = 0.470$ & 47.0 \\
-Programación Funcional & 47 & $47/100 = 0.470$ & 47.0 \\
-Teoría de Grafos & 47 & $47/100 = 0.470$ & 47.0 \\
-Telefonía IP & 45 & $45/100 = 0.450$ & 45.0 \\
-Teoría de Autómatas & 43 & $43/100 = 0.430$ & 43.0 \\
-Web Semánticas & 40 & $40/100 = 0.400$ & 40.0 \\
-Robótica & 39 & $39/100 = 0.390$ & 39.0 \\
-Graficación por Computadora & 37 & $37/100 = 0.370$ & 37.0 \\
+Aplic. Interactivas TV Digital & 72 & $72/148 = 0.486$ & 48.6 \\
+Básicas & 69 & $69/148 = 0.466$ & 46.6 \\
+Contabilidad Básica & 66 & $66/148 = 0.446$ & 44.6 \\
+Telefonía IP & 58 & $58/148 = 0.392$ & 39.2 \\
+Web Semánticas & 48 & $48/148 = 0.324$ & 32.4 \\
+Robótica & 46 & $46/148 = 0.311$ & 31.1 \\
+Taller Prog. Bajo Nivel & 46 & $46/148 = 0.311$ & 31.1 \\
+Teoría de Autómatas & 41 & $41/148 = 0.277$ & 27.7 \\
+Graficación por Computadora & 40 & $40/148 = 0.270$ & 27.0 \\
+Teoría de Grafos & 34 & $34/148 = 0.230$ & 23.0 \\
+Programación Funcional & 16 & $16/148 = 0.108$ & 10.8 \\
 \midrule
-Menciones & 500 & & 500.0 \\
+Menciones & 536 & & 362.2 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Lectura:} la respuesta más frecuente es ``Contabilidad Básica'' ($f_i = 58$, 58.0\% de 100).
+\textit{Lectura:} la respuesta más frecuente es ``Aplic. Interactivas TV Digital'' ($f_i = 72$, 48.6\% de 148).
 

@@ -83,12 +83,6 @@
     {ñ}{{\~n}}1 {Ñ}{{\~N}}1
 }
 
-% Marca visible (en negrita) para resultados calculados con el dataset de prueba.
-% Cuando se procesen las respuestas reales: reemplazar los valores y
-% redefinir estos comandos como vacíos.
-\newcommand{\datosprueba}{\textbf{[Datos de prueba]}}
-\newcommand{\avisoprueba}{\begin{center}\fbox{\parbox{0.92\textwidth}{\small\textbf{Resultados provisionales.} Los valores de esta sección se calcularon con el dataset de prueba (respuestas sintéticas) para validar la herramienta. Se reemplazan por los resultados de las encuestas reales antes de la entrega.}}\end{center}}
-
 \begin{document}
 
 \setlength{\parindent}{0pt}
@@ -112,9 +106,11 @@
 
 \begin{flushleft}
 \begin{tabular}{@{}ll}
-\textbf{Presentado por:} & Miguel Mita Choque \\[4pt]
-\textbf{Docente:}        & Henrry Frank Villarroel Tapia \\[4pt]
-\textbf{Materia:}        & Taller de Simulación de Sistemas \\
+\textbf{Integrantes:} & Mita Choque Miguel \\[4pt]
+                      & Aliaga García Edilson Daniel \\[4pt]
+                      & Aldunate Guzmán André Helian \\[4pt]
+\textbf{Docente:}     & Henrry Frank Villarroel Tapia \\[4pt]
+\textbf{Materia:}     & Taller de Simulación de Sistemas \\
 \end{tabular}
 \end{flushleft}
 
@@ -134,13 +130,21 @@ graduados, perfil de egreso, posgrado y vinculación con el sector
 productivo, y se obtienen de dos encuestas: una a titulados y otra a
 empleadores. Los datos se procesan en una herramienta de software
 propia que calcula frecuencias, medias con intervalo de confianza del
-95\%, pruebas de independencia chi-cuadrada sobre tablas de
-contingencia, y simula escenarios de inserción laboral mediante el
-método de la Transformada Inversa discreta. \textit{[Pendiente: completar
-con la síntesis de resultados una vez procesadas las respuestas reales.]}
+95\% y pruebas de independencia chi-cuadrada sobre tablas de
+contingencia. Con 148 titulados y 53 organizaciones empleadoras, el
+83.1\% de los titulados trabaja o emprende y tarda en promedio 2.63
+meses en conseguir su primer empleo (IC 95\%: 1.85 a 3.42 meses); el
+90.7\% considera que sus labores son pertinentes a su formación y el
+74.1\% está satisfecho con ella, aunque el 71.6\% pide actualizar el
+plan de estudios. El 83.1\% quiere hacer un posgrado, sobre todo en
+inteligencia artificial, pero solo el 41.5\% de ellos lo haría en la
+UMSS. Los empleadores valoran el perfil profesional (entre 79\% y 87\%
+de acuerdo), pero menos de la mitad dice haber sido consultado por la
+Carrera. Ninguno de los siete cruces muestra relación significativa entre
+las variables al 5\%.
 
 \textbf{Palabras clave:} análisis de mercado, empleabilidad, ARCU-SUR,
-simulación, Ingeniería de Sistemas.
+Ingeniería de Sistemas.
 
 \tableofcontents
 \listoftables
@@ -189,8 +193,6 @@ con los criterios de calidad ARCU-SUR para graduados y perfil de egreso.
   valoración de la formación recibida.
   \item Describir la valoración que los empleadores hacen del perfil
   profesional y de las competencias de los titulados.
-  \item Simular escenarios de inserción laboral a partir de las
-  distribuciones observadas en la encuesta.
   \item Desarrollar una herramienta de software que importe, procese y
   visualice los datos recolectados.
 \end{enumerate}
@@ -233,10 +235,7 @@ El estudio es de tipo cuantitativo y exploratorio. Es cuantitativo
 porque se basa en respuestas estructuradas (categóricas y numéricas)
 resumidas mediante frecuencias, medias e intervalos de confianza. Es
 exploratorio porque busca identificar relaciones entre variables sin
-partir de una hipótesis previa. Se complementa con un componente de
-simulación: a partir de las distribuciones observadas se generan
-cohortes de titulados para estudiar cómo cambiarían los indicadores de
-empleo bajo distintos escenarios.
+partir de una hipótesis previa.
 
 \subsection{Población Objetivo}
 
@@ -244,9 +243,9 @@ empleo bajo distintos escenarios.
   \item \textbf{Titulados} de la Carrera de Ingeniería de Sistemas de la
   UMSS. La encuesta se distribuye únicamente a titulados de la Carrera,
   por lo que el formulario no incluye una pregunta filtro.
-  \item \textbf{Empleadores} de titulados de la Carrera: cinco
-  organizaciones (cantidad confirmada con el docente), con al menos una
-  del ámbito público y una del privado, como exige el enunciado.
+  \item \textbf{Empleadores} de titulados de la Carrera: el enunciado
+  exigía al menos cinco organizaciones, con una del ámbito público y una
+  del privado; la encuesta recibió respuestas de 53 organizaciones.
 \end{enumerate}
 
 \subsection{Técnicas de Recolección de Datos}
@@ -280,7 +279,7 @@ HU & Tema & Preguntas del formulario utilizadas \\
 2 & Formación continua y áreas de interés & Formación complementaria y su nivel, interés en posgrado, área de interés, institución elegida, opinión sobre la oferta de posgrado de la FCyT \\
 3 & Mecanismos de financiamiento & Fuente de financiamiento del programa cursado; financiamiento del emprendimiento \\
 4 & Brechas en competencias & Satisfacción con la formación, concordancia formación--mercado, aspectos útiles y a mejorar, asignaturas; escala de perfil profesional de empleadores \\
-5 & Reportes y matrices cruzadas & Exportación CSV, tablas de contingencia, mapas de calor y diagrama de radar en la herramienta \\
+5 & Reportes y matrices cruzadas & Exportación CSV y para Excel, tablas de contingencia (cruces del estudio y cruce libre), mapas de calor y diagrama de radar en la herramienta \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
@@ -308,7 +307,7 @@ U7 & Ranking de asignaturas & Menciones de asignaturas con ventaja y poco útile
 U8 & Demanda de posgrado & \% con formación complementaria, \% con interés, área e institución & 2.4.1 / 1.1.5 \\
 U9 & Oferta de posgrado FCyT & Frecuencias y media de la escala (1--4) & 2.4.1 \\
 U10 & Seguimiento de graduados & \% interesado en la red de contactos de la Carrera & 3.2.2 \\
-U11 & Perfil según empleadores & Porcentaje de cada opción en los 10 criterios de perfil profesional & 2.1.2 / 2.4.2 \\
+U11 & Perfil según empleadores & Porcentaje de cada opción en los 18 ítems de perfil profesional y vinculación & 2.1.2 / 2.4.2 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
@@ -329,10 +328,12 @@ C7 & Financiamiento $\times$ nivel cursado & Complementar la historia de usuario
 \end{tabular}
 \end{mitabla}
 
-Para los empleadores el análisis es solo descriptivo: con cinco
-organizaciones, cualquier tabla de contingencia tendría frecuencias
-esperadas menores a 5 en todas sus celdas y la prueba chi-cuadrada no
-sería confiable.
+Para los empleadores el análisis es solo descriptivo (frecuencias de
+cada respuesta), tal como se definió cuando el plan consideraba cinco
+organizaciones. \textit{[Confirmar: la encuesta recibió 53 respuestas de
+empleadores, no 5 -- con esa cantidad podría ser posible aplicar
+chi-cuadrada también a empleadores; falta decidir si se mantiene el
+análisis solo descriptivo o se agregan cruces para esta encuesta.]}
 
 \subsection{Decisiones de Procesamiento}
 
@@ -373,10 +374,13 @@ herramienta aplica de forma automática:
 \subsection{Pipeline de Procesamiento}
 
 \begin{enumerate}
-  \item \textbf{Importación y depuración:} el CSV exportado de cada
-  formulario se importa en la herramienta, que elimina los datos
-  personales, toma la fecha de cada respuesta y valida que estén las
-  columnas necesarias.
+  \item \textbf{Recolección e importación:} las respuestas llegan por
+  el formulario propio de la herramienta o se importan del CSV exportado
+  de Microsoft Forms (titulados) y Google Forms (empleadores). Al
+  importar, el texto de cada pregunta y opción se traduce al código de la
+  encuesta y se informa lo que no se pudo reconocer; los datos
+  personales se guardan aparte y no entran al análisis, y se toma la
+  fecha de cada respuesta.
   \item \textbf{Selección del período:} se eligen las respuestas
   recibidas entre dos fechas (o todas).
   \item \textbf{Estadística univariada:} frecuencias absolutas y
@@ -384,8 +388,6 @@ herramienta aplica de forma automática:
   confianza del 95\% para las variables numéricas y las escalas.
   \item \textbf{Estadística bivariada:} tablas de contingencia y prueba
   chi-cuadrada para los cruces C1--C7.
-  \item \textbf{Simulación:} generación de cohortes de titulados con la
-  Transformada Inversa discreta y comparación de escenarios.
   \item \textbf{Visualización y exportación:} panel de control con
   gráficos de barras, mapas de calor y diagrama de radar; exportación de
   los datos limpios y de cada matriz cruzada en CSV.
@@ -519,119 +521,31 @@ En resumen, para nuestro caso cada símbolo significa:
 El desarrollo completo de esta prueba, paso a paso y con los datos de la
 encuesta, se presenta para cada cruce en la Sección~\ref{sec:cruces}.
 
-\subsection{Modelo de Simulación}\label{sec:modelo-sim}
-
-Los dos indicadores literales del criterio 3.2.3 (tasa de empleo y tiempo
-medio para obtener el primer empleo) se estudian también por simulación.
-El modelo genera cohortes de titulados: a cada titulado simulado se le
-asigna una situación laboral y, si trabaja en una organización, un
-tiempo hasta su primer empleo. Ambas variables son discretas y su
-distribución es la observada en la encuesta, por lo que se generan con
-el método de la Transformada Inversa discreta.
-
-\subsubsection{Generación de números aleatorios}
-
-Se usa un generador congruencial mixto:
-
-\begin{equation}
-x_{n+1} = (a\,x_n + c) \bmod m, \qquad R = \frac{x_{n+1}}{m}, \qquad 0 \le R < 1
-\end{equation}
-
-con $a = 1\,664\,525$, $c = 1\,013\,904\,223$ y $m = 2^{32}$. Se verifican
-las tres propiedades de periodo completo:
-
-\begin{enumerate}[label=\roman*)]
-  \item $c$ y $m$ son primos entre sí: $m=2^{32}$ solo tiene el factor
-  2 y $c$ es impar.
-  \item Todo primo que divide a $m$ divide a $a-1$: el único primo es 2
-  y $a-1 = 1\,664\,524$ es par.
-  \item $m$ es múltiplo de 4 y $a-1 = 4 \times 416\,131$ también lo es.
-\end{enumerate}
-
-Como se cumplen i), ii) y iii), el generador tiene periodo completo
-($2^{32}$ valores), mucho mayor que la cantidad de números que usa la
-simulación.
-
-\input{generado/sim_generador}
-
-\subsubsection{Transformada Inversa discreta}
-
-\textit{Paso 1. Contar con la función de probabilidad $p(x)$.} Para cada
-variable, $p(x)$ es la frecuencia relativa observada de cada categoría
-en la encuesta.
-
-\textit{Paso 2. Definir la función acumulada} $F(x_i) = \sum_{j \le i} p(x_j)$.
-
-\textit{Paso 3. Igualar $F(x)$ y $R$.} Cada categoría ocupa el rango de $R$
-$[F(x_{i-1}),\,F(x_i))$.
-
-\textit{Paso 4. Aplicar la inversa.} $x = F^{-1}(R)$ es la primera
-categoría $x_i$ que cumple $R < F(x_i)$.
-
-Las tablas con las probabilidades obtenidas de la encuesta y sus rangos
-de $R$ se presentan en la Sección~\ref{sec:simulacion}.
-
-\textit{Paso 5. Implementar el algoritmo.}
-
-\begin{lstlisting}[caption={Algoritmo de una corrida de la simulación}, language=Pascal]
-para cada corrida k = 1 .. n hacer
-    empleados <- 0 ; enOrganizacion <- 0 ; sumaMeses <- 0
-    para cada titulado t = 1 .. N hacer
-        R1 <- gcm() ; R2 <- gcm()
-        situacion <- F_situacion^-1(R1)
-        si situacion <> "No trabaja" entonces empleados <- empleados + 1
-        si situacion = "Trabaja en una organizacion" entonces
-            meses <- puntoMedio(F_tiempo^-1(R2))
-            enOrganizacion <- enOrganizacion + 1
-            sumaMeses <- sumaMeses + meses
-        finSi
-    finPara
-    tasa[k]   <- empleados / N
-    tiempo[k] <- sumaMeses / enOrganizacion
-finPara
-\end{lstlisting}
-
-$R_2$ se genera para todos los titulados aunque no se use, para que el
-escenario base y el modificado consuman exactamente la misma secuencia
-de números aleatorios y la diferencia entre ambos se deba solo al
-cambio de probabilidades.
-
-\subsubsection{Escenarios y número de corridas}
-
-El escenario base usa las probabilidades observadas. El escenario
-modificado plantea una situación hipotética que la Carrera podría buscar
-con mayor vinculación con empresas: se reduce en un 50\% la probabilidad
-de ``no trabaja'' (que pasa a ``trabaja en una organización'') y se
-traslada el 30\% de la probabilidad de los tiempos mayores a 4 meses a
-la categoría 1--4 meses. Ambos porcentajes son parámetros de la
-herramienta.
-
-De cada escenario se ejecutan $n = 1000$ corridas con cohortes de
-$N = 100$ titulados. Con los $n$ resultados de cada indicador se calcula
-su media y su intervalo de confianza del 95\% con la misma fórmula de la
-sección anterior. Como el ancho del intervalo es $2S\,t_{n-1,\alpha/2}/\sqrt{n}$,
-reducirlo a la mitad exige cuadruplicar las corridas (Coss Bu, 1998); con
-$n=1000$ el margen de error de la tasa de empleo queda por debajo de
-0.3 puntos porcentuales.
-
 \subsection{Herramienta de Software}
 
 La herramienta tiene dos partes:
 
 \begin{itemize}
-  \item \textbf{Backend en Java}, sin dependencias externas (servidor
-  HTTP del propio JDK). Lee los CSV, aplica las decisiones de
-  procesamiento, calcula indicadores, cruces y simulación, y expone los
-  resultados como servicios REST en formato JSON.
+  \item \textbf{Backend en Java} (servidor HTTP del propio JDK) con
+  una base de datos PostgreSQL. La estructura de las encuestas
+  (secciones, preguntas y opciones) se guarda en tablas relacionadas, y
+  cada respuesta como un documento JSON, porque cada titulado responde
+  solo las preguntas de su rama. El backend recibe las respuestas del
+  formulario, importa los CSV de Forms, aplica las decisiones de
+  procesamiento, calcula indicadores y cruces, y expone los resultados
+  como servicios REST en formato JSON.
   \item \textbf{Frontend web} en Vue, con la librería de componentes
-  Naive UI y la librería de gráficos ECharts. Se organiza por módulos
-  (titulados, empleadores, análisis y datos): indicadores de
-  empleabilidad y posgrado, valoración de la formación con diagrama de
-  radar, cruces de variables con mapas de calor, simulación de
-  escenarios con sus tablas de Transformada Inversa, e importación y
-  exportación de datos. Todas las pantallas pueden filtrarse por el
-  período en que se recibieron las respuestas. Las Historias de Usuario del enunciado se
-  cubren con estas funcionalidades (Tabla~\ref{tab:hu}).
+  Naive UI y la librería de gráficos ECharts. El panel se organiza por
+  criterio ARCU-SUR: cada pantalla muestra qué pide el criterio, su
+  valoración (aspectos favorables y desfavorables), los indicadores que
+  lo responden, los gráficos de evidencia y los cruces relacionados.
+  Además tiene una pantalla para comparar dos preguntas cualesquiera
+  (la herramienta aplica la prueba chi-cuadrada al momento), el
+  formulario público de cada encuesta, un editor de preguntas y la
+  administración, importación y exportación de respuestas. Todas las
+  pantallas pueden filtrarse por el período en que se recibieron las
+  respuestas. Las Historias de Usuario del enunciado se cubren con
+  estas funcionalidades (Tabla~\ref{tab:hu}).
 \end{itemize}
 
 \begin{mitabla}{Pantallas de la herramienta y servicios que las alimentan}
@@ -639,21 +553,18 @@ La herramienta tiene dos partes:
 \toprule
 Pantalla & Servicio REST & Contenido \\
 \midrule
-Inicio & \texttt{/api/empleabilidad}, \texttt{/api/formacion}, \texttt{/api/demografia} & Indicadores principales y su criterio ARCU-SUR \\
-Empleabilidad & \texttt{/api/empleabilidad} & U1--U5, emprendimiento, razones para no trabajar \\
-Formación y posgrado & \texttt{/api/formacion}, \texttt{/api/financiamiento} & U8, U9, fuente de financiamiento \\
-Valoración de la formación & \texttt{/api/competencias} & U6, U7 y radar del perfil (U11) \\
-Cruces de variables & \texttt{/api/cruces} & C1--C7: mapa de calor, $FO$, $FE$, $X_0^2$ y decisión \\
-Perfil y demanda (empleadores) & \texttt{/api/empleadores} & Descriptivos, homologación de cargos, preguntas abiertas \\
-Simulación & \texttt{/api/simulacion} & Parámetros, tablas TI, tabla de simulación y corridas \\
-Importar y exportar & \texttt{/api/importar}, \texttt{/api/exportar} & Carga de CSV y descarga de datos limpios y matrices \\
+Inicio & \texttt{/api/criterios} & Resumen de la valoración de cada criterio \\
+Una pantalla por criterio (2.1.2, 2.1.7, 2.4.1, 2.4.2, 3.2.1, 3.2.2, 3.2.3) & \texttt{/api/criterios} y los servicios de indicadores (\texttt{/api/empleabilidad}, \texttt{/api/formacion}, \texttt{/api/competencias}, \texttt{/api/empleadores}, \texttt{/api/cruces}) & Qué pide el criterio, valoración, indicadores, gráficos y cruces relacionados \\
+Comparar dos preguntas & \texttt{/api/cruce-libre} & Tabla de contingencia, mapa de calor, $FO$, $FE$, $X_0^2$ y decisión \\
+Generar reporte & \texttt{/api/criterios} y servicios de indicadores & Reporte imprimible (o PDF) con la valoración, indicadores, un gráfico clave y los cruces de cada criterio, calculado con el período elegido \\
+Formulario público & \texttt{/api/encuestas}, \texttt{/api/respuestas} & Encuesta a titulados y a empleadores \\
+Preguntas y respuestas & \texttt{/api/admin/...} & Editor de preguntas y administración de respuestas \\
+Importar y exportar & \texttt{/api/importar}, \texttt{/api/exportar} & Carga de CSV de Forms y descarga de datos limpios y matrices \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \section{Análisis de la Demanda Educativa y Perfil de los Titulados}\label{sec:titulados}
-
-\avisoprueba
 
 Todas las tablas de esta sección y de las dos siguientes se generan con
 la herramienta a partir de las respuestas importadas, de modo que cada
@@ -737,31 +648,40 @@ procedimiento del intervalo de confianza.
 
 \section{Análisis de la Oferta Laboral y Requerimientos del Sector Productivo}\label{sec:empleadores}
 
-\avisoprueba
-
 El criterio 2.1.2 exige que el perfil de egreso sea coherente con las
 competencias que demandan los agentes sociales relevantes, y el 2.4.2
 que la Carrera mantenga relaciones con organizaciones públicas y
 privadas. Los empleadores son esos agentes: su opinión es la única
 fuente del estudio que mira a los titulados desde fuera de la
-universidad. Con pocas organizaciones encuestadas el análisis es solo
-descriptivo: se presentan las frecuencias de cada respuesta. En la
-escala de perfil profesional no se calcula media porque sus opciones no
-son simétricas.
+universidad. El análisis es descriptivo: se presentan las frecuencias
+de cada respuesta ($N=53$ organizaciones). En la escala de perfil
+profesional no se calcula media porque sus opciones no son simétricas.
 
 \input{generado/empleadores}
 
 \subsection{Áreas, Herramientas y Habilidades Demandadas}
 
-Las tres preguntas abiertas se agruparon en categorías y se contaron
-sus menciones. Las áreas emergentes más mencionadas fueron desarrollo
-móvil, internet de las cosas y ciberseguridad; las herramientas,
-Python y sus librerías de datos; y las habilidades, ética profesional y
-aprendizaje autónomo. \datosprueba
+Las tres preguntas abiertas (10, 11 y 12) se responden con texto libre,
+así que para poder contarlas se codificaron en categorías con una regla
+explícita: cada categoría tiene una lista de palabras clave
+(tablas de regla de codificación, al final de esta subsección) y una
+respuesta cuenta una vez en cada categoría que menciona. Por eso una
+respuesta puede caer en varias categorías y las frecuencias no suman
+$n$. Las respuestas que no mencionan ninguna (texto sin contenido, como
+``ll'', o demasiado general) se reportan como ``sin categoría''. La
+codificación la hace la herramienta, de modo que se puede revisar y
+repetir con nuevas respuestas.
+
+\input{generado/preguntas_abiertas}
+
+La inteligencia artificial domina dos de las tres preguntas: es el área
+de conocimiento más mencionada (62.3\% de las respuestas) y también la
+herramienta más pedida (54.7\%), con menciones concretas a agentes de
+programación. En habilidades, lo más pedido es la capacidad de adaptarse
+y seguir aprendiendo, seguida del trabajo en equipo. Ciberseguridad es
+la segunda área emergente (28.3\%).
 
 \section{Diagnóstico y Síntesis de Resultados}
-
-\avisoprueba
 
 \subsection{Pruebas de Independencia}\label{sec:cruces}
 
@@ -784,29 +704,6 @@ chi-cuadrada de la Sección~\ref{sec:chi}.
 
 \input{generado/resumen_cruces}
 
-\subsection{Resultados de la Simulación}\label{sec:simulacion}
-
-Los indicadores de la encuesta muestran la situación actual. La
-simulación permite estimar cómo cambiarían la tasa de empleo y el
-tiempo al primer empleo si la Carrera lograra mejoras concretas, lo que
-sirve de sustento cuantitativo para las acciones del plan de mejoras
-que pide la autoevaluación. Se aplica el modelo de la
-Sección~\ref{sec:modelo-sim} con $n = 1000$
-corridas, cohortes del mismo tamaño que la muestra de titulados, semilla
-$x_0 = 12345$ y el escenario modificado descrito allí.
-
-\subsubsection*{Tablas de Transformada Inversa}
-
-\input{generado/sim_tablas_ti}
-
-\subsubsection*{Tabla de simulación}
-
-\input{generado/sim_tabla_simulacion}
-
-\subsubsection*{Corridas y comparación de escenarios}
-
-\input{generado/sim_corridas}
-
 \subsection{Respuesta a los Criterios ARCU-SUR}\label{sec:criterios}
 
 La Guía de Autoevaluación ARCU-SUR pide, para cada componente, analizar
@@ -823,25 +720,72 @@ un valor de referencia se reportan como línea base.
 
 \section{Conclusiones y Propuestas Estratégicas}
 
-\textit{[Pendiente: las conclusiones se redactan con los resultados
-reales. Las líneas de acción de abajo son las que pide el enunciado,
-asociadas al indicador que las sustentaría.]}
+\subsection*{Conclusiones}
+
+\begin{enumerate}
+  \item \textbf{Condiciones de empleo (3.2.3).} Los tres indicadores del
+  criterio son favorables: el 83.1\% de los titulados trabaja o emprende,
+  el 90.7\% considera pertinentes a su formación las labores de su puesto
+  y el 61.9\% percibe concordancia entre su formación y lo que pide el
+  mercado. El tiempo medio para conseguir el primer empleo es de 2.63
+  meses (IC 95\%: 1.85 a 3.42), y queda como línea base porque ARCU-SUR
+  no fija un valor de referencia. El 80.6\% de quienes trabajan en una
+  organización lo hace en el sector privado, principalmente en desarrollo
+  de software.
+  \item \textbf{Resultados de la formación (3.2.1) y actualización
+  curricular (2.1.7).} El 74.1\% está satisfecho con la formación
+  recibida, pero el 71.6\% señala la actualización del plan de estudios
+  como el aspecto a mejorar más importante. Base de Datos es la
+  asignatura que más ventaja da en el trabajo (94.6\%), y los
+  empleadores piden reforzar inteligencia artificial y ciberseguridad,
+  que son las dos áreas emergentes más mencionadas.
+  \item \textbf{Perfil de egreso (2.1.2).} Los cinco ítems de perfil son
+  favorables: entre el 79.2\% y el 86.8\% de los empleadores está de
+  acuerdo con que el perfil es coherente con el desempeño y que los
+  titulados evidencian competencias y valores.
+  \item \textbf{Posgrado (2.4.1 y 1.1.5).} La demanda es alta (83.1\%
+  quiere un posgrado, sobre todo en inteligencia artificial, 43.9\% de
+  los interesados) y el 70.9\% considera afín la oferta de la FCyT, pero
+  solo el 41.5\% de los interesados la elegiría: es el único aspecto
+  desfavorable del criterio. Además, el 91.8\% de quienes ya cursaron un
+  programa lo pagó con recursos propios.
+  \item \textbf{Relación con las organizaciones (2.4.2).} Es el criterio
+  más débil: 6 de 12 aspectos son desfavorables. Las organizaciones
+  contratan titulados (79.2\%) y recurren a la UMSS (60.4\%), pero menos
+  de la mitad dice que la Carrera les consulta su opinión, sobre el
+  desempeño de los titulados (47.2\%), la pertinencia de la formación
+  (43.4\%) o la autoevaluación (35.8\%).
+  \item \textbf{Seguimiento a graduados (3.2.2).} El 57.4\% quiere formar
+  parte de una red de contactos de la Carrera, y la herramienta permite
+  recibir respuestas de forma continua y recalcular los indicadores.
+  \item \textbf{Cruces.} Ninguno de los siete cruces muestra relación
+  significativa al 5\%: por ejemplo, la satisfacción con la formación no
+  cambia según la situación laboral (C1) y percibir la formación alineada
+  con el mercado no se asocia con conseguir antes el primer empleo (C6).
+  En C5 y C7 más del 20\% de las celdas tiene $FE<5$, por lo que esas dos
+  conclusiones son menos confiables.
+\end{enumerate}
+
+\subsection*{Propuestas Estratégicas}
 
 \begin{itemize}
-  \item \textbf{Fomento de becas y alianzas de financiamiento}, si la
-  proporción que financia su formación con recursos propios es alta
-  (HU3, cruce C7).
-  \item \textbf{Posgrados modulares en las áreas de mayor interés},
-  priorizando aquellas en que la mayoría elige instituciones distintas
-  de la UMSS (U8, cruce C5, criterio 2.4.1).
-  \item \textbf{Vinculación empresarial}: pasantías y consulta periódica
-  a empleadores, si los criterios ``las autoridades consultan nuestra
-  opinión'' y ``consideran nuestra opinión en prácticas'' tienen bajo
-  acuerdo (U11, criterios 2.1.2 y 2.4.2), y si la concordancia
-  formación--mercado se asocia con un ingreso más rápido al empleo (C6).
-  \item \textbf{Observatorio permanente de titulados}: aplicar la encuesta
-  de forma periódica y procesarla con la herramienta desarrollada,
-  aprovechando el interés en la red de contactos (U10, criterio 3.2.2).
+  \item \textbf{Becas y alianzas de financiamiento:} el 91.8\% de quienes
+  cursaron un programa lo financió con recursos propios (HU3).
+  \item \textbf{Posgrados modulares en inteligencia artificial,
+  ingeniería de software y redes y seguridad}, las áreas de mayor
+  interés, para captar a la mayoría de interesados que hoy elegiría
+  otra institución (criterio 2.4.1).
+  \item \textbf{Consulta periódica a empleadores}: incorporar a las
+  organizaciones en la revisión del plan de estudios, la
+  autoevaluación y el seguimiento del desempeño de los titulados, los
+  aspectos con menor acuerdo del criterio 2.4.2.
+  \item \textbf{Actualización del plan de estudios} con los contenidos que
+  piden los empleadores (inteligencia artificial, ciberseguridad,
+  análisis de datos, nube) y la opinión de los titulados sobre las
+  asignaturas (criterio 2.1.7).
+  \item \textbf{Observatorio permanente de titulados}: mantener abierto
+  el formulario de la herramienta y aprovechar el interés en la red de
+  contactos para aplicar la encuesta de forma periódica (criterio 3.2.2).
 \end{itemize}
 
 \subsection*{Limitaciones}
@@ -853,8 +797,9 @@ asociadas al indicador que las sustentaría.]}
   una organización, y su media es una cota inferior.
   \item La escala de empleadores no es simétrica y algunos de sus ítems
   agrupan varias afirmaciones.
-  \item Con cinco organizaciones, el análisis de empleadores es solo
-  descriptivo.
+  \item El análisis de empleadores es solo descriptivo (ver nota en
+  Sección~\ref{sec:empleadores} sobre si corresponde agregar cruces,
+  ahora que la encuesta recibió 53 respuestas).
 \end{itemize}
 
 \section*{Declaración de Uso de Inteligencia Artificial}
@@ -875,8 +820,10 @@ Material de referencia & Transcripción a LaTeX de los capítulos de Coss Bu y d
 Criterios ARCU-SUR & Lectura de los documentos de Criterios, Autoevaluación y Pares, y propuesta de qué preguntas del formulario responden a cada indicador & Selección final de variables y cruces \textit{[Completar]} \\
 Revisión de las encuestas & Identificación de problemas de diseño del formulario y propuesta de decisiones de procesamiento (punto medio de rangos, agrupaciones, escala de empleadores) & Decisión de no modificar el formulario y de enviarlo solo a titulados de la UMSS; aprobación de las decisiones de procesamiento \\
 Herramienta de software & Generación del código del backend (Java) y del frontend (Vue, Naive UI, ECharts) & Pruebas de funcionamiento y ajustes \textit{[Completar]} \\
-Dataset de prueba & Generación de respuestas sintéticas para validar la herramienta & --- (no son resultados del estudio; están marcados en el informe) \\
-Modelo de simulación & Propuesta del modelo (generador congruencial mixto y Transformada Inversa discreta) y del escenario modificado & Validación del modelo según los métodos de la asignatura \textit{[Completar]} \\
+Dataset de prueba & Generación de respuestas sintéticas para probar la herramienta durante el desarrollo & --- (se eliminó antes de cargar los datos reales; ningún resultado del informe sale de él) \\
+Base de datos e importación & Diseño de la base PostgreSQL, del formulario propio y del importador que traduce los CSV de Forms a los códigos de la encuesta & Elección de PostgreSQL; revisión del informe de importación \textit{[Completar]} \\
+Preguntas abiertas & Propuesta de categorías y palabras clave para codificar las preguntas 10 a 12 de empleadores & Revisión y aprobación de las categorías \textit{[Completar]} \\
+Panel por criterio & Reorganización del panel por criterio ARCU-SUR & Decisión de organizar el panel por criterio \\
 Redacción del informe & Borrador de las secciones 1 a 6 y de las tablas & Revisión y corrección del texto \textit{[Completar]} \\
 \bottomrule
 \end{tabular}

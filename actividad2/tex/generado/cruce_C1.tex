@@ -1,61 +1,61 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: dataset de prueba (respuestas sinteticas)
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C1. Situación laboral $\times$ satisfacción con la formación}
 
 \textit{Propósito.} Determinar si la valoración de la formación recibida cambia según la situación laboral actual del titulado, como evidencia del resultado del proceso formativo frente a las condiciones de empleo. Respalda el criterio ARCU-SUR 3.2.1 / 3.2.3. Se aplica sobre: todos los titulados, con nivel de significancia $\alpha = 0.05$.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 100$).
+\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 147$).
 
-\begin{mitabla}{C1: frecuencia observada $FO_{ij}$ \datosprueba}
+\begin{mitabla}{C1: frecuencia observada $FO_{ij}$}
 \begin{tabular}{lcc|c}
 \toprule
 Situación laboral & En desacuerdo & De acuerdo & Total fila \\
 \midrule
-Trabaja en una organización & 9 & 59 & 68 \\
-Emprendimiento propio & 5 & 14 & 19 \\
-No trabaja & 3 & 10 & 13 \\
+Trabaja en una organización & 27 & 81 & 108 \\
+Emprendimiento propio & 5 & 9 & 14 \\
+No trabaja & 6 & 19 & 25 \\
 \midrule
-Total columna & 17 & 83 & $N=100$ \\
+Total columna & 38 & 109 & $N=147$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Trabaja en una organización -- En desacuerdo'': $FE_{11} = 68 \times 17 / 100 = 11.5600$.
+\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Trabaja en una organización -- En desacuerdo'': $FE_{11} = 108 \times 38 / 147 = 27.9184$.
 
-\begin{mitabla}{C1: frecuencia esperada $FE_{ij}$ \datosprueba}
+\begin{mitabla}{C1: frecuencia esperada $FE_{ij}$}
 \begin{tabular}{lcc}
 \toprule
 Situación laboral & En desacuerdo & De acuerdo \\
 \midrule
-Trabaja en una organización & $68\cdot17/100 = 11.56$ & $68\cdot83/100 = 56.44$ \\
-Emprendimiento propio & $19\cdot17/100 = 3.23$ & $19\cdot83/100 = 15.77$ \\
-No trabaja & $13\cdot17/100 = 2.21$ & $13\cdot83/100 = 10.79$ \\
+Trabaja en una organización & $108\cdot38/147 = 27.92$ & $108\cdot109/147 = 80.08$ \\
+Emprendimiento propio & $14\cdot38/147 = 3.62$ & $14\cdot109/147 = 10.38$ \\
+No trabaja & $25\cdot38/147 = 6.46$ & $25\cdot109/147 = 18.54$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
 
-\begin{mitabla}{C1: cálculo de $X_0^2$ celda por celda \datosprueba}
+\begin{mitabla}{C1: cálculo de $X_0^2$ celda por celda}
 \begin{tabular}{L{5.4cm}cccc}
 \toprule
 Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
 \midrule
-Trabaja en una organización -- En desacuerdo & 9 & 11.5600 & 6.5536 & 0.5669 \\
-Trabaja en una organización -- De acuerdo & 59 & 56.4400 & 6.5536 & 0.1161 \\
-Emprendimiento propio -- En desacuerdo & 5 & 3.2300 & 3.1329 & 0.9699 \\
-Emprendimiento propio -- De acuerdo & 14 & 15.7700 & 3.1329 & 0.1987 \\
-No trabaja -- En desacuerdo & 3 & 2.2100 & 0.6241 & 0.2824 \\
-No trabaja -- De acuerdo & 10 & 10.7900 & 0.6241 & 0.0578 \\
+Trabaja en una organización -- En desacuerdo & 27 & 27.9184 & 0.8434 & 0.0302 \\
+Trabaja en una organización -- De acuerdo & 81 & 80.0816 & 0.8434 & 0.0105 \\
+Emprendimiento propio -- En desacuerdo & 5 & 3.6190 & 1.9070 & 0.5269 \\
+Emprendimiento propio -- De acuerdo & 9 & 10.3810 & 1.9070 & 0.1837 \\
+No trabaja -- En desacuerdo & 6 & 6.4626 & 0.2140 & 0.0331 \\
+No trabaja -- De acuerdo & 19 & 18.5374 & 0.2140 & 0.0115 \\
 \midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 2.1919 \\
+\multicolumn{4}{r}{$X_0^2 = \sum$} & 0.7960 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 4. Determinar el estadístico teórico.} Con $k = 3$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (3-1)(2-1) = 2$. De la tabla de chi-cuadrada: $X_{0.05,\,2}^2 = 5.991$.
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,2}^2 \;\Rightarrow\; 2.1919 < 5.991$.
+\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,2}^2 \;\Rightarrow\; 0.7960 < 5.991$.
 
 \textit{Paso 6. Conclusión.}
 
@@ -69,7 +69,7 @@ FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que situación laboral y satisfacción sean independientes. \datosprueba
+No se puede rechazar que situación laboral y satisfacción sean independientes.
 
-\textit{Observación:} 2 de 6 celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.
+\textit{Observación:} 1 de 6 celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.
 

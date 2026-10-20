@@ -1,3 +1,8 @@
 target/
 .idea/
 *.iml
+# credenciales locales de la base de datos
+db.properties
+# respuestas reales de las encuestas (datos personales): nunca a git
+src/main/resources/*.csv
+*.csv

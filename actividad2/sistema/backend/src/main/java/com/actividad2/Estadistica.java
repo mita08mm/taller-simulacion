@@ -9,7 +9,8 @@ import java.util.Map;
  * Formulas de referencias/cap6_analisis_resultados.tex (6.1, intervalo de
  * confianza) y de la prueba de las frecuencias (chi-cuadrado) de
  * referencias/apuntes_simulacion.tex, extendida a tabla de contingencia
- * (FE_ij = fila * columna / N, ver PREGUNTA_DOCENTE_CHI_CUADRADA.md).
+ * (FE_ij = fila * columna / N -- generalizacion estandar, no textual en
+ * las referencias, pendiente de confirmar con el docente).
  */
 public class Estadistica {
 

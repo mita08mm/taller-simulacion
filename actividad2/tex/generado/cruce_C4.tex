@@ -1,57 +1,57 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: dataset de prueba (respuestas sinteticas)
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C4. Interés en posgrado $\times$ oferta de posgrado FCyT}
 
 \textit{Propósito.} Determinar si la percepción de que la oferta de posgrado de la FCyT es afín a la carrera depende del interés en realizar un posgrado. Respalda el criterio ARCU-SUR 2.4.1 / 1.1.5. Se aplica sobre: todos los titulados, con nivel de significancia $\alpha = 0.05$.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 100$).
+\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 148$).
 
-\begin{mitabla}{C4: frecuencia observada $FO_{ij}$ \datosprueba}
+\begin{mitabla}{C4: frecuencia observada $FO_{ij}$}
 \begin{tabular}{lcc|c}
 \toprule
 Interés en posgrado & En desacuerdo & De acuerdo & Total fila \\
 \midrule
-Sí & 15 & 49 & 64 \\
-No & 11 & 25 & 36 \\
+Sí & 33 & 90 & 123 \\
+No & 10 & 15 & 25 \\
 \midrule
-Total columna & 26 & 74 & $N=100$ \\
+Total columna & 43 & 105 & $N=148$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Sí -- En desacuerdo'': $FE_{11} = 64 \times 26 / 100 = 16.6400$.
+\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Sí -- En desacuerdo'': $FE_{11} = 123 \times 43 / 148 = 35.7365$.
 
-\begin{mitabla}{C4: frecuencia esperada $FE_{ij}$ \datosprueba}
+\begin{mitabla}{C4: frecuencia esperada $FE_{ij}$}
 \begin{tabular}{lcc}
 \toprule
 Interés en posgrado & En desacuerdo & De acuerdo \\
 \midrule
-Sí & $64\cdot26/100 = 16.64$ & $64\cdot74/100 = 47.36$ \\
-No & $36\cdot26/100 = 9.36$ & $36\cdot74/100 = 26.64$ \\
+Sí & $123\cdot43/148 = 35.74$ & $123\cdot105/148 = 87.26$ \\
+No & $25\cdot43/148 = 7.26$ & $25\cdot105/148 = 17.74$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
 
-\begin{mitabla}{C4: cálculo de $X_0^2$ celda por celda \datosprueba}
+\begin{mitabla}{C4: cálculo de $X_0^2$ celda por celda}
 \begin{tabular}{L{5.4cm}cccc}
 \toprule
 Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
 \midrule
-Sí -- En desacuerdo & 15 & 16.6400 & 2.6896 & 0.1616 \\
-Sí -- De acuerdo & 49 & 47.3600 & 2.6896 & 0.0568 \\
-No -- En desacuerdo & 11 & 9.3600 & 2.6896 & 0.2874 \\
-No -- De acuerdo & 25 & 26.6400 & 2.6896 & 0.1010 \\
+Sí -- En desacuerdo & 33 & 35.7365 & 7.4884 & 0.2095 \\
+Sí -- De acuerdo & 90 & 87.2635 & 7.4884 & 0.0858 \\
+No -- En desacuerdo & 10 & 7.2635 & 7.4884 & 1.0310 \\
+No -- De acuerdo & 15 & 17.7365 & 7.4884 & 0.4222 \\
 \midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 0.6067 \\
+\multicolumn{4}{r}{$X_0^2 = \sum$} & 1.7485 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 4. Determinar el estadístico teórico.} Con $k = 2$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (2-1)(2-1) = 1$. De la tabla de chi-cuadrada: $X_{0.05,\,1}^2 = 3.841$.
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 0.6067 < 3.841$.
+\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 1.7485 < 3.841$.
 
 \textit{Paso 6. Conclusión.}
 
@@ -65,5 +65,5 @@ FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que interés en posgrado y oferta fcyt afín sean independientes. \datosprueba
+No se puede rechazar que interés en posgrado y oferta fcyt afín sean independientes.
 

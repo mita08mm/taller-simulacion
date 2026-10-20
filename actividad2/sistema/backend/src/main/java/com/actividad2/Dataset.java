@@ -138,8 +138,12 @@ public class Dataset {
 
     /** Columnas de eleccion multiple: las opciones vienen separadas por "|". */
     public List<String> valoresMultiples(String columna) {
+        return valoresMultiples(columna, f -> true);
+    }
+
+    public List<String> valoresMultiples(String columna, Predicate<Map<String, String>> filtro) {
         List<String> lista = new ArrayList<>();
-        for (String v : valores(columna)) {
+        for (String v : valores(columna, filtro)) {
             for (String parte : v.split("\\|")) {
                 if (!parte.isBlank()) lista.add(parte.trim());
             }

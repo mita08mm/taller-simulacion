@@ -1,69 +1,69 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: dataset de prueba (respuestas sinteticas)
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C5. Área de interés $\times$ institución elegida}
 
 \textit{Propósito.} Determinar si la preferencia por estudiar el posgrado en la UMSS depende del área de interés, para identificar áreas en que la oferta propia no capta la demanda. Respalda el criterio ARCU-SUR 2.4.1 / 1.1.5. Se aplica sobre: interesados en posgrado, con nivel de significancia $\alpha = 0.05$.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 64$).
+\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 123$).
 
-\begin{mitabla}{C5: frecuencia observada $FO_{ij}$ \datosprueba}
+\begin{mitabla}{C5: frecuencia observada $FO_{ij}$}
 \begin{tabular}{lcc|c}
 \toprule
 Área de interés & UMSS (EUPG o FCyT) & Otra institución & Total fila \\
 \midrule
-IA & 3 & 15 & 18 \\
-Robótica & 4 & 10 & 14 \\
-Ing. de Software & 3 & 6 & 9 \\
-Base de Datos & 3 & 11 & 14 \\
-Redes y Seguridad & 2 & 7 & 9 \\
+IA & 20 & 34 & 54 \\
+Robótica & 2 & 3 & 5 \\
+Ing. de Software & 13 & 16 & 29 \\
+Base de Datos & 6 & 4 & 10 \\
+Redes y Seguridad & 10 & 15 & 25 \\
 \midrule
-Total columna & 15 & 49 & $N=64$ \\
+Total columna & 51 & 72 & $N=123$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``IA -- UMSS (EUPG o FCyT)'': $FE_{11} = 18 \times 15 / 64 = 4.2188$.
+\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``IA -- UMSS (EUPG o FCyT)'': $FE_{11} = 54 \times 51 / 123 = 22.3902$.
 
-\begin{mitabla}{C5: frecuencia esperada $FE_{ij}$ \datosprueba}
+\begin{mitabla}{C5: frecuencia esperada $FE_{ij}$}
 \begin{tabular}{lcc}
 \toprule
 Área de interés & UMSS (EUPG o FCyT) & Otra institución \\
 \midrule
-IA & $18\cdot15/64 = 4.22$ & $18\cdot49/64 = 13.78$ \\
-Robótica & $14\cdot15/64 = 3.28$ & $14\cdot49/64 = 10.72$ \\
-Ing. de Software & $9\cdot15/64 = 2.11$ & $9\cdot49/64 = 6.89$ \\
-Base de Datos & $14\cdot15/64 = 3.28$ & $14\cdot49/64 = 10.72$ \\
-Redes y Seguridad & $9\cdot15/64 = 2.11$ & $9\cdot49/64 = 6.89$ \\
+IA & $54\cdot51/123 = 22.39$ & $54\cdot72/123 = 31.61$ \\
+Robótica & $5\cdot51/123 = 2.07$ & $5\cdot72/123 = 2.93$ \\
+Ing. de Software & $29\cdot51/123 = 12.02$ & $29\cdot72/123 = 16.98$ \\
+Base de Datos & $10\cdot51/123 = 4.15$ & $10\cdot72/123 = 5.85$ \\
+Redes y Seguridad & $25\cdot51/123 = 10.37$ & $25\cdot72/123 = 14.63$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
 
-\begin{mitabla}{C5: cálculo de $X_0^2$ celda por celda \datosprueba}
+\begin{mitabla}{C5: cálculo de $X_0^2$ celda por celda}
 \begin{tabular}{L{5.4cm}cccc}
 \toprule
 Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
 \midrule
-IA -- UMSS (EUPG o FCyT) & 3 & 4.2188 & 1.4854 & 0.3521 \\
-IA -- Otra institución & 15 & 13.7813 & 1.4854 & 0.1078 \\
-Robótica -- UMSS (EUPG o FCyT) & 4 & 3.2813 & 0.5166 & 0.1574 \\
-Robótica -- Otra institución & 10 & 10.7188 & 0.5166 & 0.0482 \\
-Ing. de Software -- UMSS (EUPG o FCyT) & 3 & 2.1094 & 0.7932 & 0.3760 \\
-Ing. de Software -- Otra institución & 6 & 6.8906 & 0.7932 & 0.1151 \\
-Base de Datos -- UMSS (EUPG o FCyT) & 3 & 3.2813 & 0.0791 & 0.0241 \\
-Base de Datos -- Otra institución & 11 & 10.7188 & 0.0791 & 0.0074 \\
-Redes y Seguridad -- UMSS (EUPG o FCyT) & 2 & 2.1094 & 0.0120 & 0.0057 \\
-Redes y Seguridad -- Otra institución & 7 & 6.8906 & 0.0120 & 0.0017 \\
+IA -- UMSS (EUPG o FCyT) & 20 & 22.3902 & 5.7133 & 0.2552 \\
+IA -- Otra institución & 34 & 31.6098 & 5.7133 & 0.1807 \\
+Robótica -- UMSS (EUPG o FCyT) & 2 & 2.0732 & 0.0054 & 0.0026 \\
+Robótica -- Otra institución & 3 & 2.9268 & 0.0054 & 0.0018 \\
+Ing. de Software -- UMSS (EUPG o FCyT) & 13 & 12.0244 & 0.9518 & 0.0792 \\
+Ing. de Software -- Otra institución & 16 & 16.9756 & 0.9518 & 0.0561 \\
+Base de Datos -- UMSS (EUPG o FCyT) & 6 & 4.1463 & 3.4360 & 0.8287 \\
+Base de Datos -- Otra institución & 4 & 5.8537 & 3.4360 & 0.5870 \\
+Redes y Seguridad -- UMSS (EUPG o FCyT) & 10 & 10.3659 & 0.1338 & 0.0129 \\
+Redes y Seguridad -- Otra institución & 15 & 14.6341 & 0.1338 & 0.0091 \\
 \midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 1.1956 \\
+\multicolumn{4}{r}{$X_0^2 = \sum$} & 2.0133 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 4. Determinar el estadístico teórico.} Con $k = 5$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (5-1)(2-1) = 4$. De la tabla de chi-cuadrada: $X_{0.05,\,4}^2 = 9.488$.
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,4}^2 \;\Rightarrow\; 1.1956 < 9.488$.
+\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,4}^2 \;\Rightarrow\; 2.0133 < 9.488$.
 
 \textit{Paso 6. Conclusión.}
 
@@ -77,7 +77,7 @@ FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que área de interés y institución sean independientes. \datosprueba
+No se puede rechazar que área de interés y institución sean independientes.
 
-\textit{Observación:} 5 de 10 celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.
+\textit{Observación:} 3 de 10 celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.
 

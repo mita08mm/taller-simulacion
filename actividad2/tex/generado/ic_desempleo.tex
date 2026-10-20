@@ -1,43 +1,51 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: dataset de prueba (respuestas sinteticas)
-\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Los valores son numéricos y se agrupan por valor repetido ($x_i$ con su frecuencia $f_i$). Se descartan las filas en que los años desempleado superan los años de vida profesional (0 en esta muestra). El tamaño de la muestra es $n = 100$.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Los valores son numéricos y se agrupan por valor repetido ($x_i$ con su frecuencia $f_i$). Se descartan las filas en que los años desempleado superan los años de vida profesional (2 en esta muestra). El tamaño de la muestra es $n = 143$.
 
-\begin{mitabla}{Cálculo de la media y la desviación estándar de años desempleado \datosprueba}
+\begin{mitabla}{Cálculo de la media y la desviación estándar de años desempleado}
 \begin{tabular}{lccccc}
 \toprule
 Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
 \midrule
-0 años & 0 & 42 & 0.00 & 1.0404 & 43.6968 \\
-1 años & 1 & 26 & 26.00 & 0.0004 & 0.0104 \\
-2 años & 2 & 20 & 40.00 & 0.9604 & 19.2080 \\
-3 años & 3 & 12 & 36.00 & 3.9204 & 47.0448 \\
+0 años & 0 & 61 & 0.00 & 0.6440 & 39.2861 \\
+0.2 años & 0.2 & 3 & 0.51 & 0.4001 & 1.2002 \\
+0.3 años & 0.3 & 1 & 0.25 & 0.3053 & 0.3053 \\
+0.3 años & 0.3 & 1 & 0.33 & 0.2233 & 0.2233 \\
+0.4 años & 0.4 & 1 & 0.42 & 0.1463 & 0.1463 \\
+0.5 años & 0.5 & 5 & 2.50 & 0.0915 & 0.4576 \\
+0.8 años & 0.8 & 1 & 0.75 & 0.0028 & 0.0028 \\
+1 años & 1 & 49 & 49.00 & 0.0390 & 1.9110 \\
+2 años & 2 & 12 & 24.00 & 1.4340 & 17.2076 \\
+3 años & 3 & 1 & 3.00 & 4.8289 & 4.8289 \\
+4 años & 4 & 6 & 24.00 & 10.2239 & 61.3434 \\
+5 años & 5 & 2 & 10.00 & 17.6189 & 35.2377 \\
 \midrule
-$\Sigma$ & & 100 & 102.00 & & 109.9600 \\
+$\Sigma$ & & 143 & 114.76 & & 162.1501 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
 \textit{Paso 2. Calcular la media muestral.}
 \[
-\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{102.00}{100} = 1.0200\ \text{años}
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{114.76}{143} = 0.8025\ \text{años}
 \]
 
 \textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
 \[
-S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{109.9600}{99}} = 1.0539
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{162.1501}{142}} = 1.0686
 \]
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 99$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{99,\,0.025} \approx z_{0.025} = 1.96$.
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 142$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{142,\,0.025} \approx z_{0.025} = 1.96$.
 
 \textit{Paso 5. Calcular el margen de error.}
 \[
-\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{1.0539}{\sqrt{100}}\times 1.960 = 0.1054 \times 1.960 = 0.2066
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{1.0686}{\sqrt{143}}\times 1.960 = 0.0894 \times 1.960 = 0.1751
 \]
 
 \textit{Paso 6. Construir el intervalo y concluir.}
 \[
-1.0200 - 0.2066 \;\le\; \mu \;\le\; 1.0200 + 0.2066 \quad\Longrightarrow\quad 0.81 \le \mu \le 1.23
+0.8025 - 0.1751 \;\le\; \mu \;\le\; 0.8025 + 0.1751 \quad\Longrightarrow\quad 0.63 \le \mu \le 0.98
 \]
 
-Con un 95\% de confianza, la media de años desempleado de todos los titulados está entre 0.81 y 1.23 años. \datosprueba
+Con un 95\% de confianza, la media de años desempleado de todos los titulados está entre 0.63 y 0.98 años.
 

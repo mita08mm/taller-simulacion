@@ -16,7 +16,11 @@ import java.util.TreeMap;
  * de los mismos calculos del sistema, con el formato de los ejercicios de
  * referencias/apuntes_simulacion.tex (Paso 1 ... Paso 6).
  *
- * Uso: java -cp target/classes:src/main/resources com.actividad2.ReporteTex <carpeta_salida> [titulados.csv empleadores.csv]
+ * Uso (desde la base de datos, con db.properties):
+ *   java -cp target/classes:src/main/resources:lib/postgresql-42.7.5.jar com.actividad2.ReporteTex <carpeta_salida> [- desde hasta]
+ * Uso (desde archivos CSV):
+ *   java -cp ... com.actividad2.ReporteTex <carpeta_salida> titulados.csv empleadores.csv [desde hasta]
+ * Fechas en aaaa-mm-dd, o "-" para no limitar.
  */
 public class ReporteTex {
 
@@ -24,25 +28,30 @@ public class ReporteTex {
     private static Dataset empleadores;
     private static boolean prueba;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         Path salida = Path.of(args.length > 0 ? args[0] : "../../tex/generado");
         Files.createDirectories(salida);
-        if (args.length >= 3) {
+        boolean desdeCsv = args.length >= 3 && !args[1].equals("-");
+        int iFechas;
+        if (desdeCsv) {
             titulados = new Dataset(args[1], Csv.leer(Files.readString(Path.of(args[1]))));
             empleadores = new Dataset(args[2], Csv.leer(Files.readString(Path.of(args[2]))));
-            prueba = false;
-            // Fecha de corte opcional: <desde> <hasta> en aaaa-mm-dd, o "-" para no limitar
-            if (args.length >= 5) {
-                java.time.LocalDate desde = args[3].equals("-") ? null : java.time.LocalDate.parse(args[3]);
-                java.time.LocalDate hasta = args[4].equals("-") ? null : java.time.LocalDate.parse(args[4]);
-                titulados = titulados.entreFechas(desde, hasta);
-                empleadores = empleadores.entreFechas(desde, hasta);
-            }
+            iFechas = 3;
         } else {
-            titulados = new Dataset("prueba", Csv.leer(recurso("dataset_titulados.csv")));
-            empleadores = new Dataset("prueba", Csv.leer(recurso("dataset_empleadores.csv")));
-            prueba = true;
+            Db.iniciar();
+            titulados = Respuestas.dataset("titulados");
+            empleadores = Respuestas.dataset("empleadores");
+            iFechas = 1;
         }
+        // Las marcas [Datos de prueba] solo aparecen si la base todavía tiene respuestas de prueba
+        prueba = titulados.origen.contains("prueba") || empleadores.origen.contains("prueba");
+        if (args.length >= iFechas + 2) {
+            java.time.LocalDate desde = args[iFechas].equals("-") ? null : java.time.LocalDate.parse(args[iFechas]);
+            java.time.LocalDate hasta = args[iFechas + 1].equals("-") ? null : java.time.LocalDate.parse(args[iFechas + 1]);
+            titulados = titulados.entreFechas(desde, hasta);
+            empleadores = empleadores.entreFechas(desde, hasta);
+        }
+        if (titulados.n() == 0) throw new IllegalStateException("No hay respuestas de titulados para generar el informe");
 
         escribir(salida, "periodo.tex", periodo());
         escribir(salida, "demografia.tex", demografia());
@@ -59,27 +68,16 @@ public class ReporteTex {
         escribir(salida, "resumen_cruces.tex", resumenCruces());
         escribir(salida, "criterios_arcusur.tex", criterios());
         escribir(salida, "empleadores.tex", empleadores());
-        Simulacion.Parametros par = new Simulacion.Parametros(1000, titulados.n(), 12345, 0.5, 0.3);
-        Map<String, Object> sim = Simulacion.ejecutar(titulados, par);
-        escribir(salida, "sim_generador.tex", generador(par.semilla()));
-        escribir(salida, "sim_tablas_ti.tex", tablasTI(sim, par));
-        escribir(salida, "sim_tabla_simulacion.tex", tablaSimulacion(sim));
-        escribir(salida, "sim_corridas.tex", corridas(sim, par));
+        escribir(salida, "preguntas_abiertas.tex", preguntasAbiertas());
         System.out.println("Fragmentos generados en " + salida.toAbsolutePath());
+        System.exit(0); // cierra las conexiones del pool
     }
 
     // ===================== utilidades =====================
 
-    private static String recurso(String nombre) throws IOException {
-        try (var in = ReporteTex.class.getClassLoader().getResourceAsStream(nombre)) {
-            if (in == null) throw new IOException("No se encontro " + nombre);
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        }
-    }
-
     private static void escribir(Path dir, String nombre, String contenido) throws IOException {
         String cabecera = "% Generado por sistema/backend ReporteTex.java -- no editar a mano.\n"
-            + "% Datos: " + (prueba ? "dataset de prueba (respuestas sinteticas)" : titulados.origen) + "\n";
+            + "% Datos: " + titulados.origen + " (titulados) / " + empleadores.origen + " (empleadores)\n";
         Files.writeString(dir.resolve(nombre), cabecera + contenido.replaceAll("\n{3,}", "\n\n"), StandardCharsets.UTF_8);
     }
 
@@ -595,7 +593,7 @@ public class ReporteTex {
         fav = new ArrayList<>(); des = new ArrayList<>();
         clasificar(contrato, "organizaciones que contrataron titulados en los últimos 5 años", fav, des);
         for (Map<String, Object> p : perfil) {
-            if (List.of("perfil_consulta_autoridades", "perfil_opinion_practicas", "perfil_participo_retroalimentacion").contains(p.get("codigo"))) {
+            if (Criterios.ITEMS_RELACION.contains(p.get("codigo"))) {
                 clasificar(d(p.get("porcentajeAcuerdo")), "``" + t((String) p.get("criterio")) + "''", fav, des);
             }
         }
@@ -603,7 +601,7 @@ public class ReporteTex {
 
         // 1.2.2
         sb.append("\\paragraph{1.2.2 Sistemas de información para la toma de decisiones.} \\textbf{Qué pide:} sistemas con información relevante, confiable y actualizada que respalden las decisiones institucionales. ");
-        sb.append("\\textbf{Evidencia del estudio:} la herramienta desarrollada importa las respuestas, elimina los datos personales, calcula los indicadores y cruces de este informe, simula escenarios y exporta los resultados, por lo que puede usarse de forma permanente para actualizar esta información.\n\n");
+        sb.append("\\textbf{Evidencia del estudio:} la herramienta desarrollada importa las respuestas, elimina los datos personales, calcula los indicadores y cruces de este informe y exporta los resultados, por lo que puede usarse de forma permanente para actualizar esta información.\n\n");
         return sb.toString();
     }
 
@@ -634,171 +632,41 @@ public class ReporteTex {
         return sb.toString();
     }
 
-    // ===================== Simulación =====================
+    // ===================== Preguntas abiertas de empleadores =====================
 
-    private static String generador(long semilla) {
-        final long a = 1664525L, c = 1013904223L, m = 1L << 32;
+    private static String preguntasAbiertas() {
+        Map<String, String[]> preguntas = new LinkedHashMap<>();
+        preguntas.put("areas_emergentes", new String[]{"Áreas de conocimiento emergentes", "Pregunta 10"});
+        preguntas.put("herramientas", new String[]{"Herramientas tecnológicas", "Pregunta 11"});
+        preguntas.put("habilidades", new String[]{"Habilidades y competencias", "Pregunta 12"});
+        Map<String, List<String[]>> diccionario = Abiertas.diccionario();
         StringBuilder sb = new StringBuilder();
-        sb.append("Con $a = ").append(miles(a)).append("$, $c = ").append(miles(c)).append("$, $m = 2^{32} = ").append(miles(m))
-          .append("$ y semilla $x_0 = ").append(miles(semilla)).append("$, las primeras iteraciones son:\n\n");
-        sb.append("\\begin{mitabla}{Primeras iteraciones del generador congruencial mixto}\n");
-        sb.append("\\begin{tabular}{crrrc}\n\\toprule\n$n$ & $x_n$ & $a \\cdot x_n + c$ & $x_{n+1} = (a\\,x_n + c) \\bmod m$ & $R = x_{n+1}/m$ \\\\\n\\midrule\n");
-        long x = semilla;
-        for (int k = 0; k < 6; k++) {
-            long ax = a * x + c;
-            long x1 = ax % m;
-            sb.append(k).append(" & ").append(miles(x)).append(" & ").append(miles(ax)).append(" & ").append(miles(x1)).append(" & ")
-              .append(n((double) x1 / m, 4)).append(" \\\\\n");
-            x = x1;
-        }
-        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
-        long ax0 = a * semilla + c;
-        sb.append("Por ejemplo, para $n = 0$: $a \\cdot x_0 + c = ").append(miles(a)).append(" \\times ").append(miles(semilla)).append(" + ").append(miles(c))
-          .append(" = ").append(miles(ax0)).append("$; al dividir entre $m$ el residuo es $x_1 = ").append(miles(ax0 % m)).append("$ y $R = ")
-          .append(miles(ax0 % m)).append(" / ").append(miles(m)).append(" = ").append(n((double) (ax0 % m) / m, 4))
-          .append("$. Estos son los valores $R_1, R_2, \\ldots$ que usa la simulación.\n\n");
-        return sb.toString();
-    }
-
-    private static String tablaTI(String titulo, List<Map<String, Object>> filas, Map<String, Integer> conteo, int n, boolean conMeses) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\\begin{mitabla}{").append(titulo).append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{l").append(conteo != null ? "c" : "").append(conMeses ? "c" : "").append("ccc}\n\\toprule\n$x$");
-        if (conteo != null) sb.append(" & $f_i$");
-        if (conMeses) sb.append(" & Meses");
-        sb.append(" & $p(x)$ & $F(x)$ & Rango de $R$ \\\\\n\\midrule\n");
-        for (Map<String, Object> f : filas) {
-            String cod = (String) f.get("codigo");
-            sb.append(t((String) f.get("etiqueta")));
-            if (conteo != null) sb.append(" & ").append(conteo.getOrDefault(cod, 0));
-            if (conMeses) sb.append(" & ").append(fmtX(Catalogo.MESES_PRIMER_TRABAJO.get(cod)));
-            sb.append(" & ").append(conteo != null ? "$" + conteo.getOrDefault(cod, 0) + "/" + n + " = " + n(d(f.get("probabilidad")), 3) + "$" : n(d(f.get("probabilidad")), 3))
-              .append(" & ").append(n(d(f.get("acumulada")), 3))
-              .append(" & $[").append(n(d(f.get("rangoDesde")), 3)).append(",\\ ").append(n(d(f.get("rangoHasta")), 3)).append(")$ \\\\\n");
-        }
-        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
-        return sb.toString();
-    }
-
-    private static Map<String, Integer> contar(List<String> valores) {
-        Map<String, Integer> m = new LinkedHashMap<>();
-        valores.forEach(v -> m.merge(v, 1, Integer::sum));
-        return m;
-    }
-
-    private static String tablasTI(Map<String, Object> sim, Simulacion.Parametros par) {
-        Map<String, Object> tablas = mapa(sim.get("tablasTI"));
-        List<String> sit = titulados.valores("situacion_laboral");
-        List<String> tie = titulados.valores("tiempo_primer_trabajo");
-        StringBuilder sb = new StringBuilder();
-        sb.append("\\textit{Paso 1. Contar con la función de probabilidad} $p(x) = f_i/n$, a partir de las frecuencias observadas en la encuesta. ");
-        sb.append("\\textit{Paso 2. Definir la acumulada} $F(x_i) = F(x_{i-1}) + p(x_i)$. ");
-        sb.append("\\textit{Pasos 3 y 4. Igualar $F(x) = R$ e invertir:} a cada categoría le corresponde el rango $[F(x_{i-1}),\\,F(x_i))$, y $x = F^{-1}(R)$ es la categoría cuyo rango contiene a $R$.\n\n");
-        sb.append(tablaTI("Transformada Inversa de la situación laboral, escenario base ($n=" + sit.size() + "$)", lista(tablas.get("situacionBase")), contar(sit), sit.size(), false));
-        sb.append(tablaTI("Transformada Inversa del tiempo al primer empleo, escenario base ($n=" + tie.size() + "$)", lista(tablas.get("tiempoBase")), contar(tie), tie.size(), true));
-
-        // Escenario: arithmetic of the adjustment
-        List<Map<String, Object>> sb0 = lista(tablas.get("situacionBase"));
-        double pNo = sb0.stream().filter(f -> "no_trabajo".equals(f.get("codigo"))).mapToDouble(f -> d(f.get("probabilidad"))).findFirst().orElse(0);
-        double pTr = sb0.stream().filter(f -> "trabajando".equals(f.get("codigo"))).mapToDouble(f -> d(f.get("probabilidad"))).findFirst().orElse(0);
-        double ae = par.ajusteEmpleo();
-        sb.append("\\textit{Escenario modificado.} Se traslada el ").append(n(100 * ae, 0)).append("\\% de la probabilidad de ``No trabaja'' a ``Trabaja en una organización'':\n");
-        sb.append("\\[\np^{\\prime}(\\text{No trabaja}) = ").append(n(pNo, 3)).append(" \\times (1 - ").append(n(ae, 2)).append(") = ").append(n(pNo * (1 - ae), 4))
-          .append(", \\qquad p^{\\prime}(\\text{Trabaja}) = ").append(n(pTr, 3)).append(" + ").append(n(pNo, 3)).append(" \\times ").append(n(ae, 2)).append(" = ")
-          .append(n(pTr + pNo * ae, 4)).append("\n\\]\n");
-        List<Map<String, Object>> tb = lista(tablas.get("tiempoBase"));
-        double at = par.ajusteTiempo();
-        double movido = 0;
-        List<String> partes = new ArrayList<>();
-        for (Map<String, Object> f : tb) {
-            String cod = (String) f.get("codigo");
-            if (List.of("4_8_meses", "8_12_meses", "mas_12_meses").contains(cod)) {
-                movido += d(f.get("probabilidad")) * at;
-                partes.add(n(d(f.get("probabilidad")), 3));
+        for (Map.Entry<String, String[]> q : preguntas.entrySet()) {
+            List<String> respuestas = empleadores.valores(q.getKey());
+            int n = respuestas.size();
+            List<Map<String, Object>> frec = Abiertas.codificar(q.getKey(), respuestas);
+            sb.append("\\begin{mitabla}{").append(q.getValue()[0]).append(" mencionadas por los empleadores (").append(q.getValue()[1]).append(", $n=").append(n).append("$)").append(marca()).append("}\n");
+            sb.append("\\begin{tabular}{L{9cm}cc}\n\\toprule\nCategoría & $f_i$ & $f_i/n$ \\\\\n\\midrule\n");
+            for (Map<String, Object> f : frec) {
+                int fi = i(f.get("frecuencia"));
+                if (fi == 0) continue;
+                if ("sin_categoria".equals(f.get("codigo"))) sb.append("\\midrule\n");
+                sb.append(t((String) f.get("etiqueta"))).append(" & ").append(fi).append(" & $").append(fi).append("/").append(n).append(" = ")
+                  .append(n(n == 0 ? 0 : (double) fi / n, 3)).append("$ \\\\\n");
             }
+            sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+            Map<String, Object> primera = frec.get(0);
+            sb.append("\\textit{Lectura:} la categoría más mencionada es ``").append(t((String) primera.get("etiqueta"))).append("'', presente en ")
+              .append(i(primera.get("frecuencia"))).append(" de las ").append(n).append(" respuestas (").append(n(100.0 * i(primera.get("frecuencia")) / Math.max(n, 1), 1))
+              .append("\\%). Como una respuesta puede mencionar varias categorías, la columna $f_i$ no suma $n$.\n\n");
         }
-        double p14 = tb.stream().filter(f -> "1_4_meses".equals(f.get("codigo"))).mapToDouble(f -> d(f.get("probabilidad"))).findFirst().orElse(0);
-        sb.append("y el ").append(n(100 * at, 0)).append("\\% de la probabilidad de los tiempos mayores a 4 meses a ``1--4 meses'':\n");
-        sb.append("\\[\np^{\\prime}(\\text{1--4 meses}) = ").append(n(p14, 3)).append(" + (").append(String.join(" + ", partes)).append(") \\times ").append(n(at, 2))
-          .append(" = ").append(n(p14 + movido, 4)).append("\n\\]\n");
-        sb.append("y cada uno de esos tres rangos queda multiplicado por $1 - ").append(n(at, 2)).append("$.\n\n");
-        sb.append(tablaTI("Transformada Inversa de la situación laboral, escenario modificado", lista(tablas.get("situacionEscenario")), null, 0, false));
-        sb.append(tablaTI("Transformada Inversa del tiempo al primer empleo, escenario modificado", lista(tablas.get("tiempoEscenario")), null, 0, true));
-        return sb.toString();
-    }
-
-    private static String tablaSimulacion(Map<String, Object> sim) {
-        Map<String, Object> tablas = mapa(sim.get("tablasTI"));
-        List<Map<String, Object>> sit = lista(tablas.get("situacionBase"));
-        List<Map<String, Object>> tie = lista(tablas.get("tiempoBase"));
-        StringBuilder sb = new StringBuilder();
-        sb.append("\\begin{mitabla}{Tabla de simulación: primeros 10 titulados de la corrida 1, escenario base").append(marca()).append("}\n");
-        sb.append("\\scriptsize\n\\begin{tabular}{cclcll}\n\\toprule\n$t$ & $R_1 \\leftarrow \\text{gcm}()$ & Situación $= F^{-1}(R_1)$ & $R_2 \\leftarrow \\text{gcm}()$ & Tiempo $= F^{-1}(R_2)$ & Meses \\\\\n\\midrule\n");
-        for (Map<String, Object> f : lista(mapa(sim.get("base")).get("primeraCohorte"))) {
-            double r1 = d(f.get("r1"));
-            Map<String, Object> cat1 = sit.stream().filter(x -> r1 >= d(x.get("rangoDesde")) && r1 < d(x.get("rangoHasta"))).findFirst().orElse(sit.get(sit.size() - 1));
-            sb.append(f.get("titulado")).append(" & ").append(n(r1, 4)).append(" & ").append(t((String) f.get("situacion")))
-              .append(" {\\scriptsize ($R_1 < ").append(n(d(cat1.get("rangoHasta")), 3)).append("$)}");
-            if (f.get("r2") == null) {
-                sb.append(" & --- & --- & --- \\\\\n");
-            } else {
-                double r2 = d(f.get("r2"));
-                Map<String, Object> cat2 = tie.stream().filter(x -> r2 >= d(x.get("rangoDesde")) && r2 < d(x.get("rangoHasta"))).findFirst().orElse(tie.get(tie.size() - 1));
-                sb.append(" & ").append(n(r2, 4)).append(" & ").append(t((String) f.get("tiempo")))
-                  .append(" {\\scriptsize ($R_2 < ").append(n(d(cat2.get("rangoHasta")), 3)).append("$)}")
-                  .append(" & ").append(fmtX(d(f.get("meses")))).append(" \\\\\n");
-            }
+        // Regla de codificación: una tabla por pregunta (juntas no caben en una página)
+        for (Map.Entry<String, String[]> q : preguntas.entrySet()) {
+            sb.append("\\begin{mitabla}{Regla de codificación, ").append(q.getValue()[1].toLowerCase()).append(": palabras clave por categoría (sin acentos; $^{*}$ = cualquier terminación)}\n");
+            sb.append("\\begin{tabular}{L{5.2cm}L{9.4cm}}\n\\toprule\nCategoría & Palabras clave \\\\\n\\midrule\n");
+            for (String[] c : diccionario.get(q.getKey())) sb.append(t(c[0])).append(" & ").append(t(c[1]).replace("*", "$^{*}$")).append(" \\\\\n");
+            sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
         }
-        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
-        sb.append("Entre paréntesis se indica el límite superior del rango que contiene a $R$: se toma la primera categoría cuya acumulada $F(x)$ es mayor que $R$.\n\n");
-        return sb.toString();
-    }
-
-    private static String corridas(Map<String, Object> sim, Simulacion.Parametros par) {
-        StringBuilder sb = new StringBuilder();
-        Map<String, Object> base = mapa(sim.get("base"));
-        Map<String, Object> esc = mapa(sim.get("escenario"));
-        int nc = par.tamanoCohorte();
-        sb.append("En cada corrida se simulan $N = ").append(nc).append("$ titulados y se calcula:\n");
-        sb.append("\\[\n\\text{Tasa de empleo}_k = \\frac{\\text{empleados}_k}{N}, \\qquad \\text{Tiempo medio}_k = \\frac{\\sum \\text{meses}}{\\text{titulados en una organización}_k}\n\\]\n\n");
-        sb.append("\\begin{mitabla}{Prueba de escritorio: primeras 25 corridas del escenario base ($N=").append(nc).append("$)").append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{cccccc}\n\\toprule\nCorrida $k$ & Empleados & Tasa de empleo & En organización & $\\sum$ meses & Tiempo medio \\\\\n\\midrule\n");
-        for (Map<String, Object> f : lista(base.get("corridas"))) {
-            int emp = i(f.get("empleados"));
-            int org = i(f.get("enOrganizacion"));
-            double tm = d(f.get("tiempoMedio"));
-            sb.append(f.get("corrida")).append(" & ").append(emp).append(" & $").append(emp).append("/").append(nc).append(" = ").append(n((double) emp / nc, 2))
-              .append("$ & ").append(org).append(" & ").append(n(tm * org, 1)).append(" & ").append(n(tm, 3)).append(" \\\\\n");
-        }
-        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
-
-        sb.append("Con las $n = ").append(par.corridas()).append("$ corridas se calcula la media, la desviación estándar y el intervalo de confianza de cada indicador, con el mismo procedimiento de los Pasos 2 a 6 del intervalo de confianza ($n - 1 > 30$, por lo que $t \\approx 1.96$):\n\n");
-        sb.append("\\begin{mitabla}{Resumen de las ").append(par.corridas()).append(" corridas por escenario").append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{llcccc}\n\\toprule\nIndicador & Escenario & $\\bar{x}$ & $S$ & $\\frac{S}{\\sqrt{n}} \\cdot 1.96$ & IC 95\\% \\\\\n\\midrule\n");
-        for (String[] ind : new String[][]{{"tasaEmpleo", "Tasa de empleo", "4"}, {"tiempoMedio", "Tiempo medio (meses)", "3"}}) {
-            for (Object[] esc2 : new Object[][]{{"Base", base}, {"Modificado", esc}}) {
-                Map<String, Object> ic = mapa(((Map<String, Object>) esc2[1]).get(ind[0]));
-                int dec = Integer.parseInt(ind[2]);
-                sb.append(esc2[0].equals("Base") ? ind[1] : "").append(" & ").append(esc2[0]).append(" & ").append(n(d(ic.get("media")), dec)).append(" & ")
-                  .append(n(d(ic.get("desviacion")), dec)).append(" & ").append(n(d(ic.get("margenError")), dec)).append(" & $[")
-                  .append(n(d(ic.get("limiteInferior")), dec)).append(",\\ ").append(n(d(ic.get("limiteSuperior")), dec)).append("]$ \\\\\n");
-            }
-        }
-        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
-
-        Map<String, Object> e = Analisis.empleabilidad(titulados);
-        double tasaObs = d(mapa(e.get("tasaEmpleo")).get("proporcion"));
-        double tiempoObs = d(mapa(mapa(e.get("tiempoPrimerEmpleo")).get("mesesIC95")).get("media"));
-        double tb = d(mapa(base.get("tasaEmpleo")).get("media"));
-        double te = d(mapa(esc.get("tasaEmpleo")).get("media"));
-        double mb = d(mapa(base.get("tiempoMedio")).get("media"));
-        double me = d(mapa(esc.get("tiempoMedio")).get("media"));
-        sb.append("\\textit{Validación del modelo.} La media simulada del escenario base (tasa ").append(n(100 * tb, 1)).append("\\%, tiempo ").append(n(mb, 2))
-          .append(" meses) coincide con lo observado en la encuesta (").append(n(100 * tasaObs, 1)).append("\\% y ").append(n(tiempoObs, 2))
-          .append(" meses), lo que indica que el modelo reproduce los datos de los que parte.\n\n");
-        sb.append("\\textit{Comparación de escenarios.} Diferencia en la tasa de empleo: $").append(n(te, 4)).append(" - ").append(n(tb, 4)).append(" = ")
-          .append(n(te - tb, 4)).append("$ (").append(n(100 * (te - tb), 1)).append(" puntos porcentuales). Diferencia en el tiempo medio: $")
-          .append(n(me, 3)).append(" - ").append(n(mb, 3)).append(" = ").append(n(me - mb, 3)).append("$ meses.").append(marca()).append("\n\n");
         return sb.toString();
     }
 }
