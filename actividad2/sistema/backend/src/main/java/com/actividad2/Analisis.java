@@ -51,6 +51,36 @@ public class Analisis {
         r.put("aniosDesempleado", Estadistica.intervaloConfianza95(desempleo));
         r.put("filasInconsistentesDescartadas", inconsistentes);
 
+        // HU1: mediana de los años de vida profesional y segmentación junior / consolidados.
+        // El corte es la propia mediana (la mitad con menos experiencia frente a la otra mitad), no un umbral fijado a mano.
+        double mediana = Estadistica.mediana(vida);
+        r.put("medianaVidaProfesional", vida.isEmpty() ? null : mediana);
+        List<Map<String, Object>> segmentos = new ArrayList<>();
+        if (!vida.isEmpty()) {
+            for (boolean junior : new boolean[]{true, false}) {
+                int casos = 0, conCargo = 0, ejecutivos = 0;
+                for (Map<String, String> f : d.filas) {
+                    // mismas filas que la media y la mediana: con ambos datos y sin incoherencias
+                    String v = d.valor(f, "anios_vida_profesional");
+                    String u = d.valor(f, "anios_desempleado");
+                    if (v.isEmpty() || u.isEmpty() || Double.parseDouble(u) > Double.parseDouble(v)) continue;
+                    double x = Double.parseDouble(v);
+                    if ((x <= mediana) != junior) continue;
+                    casos++;
+                    String cargo = d.valor(f, "cargo");
+                    if (!cargo.isEmpty()) { conCargo++; if ("Ejecutivo".equals(cargo)) ejecutivos++; }
+                }
+                Map<String, Object> seg = new LinkedHashMap<>();
+                seg.put("segmento", junior ? "Junior" : "Consolidado");
+                seg.put("criterio", (junior ? "Hasta " : "Más de ") + (mediana == Math.rint(mediana) ? String.valueOf((long) mediana) : String.valueOf(mediana)) + " años");
+                seg.put("casos", casos);
+                seg.put("conCargo", conCargo);
+                seg.put("ejecutivos", ejecutivos);
+                segmentos.add(seg);
+            }
+        }
+        r.put("segmentosExperiencia", segmentos);
+
         // U4: destino laboral (solo rama "trabaja en una organización")
         Map<String, Object> destino = new LinkedHashMap<>();
         for (String col : List.of("rubro", "sector_publico_privado", "departamento_bolivia", "cargo", "remuneracion_promedio", "antiguedad_trabajo", "medio_obtuvo_trabajo")) {
@@ -256,6 +286,7 @@ public class Analisis {
             e.put("nombre", d.valor(f, "nombre_empresa"));
             e.put("tipo", Catalogo.etiqueta("tipo_organizacion", d.valor(f, "tipo_organizacion")));
             e.put("tamano", Catalogo.etiqueta("tamano", d.valor(f, "tamano")));
+            e.put("rubro", Catalogo.etiqueta("rubro", d.valor(f, "rubro")));
             empresas.add(e);
         }
         r.put("empresas", empresas);

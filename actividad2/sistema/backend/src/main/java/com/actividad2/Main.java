@@ -102,6 +102,7 @@ public class Main {
         ruta("GET", "/api/admin/respuestas", p -> Respuestas.listar(p.q().getOrDefault("encuesta", "titulados"),
             fecha(p.q(), "desde"), fecha(p.q(), "hasta"), vacioANull(p.q().get("origen")),
             entero(p.q(), "pagina", 1), limitar(entero(p.q(), "tamano", 20), 1, 200)));
+        ruta("GET", "/api/admin/respuestas/revisar", p -> Revision.revisar(encuestaDe(p)));
         ruta("GET", "/api/admin/respuestas/(\\d+)", p -> Respuestas.obtener(p.id(0)));
         ruta("PUT", "/api/admin/respuestas/(\\d+)", p -> Respuestas.editar(p.id(0), p.cuerpo()));
         ruta("DELETE", "/api/admin/respuestas/(\\d+)", p -> Respuestas.eliminar(p.id(0)));

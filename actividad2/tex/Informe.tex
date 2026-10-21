@@ -19,6 +19,7 @@
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 \usepackage{geometry}
 \usepackage{booktabs}
+\usepackage{longtable}
 \usepackage{array}
 \usepackage{fancyhdr}
 \usepackage{float}
@@ -118,6 +119,10 @@
 {\bfseries Cochabamba, Bolivia\par}
 \end{titlepage}
 
+\tableofcontents
+\listoftables
+\newpage
+
 \section*{Resumen}
 
 Este informe presenta el análisis de mercado sobre el perfil, la
@@ -146,8 +151,6 @@ las variables al 5\%.
 \textbf{Palabras clave:} análisis de mercado, empleabilidad, ARCU-SUR,
 Ingeniería de Sistemas.
 
-\tableofcontents
-\listoftables
 \newpage
 
 \pagenumbering{arabic}
@@ -237,6 +240,17 @@ resumidas mediante frecuencias, medias e intervalos de confianza. Es
 exploratorio porque busca identificar relaciones entre variables sin
 partir de una hipótesis previa.
 
+El enunciado director menciona la experimentación por simulación y el
+análisis de diferentes escenarios. El modelo de simulación (generador
+congruencial y Transformada Inversa discreta para proyectar escenarios)
+se retiró del estudio por indicación del docente, porque proyectar
+resultados exige otras variables y datos que esta actividad no trabaja.
+El análisis de escenarios se resuelve con los datos observados: la
+herramienta permite recalcular todos los indicadores para cualquier
+período (gestión, semestre, mes o fechas exactas), comparar cualquier
+par de preguntas y armar reportes a medida con las variables que se
+quieran estudiar (Sección~\ref{sec:herramienta}).
+
 \subsection{Población Objetivo}
 
 \begin{enumerate}
@@ -245,7 +259,7 @@ partir de una hipótesis previa.
   por lo que el formulario no incluye una pregunta filtro.
   \item \textbf{Empleadores} de titulados de la Carrera: el enunciado
   exigía al menos cinco organizaciones, con una del ámbito público y una
-  del privado; la encuesta recibió respuestas de 53 organizaciones.
+  del privado. La encuesta recibió respuestas de 53 organizaciones.
 \end{enumerate}
 
 \subsection{Técnicas de Recolección de Datos}
@@ -329,11 +343,11 @@ C7 & Financiamiento $\times$ nivel cursado & Complementar la historia de usuario
 \end{mitabla}
 
 Para los empleadores el análisis es solo descriptivo (frecuencias de
-cada respuesta), tal como se definió cuando el plan consideraba cinco
-organizaciones. \textit{[Confirmar: la encuesta recibió 53 respuestas de
-empleadores, no 5 -- con esa cantidad podría ser posible aplicar
-chi-cuadrada también a empleadores; falta decidir si se mantiene el
-análisis solo descriptivo o se agregan cruces para esta encuesta.]}
+cada respuesta). \textit{[Confirmar: la encuesta reunió 53 respuestas
+de empleadores, no las 5 que exigía el enunciado -- con esa cantidad
+podría ser posible aplicar chi-cuadrada también a empleadores; falta
+decidir si se mantiene el análisis solo descriptivo o se agregan
+cruces para esta encuesta.]}
 
 \subsection{Decisiones de Procesamiento}
 
@@ -362,9 +376,6 @@ herramienta aplica de forma automática:
   Bs 5.000 / más de Bs 5.000), tiempo al primer empleo (hasta 4 meses /
   más de 4 meses), institución de posgrado (UMSS: EUPG o FCyT / otra) y
   nivel cursado (diplomado o especialidad / maestría o superior).
-  \item \textbf{Cargos.} Las listas de cargos de ambas encuestas son
-  distintas; para compararlas se usa una tabla de homologación propia
-  (Anexo~\ref{anexo:homologacion}).
   \item \textbf{Datos personales.} Correo, teléfono y LinkedIn se eliminan
   al importar los datos, antes de cualquier cálculo. Las organizaciones
   se listan, pero ningún resultado se atribuye a una organización con
@@ -521,7 +532,7 @@ En resumen, para nuestro caso cada símbolo significa:
 El desarrollo completo de esta prueba, paso a paso y con los datos de la
 encuesta, se presenta para cada cruce en la Sección~\ref{sec:cruces}.
 
-\subsection{Herramienta de Software}
+\subsection{Herramienta de Software}\label{sec:herramienta}
 
 La herramienta tiene dos partes:
 
@@ -556,7 +567,7 @@ Pantalla & Servicio REST & Contenido \\
 Inicio & \texttt{/api/criterios} & Resumen de la valoración de cada criterio \\
 Una pantalla por criterio (2.1.2, 2.1.7, 2.4.1, 2.4.2, 3.2.1, 3.2.2, 3.2.3) & \texttt{/api/criterios} y los servicios de indicadores (\texttt{/api/empleabilidad}, \texttt{/api/formacion}, \texttt{/api/competencias}, \texttt{/api/empleadores}, \texttt{/api/cruces}) & Qué pide el criterio, valoración, indicadores, gráficos y cruces relacionados \\
 Comparar dos preguntas & \texttt{/api/cruce-libre} & Tabla de contingencia, mapa de calor, $FO$, $FE$, $X_0^2$ y decisión \\
-Generar reporte & \texttt{/api/criterios} y servicios de indicadores & Reporte imprimible (o PDF) con la valoración, indicadores, un gráfico clave y los cruces de cada criterio, calculado con el período elegido \\
+Generar reporte & \nolinkurl{/api/reporte/variables}, \texttt{/api/reporte}, \texttt{/api/exportar} & Reporte a medida: el usuario elige la encuesta, el período (gestión, semestre, mes o fechas exactas) y las preguntas; se obtiene la tabla y el gráfico de cada pregunta (imprimible o en PDF), opcionalmente con la valoración ARCU-SUR, y su exportación a Excel (tablas o respuestas individuales) \\
 Formulario público & \texttt{/api/encuestas}, \texttt{/api/respuestas} & Encuesta a titulados y a empleadores \\
 Preguntas y respuestas & \texttt{/api/admin/...} & Editor de preguntas y administración de respuestas \\
 Importar y exportar & \texttt{/api/importar}, \texttt{/api/exportar} & Carga de CSV de Forms y descarga de datos limpios y matrices \\
@@ -611,6 +622,14 @@ Ambos se estiman con su intervalo de confianza.
 
 \input{generado/ic_vida_profesional}
 
+\paragraph{Mediana y segmentación por experiencia.} La Historia de
+Usuario~1 pide también la mediana de los años transcurridos desde la
+titulación y separar a los profesionales junior de los consolidados. Como
+el formulario de Forms no preguntaba el año de titulación, se usan los
+años de vida profesional.
+
+\input{generado/experiencia}
+
 \paragraph{Años desempleado.}
 
 \input{generado/ic_desempleo}
@@ -656,6 +675,12 @@ fuente del estudio que mira a los titulados desde fuera de la
 universidad. El análisis es descriptivo: se presentan las frecuencias
 de cada respuesta ($N=53$ organizaciones). En la escala de perfil
 profesional no se calcula media porque sus opciones no son simétricas.
+
+\subsection{Organizaciones Encuestadas}
+
+\input{generado/organizaciones}
+
+\subsection{Contratación y Perfil Profesional}
 
 \input{generado/empleadores}
 
@@ -731,7 +756,10 @@ un valor de referencia se reportan como línea base.
   meses (IC 95\%: 1.85 a 3.42), y queda como línea base porque ARCU-SUR
   no fija un valor de referencia. El 80.6\% de quienes trabajan en una
   organización lo hace en el sector privado, principalmente en desarrollo
-  de software.
+  de software. La mediana de experiencia es de 6 años (media 8.95, elevada
+  por unos pocos titulados con muchos años); entre los consolidados, el
+  22.6\% de quienes declararon un cargo ocupa uno ejecutivo, frente al
+  7.5\% de los junior.
   \item \textbf{Resultados de la formación (3.2.1) y actualización
   curricular (2.1.7).} El 74.1\% está satisfecho con la formación
   recibida, pero el 71.6\% señala la actualización del plan de estudios
@@ -745,7 +773,9 @@ un valor de referencia se reportan como línea base.
   titulados evidencian competencias y valores.
   \item \textbf{Posgrado (2.4.1 y 1.1.5).} La demanda es alta (83.1\%
   quiere un posgrado, sobre todo en inteligencia artificial, 43.9\% de
-  los interesados) y el 70.9\% considera afín la oferta de la FCyT, pero
+  los interesados; junto con ingeniería de software reúne el 67.5\% de
+  las preferencias, cerca del 70\% que el enunciado toma como referencia
+  para abrir programas modulares) y el 70.9\% considera afín la oferta de la FCyT, pero
   solo el 41.5\% de los interesados la elegiría: es el único aspecto
   desfavorable del criterio. Además, el 91.8\% de quienes ya cursaron un
   programa lo pagó con recursos propios.
@@ -791,50 +821,25 @@ un valor de referencia se reportan como línea base.
 \subsection*{Limitaciones}
 
 \begin{itemize}
-  \item El formulario no pregunta el año de titulación, por lo que no se
-  pueden analizar resultados por cohorte.
+  \item El formulario de Microsoft Forms no preguntaba el año de
+  titulación, por lo que no se pueden analizar resultados por cohorte; la
+  antigüedad se aproxima con los años de vida profesional. El formulario
+  de la herramienta ya incluye esa pregunta para las respuestas nuevas.
+  \item El formulario pregunta por el nivel y el financiamiento del
+  programa \emph{ya cursado}, no por el nivel de posgrado \emph{deseado} ni
+  por el financiamiento \emph{futuro} que mencionan las Historias de
+  Usuario~2 y~3; por eso la demanda de posgrado se mide por área de
+  interés e institución, y el financiamiento con lo ya cursado.
+  \item Las escalas de acuerdo del formulario tienen 4 niveles, no 5 como
+  sugiere la Historia de Usuario~4; las medias se calculan sobre la escala
+  de 1 a 4.
   \item El tiempo al primer empleo solo lo responde quien hoy trabaja en
   una organización, y su media es una cota inferior.
   \item La escala de empleadores no es simétrica y algunos de sus ítems
   agrupan varias afirmaciones.
-  \item El análisis de empleadores es solo descriptivo (ver nota en
-  Sección~\ref{sec:empleadores} sobre si corresponde agregar cruces,
-  ahora que la encuesta recibió 53 respuestas).
+  \item El análisis de empleadores es descriptivo: no se cruzaron sus
+  respuestas entre sí ni se aplicaron pruebas de independencia.
 \end{itemize}
-
-\section*{Declaración de Uso de Inteligencia Artificial}
-\addcontentsline{toc}{section}{Declaración de Uso de Inteligencia Artificial}
-
-En la elaboración de este trabajo se utilizó el asistente de
-inteligencia artificial Claude (Anthropic, 2026), mediante la
-herramienta Claude Code, entre septiembre y octubre de 2026. La
-Tabla~\ref{tab:ia} detalla en qué tareas se usó y qué parte quedó a
-cargo del autor.
-
-\begin{mitabla}{Tareas en las que se usó inteligencia artificial\label{tab:ia}}
-\begin{tabular}{L{3.6cm}L{5.6cm}L{5.4cm}}
-\toprule
-Tarea & Uso de la IA & Revisión y decisiones del autor \\
-\midrule
-Material de referencia & Transcripción a LaTeX de los capítulos de Coss Bu y de los apuntes de clase a partir de los PDF, marcando los errores del original con notas al pie & Revisión de las transcripciones \textit{[Completar]} \\
-Criterios ARCU-SUR & Lectura de los documentos de Criterios, Autoevaluación y Pares, y propuesta de qué preguntas del formulario responden a cada indicador & Selección final de variables y cruces \textit{[Completar]} \\
-Revisión de las encuestas & Identificación de problemas de diseño del formulario y propuesta de decisiones de procesamiento (punto medio de rangos, agrupaciones, escala de empleadores) & Decisión de no modificar el formulario y de enviarlo solo a titulados de la UMSS; aprobación de las decisiones de procesamiento \\
-Herramienta de software & Generación del código del backend (Java) y del frontend (Vue, Naive UI, ECharts) & Pruebas de funcionamiento y ajustes \textit{[Completar]} \\
-Dataset de prueba & Generación de respuestas sintéticas para probar la herramienta durante el desarrollo & --- (se eliminó antes de cargar los datos reales; ningún resultado del informe sale de él) \\
-Base de datos e importación & Diseño de la base PostgreSQL, del formulario propio y del importador que traduce los CSV de Forms a los códigos de la encuesta & Elección de PostgreSQL; revisión del informe de importación \textit{[Completar]} \\
-Preguntas abiertas & Propuesta de categorías y palabras clave para codificar las preguntas 10 a 12 de empleadores & Revisión y aprobación de las categorías \textit{[Completar]} \\
-Panel por criterio & Reorganización del panel por criterio ARCU-SUR & Decisión de organizar el panel por criterio \\
-Redacción del informe & Borrador de las secciones 1 a 6 y de las tablas & Revisión y corrección del texto \textit{[Completar]} \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-No se usó inteligencia artificial para generar respuestas de las
-encuestas presentadas como reales: los resultados finales provienen
-exclusivamente de los datos recolectados y procesados con la
-herramienta. Tampoco se usó para \textit{[Completar: por ejemplo,
-aplicación de las encuestas, contacto con las organizaciones, reuniones
-con el docente]}.
 
 \section*{Referencias Bibliográficas}
 \addcontentsline{toc}{section}{Referencias Bibliográficas}
@@ -843,9 +848,6 @@ con el docente]}.
 Ali Rodriguez, J. G. (2021). \textit{Simulación de Sistemas: apuntes de
 clases} [Apuntes de la materia dictada por H. F. Villarroel Tapia].
 Carrera de Ingeniería de Sistemas, Universidad Mayor de San Simón.
-
-Anthropic. (2026). \textit{Claude} (versión Opus 5.5) [Modelo de
-lenguaje de gran tamaño]. \url{https://claude.ai}
 
 ARCU-SUR. (2016a). \textit{Guía de autoevaluación para carreras de
 Ingeniería}. Red de Agencias Nacionales de Acreditación, Sector Educativo
@@ -864,23 +866,5 @@ Sector Educativo del MERCOSUR.
 
 Coss Bu, R. (1998). \textit{Simulación: un enfoque práctico}. Limusa.
 \end{hangparas}
-
-\appendix
-
-\section{Tabla de Homologación de Cargos}\label{anexo:homologacion}
-
-\begin{mitabla}{Homologación de los cargos de ambas encuestas}
-\begin{tabular}{lL{5.2cm}L{5.8cm}}
-\toprule
-Grupo & Encuesta a titulados & Encuesta a empleadores \\
-\midrule
-Soporte                 & Help Desk            & De apoyo / asistencia tecnológica \\
-Técnico / Desarrollo    & Técnico, Desarrollo  & Técnico \\
-Analista / Especialista & ---                  & Analista, especialista, consultor tecnológico \\
-Gestión / Jefatura      & Ejecutivo            & Supervisor / coordinador, jefatura o gerencial \\
-Otro                    & Otro                 & Otro \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
 
 \end{document}

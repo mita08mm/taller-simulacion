@@ -94,17 +94,40 @@ async function eliminar(id) {
     mensaje.error(e.message)
   }
 }
-async function eliminarPrueba() {
+// Revisión de calidad: respuestas casi vacías, con nombre sin sentido o repetidas (el sistema solo avisa, no borra)
+const avisos = ref(null)
+const revisando = ref(false)
+async function revisar() {
+  revisando.value = true
   try {
-    const r = await enviar('DELETE', '/api/admin/respuestas', undefined, { origen: 'prueba' })
-    mensaje.success(`Se eliminaron ${r.eliminadas} respuestas de prueba`)
-    alImportar()
+    avisos.value = await obtener('/api/admin/respuestas/revisar', { encuesta: encuesta.value })
   } catch (e) {
     mensaje.error(e.message)
+  } finally {
+    revisando.value = false
   }
 }
+watch([encuesta, version], () => { avisos.value = null; revisar() }, { immediate: true })
+const tipoMotivo = { 'Casi vacía': 'warning', 'Nombre sin sentido': 'error', 'Posible duplicado': 'info' }
+const columnasAvisos = [
+  { title: 'Motivo', key: 'motivo', width: 160, render: (a) => h(NTag, { size: 'small', bordered: false, type: tipoMotivo[a.motivo] }, () => a.motivo) },
+  { title: 'Grupo', key: 'grupo', width: 90, render: (a) => a.grupo ?? '' },
+  { title: 'N.º', key: 'id', width: 70 },
+  { title: 'Fecha', key: 'fecha', width: 110 },
+  { title: 'Detalle', key: 'detalle' },
+  {
+    title: '', key: 'acciones', width: 150,
+    render: (a) => h(NSpace, { size: 4, wrap: false }, () => [
+      h(NButton, { size: 'tiny', secondary: true, onClick: () => verDetalle(a.id) }, () => 'Ver'),
+      h(NPopconfirm, { onPositiveClick: () => eliminar(a.id) }, {
+        trigger: () => h(NButton, { size: 'tiny', quaternary: true, type: 'error' }, () => 'Eliminar'),
+        default: () => '¿Eliminar esta respuesta?',
+      }),
+    ]),
+  },
+]
 
-const tipoOrigen = { formulario: 'success', importado: 'info', prueba: 'default' }
+const tipoOrigen = { formulario: 'success', importado: 'info' }
 const columnas = [
   { title: 'N.º', key: 'id', width: 70 },
   { title: 'Fecha', key: 'fecha', width: 170 },
@@ -131,9 +154,8 @@ const graficoDias = computed(() => barras(porDia.value.map((d) => ({ etiqueta: d
 
 <template>
   <div class="pagina">
-    <div class="etiqueta-criterio">Encuestas · CRUD de respuestas</div>
     <h1 class="pagina-titulo">Respuestas</h1>
-    <p class="pagina-sub">Respuestas guardadas en la base de datos, del formulario propio, importadas de Forms o del dataset de prueba.</p>
+    <p class="pagina-sub">Respuestas guardadas en la base de datos, del formulario propio o importadas de Forms.</p>
 
     <n-card size="small" title="Enlaces del formulario para compartir">
       <n-grid :cols="2" :x-gap="14" :y-gap="10" responsive="screen" item-responsive>
@@ -159,20 +181,26 @@ const graficoDias = computed(() => barras(porDia.value.map((d) => ({ etiqueta: d
         <n-radio-button value="empleadores">Empleadores</n-radio-button>
       </n-radio-group>
       <n-select v-model:value="origen" size="small" clearable placeholder="Todos los orígenes" style="width: 190px"
-        :options="[{ label: 'Formulario', value: 'formulario' }, { label: 'Importado', value: 'importado' }, { label: 'Prueba', value: 'prueba' }]" />
-      <span style="flex: 1" />
-      <n-popconfirm @positive-click="eliminarPrueba">
-        <template #trigger><n-button size="small" type="error" secondary>Eliminar datos de prueba</n-button></template>
-        Se borran las respuestas de prueba de ambas encuestas. Las del formulario y las importadas no se tocan.
-      </n-popconfirm>
+        :options="[{ label: 'Formulario', value: 'formulario' }, { label: 'Importado', value: 'importado' }]" />
+
     </div>
 
     <n-grid v-if="actual" :cols="4" :x-gap="14" :y-gap="14" responsive="screen" item-responsive>
       <n-gi span="4 m:2 l:1"><Kpi titulo="Del formulario propio" color="#14b8a6" :valor="String(actual.respuestas.formulario)" /></n-gi>
       <n-gi span="4 m:2 l:1"><Kpi titulo="Importadas de Forms" color="#0ea5e9" :valor="String(actual.respuestas.importado)" /></n-gi>
-      <n-gi span="4 m:2 l:1"><Kpi titulo="De prueba" color="#71717a" :valor="String(actual.respuestas.prueba)" /></n-gi>
+      <n-gi span="4 m:2 l:1"><Kpi titulo="Para revisar" :valor="avisos ? String(new Set(avisos.map((a) => a.id)).size) : '…'" detalle="Respuestas con algún aviso de calidad" /></n-gi>
       <n-gi span="4 m:2 l:1"><Kpi titulo="Versión de la encuesta" :valor="String(actual.version)" detalle="Sube con cada cambio en el editor" /></n-gi>
     </n-grid>
+
+    <n-card size="small" title="Revisión de calidad de los datos" style="margin-top: 14px">
+      <template #header-extra><n-button size="small" quaternary :loading="revisando" @click="revisar">Volver a revisar</n-button></template>
+      <p class="nota" style="margin: 0 0 10px">
+        Señala respuestas que conviene mirar antes de analizar: casi vacías, con un nombre de organización sin sentido o repetidas.
+        El sistema no borra nada: revisa cada una con «Ver» y elimina solo las que no sean válidas. En empleadores, dos respuestas de la misma organización pueden ser de personas distintas.
+      </p>
+      <n-alert v-if="avisos && !avisos.length" type="success" :bordered="false">No se encontraron respuestas sospechosas.</n-alert>
+      <n-data-table v-else-if="avisos" size="small" :columns="columnasAvisos" :data="avisos" :row-key="(a) => a.motivo + a.id" :max-height="320" />
+    </n-card>
 
     <n-card size="small" title="Respuestas del formulario en los últimos 30 días" style="margin-top: 14px">
       <v-chart v-if="porDia.length" style="height: 200px" :option="graficoDias" autoresize />

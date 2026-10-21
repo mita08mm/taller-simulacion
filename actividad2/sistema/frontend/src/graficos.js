@@ -27,7 +27,7 @@ export function barras(items, { horizontal = false, color = COLORES[0], porcenta
   const fmt = porcentaje ? '{value}%' : '{value}'
   return {
     toolbox: descarga,
-    grid: { left: horizontal ? 150 : 40, right: 24, top: 16, bottom: horizontal ? 24 : 60, containLabel: false },
+    grid: { left: horizontal ? 150 : 40, right: horizontal ? 52 : 24, top: 16, bottom: horizontal ? 24 : 60, containLabel: false },
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, valueFormatter: (v) => (porcentaje ? `${v}%` : v) },
     xAxis: horizontal ? ejeValores(fmt) : ejeCategorias(etiquetas, etiquetas.length > 5 ? 25 : 0),
     yAxis: horizontal ? { ...ejeCategorias(etiquetas), inverse: true } : ejeValores(fmt),

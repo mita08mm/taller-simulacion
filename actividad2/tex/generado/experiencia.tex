@@ -1,0 +1,21 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\textit{Paso 1. Ordenar los datos.} Se ordenan de menor a mayor los 143 valores de años de vida profesional usados en el intervalo anterior.
+
+\textit{Paso 2. Ubicar el centro.} Como $n = 143$ es impar, la mediana es el valor en la posición $\frac{n+1}{2} = 72$.
+
+\textit{Paso 3. Resultado.} Mediana $= 6$ años, frente a una media de $8.95$ años. La media es mayor que la mediana porque unos pocos titulados con muchos años de experiencia la elevan; la mediana describe mejor al titulado típico.
+
+El enunciado pide distinguir a los profesionales junior de los mandos consolidados. Se usa la mediana como corte: la mitad con menos experiencia frente a la mitad con más. Para cada grupo se indica qué proporción de quienes declararon un cargo ocupa un cargo ejecutivo.
+
+\begin{mitabla}{Titulados por experiencia profesional (corte en la mediana, $n=143$)}
+\begin{tabular}{llccc}
+\toprule
+Grupo & Años de vida profesional & $f_i$ & $f_i/n$ & Cargo ejecutivo \\
+\midrule
+Junior & Hasta 6 años & 77 & $77/143 = 0.538$ & 4 de 53 (7.5\%) \\
+Consolidado & Más de 6 años & 66 & $66/143 = 0.462$ & 12 de 53 (22.6\%) \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+

@@ -10,7 +10,7 @@ const { datos: d } = useApi('/api/empleadores')
 const ITEMS = ['perfil_vinculos_oportunidades', 'perfil_recurre_umss', 'perfil_opinion_practicas', 'perfil_consulta_autoridades', 'perfil_consultado_desempeno', 'perfil_consultada_pertinencia', 'perfil_consultado_autoevaluacion', 'perfil_participo_retroalimentacion', 'perfil_participo_vinculacion_entorno', 'perfil_participo_difusion', 'perfil_participo_vinculacion_profesionales']
 const items = computed(() => d.value && ITEMS.map((c) => d.value.perfil.find((p) => p.codigo === c)).filter(Boolean))
 const vinculacion = computed(() => items.value && items.value.map((p) => ({ nombre: p.criterio, frecuencias: p.frecuencias })))
-const columnas = [{ title: 'Organización', key: 'nombre' }, { title: 'Tipo', key: 'tipo' }, { title: 'Tamaño', key: 'tamano' }]
+const columnas = [{ title: 'Organización', key: 'nombre' }, { title: 'Tipo', key: 'tipo' }, { title: 'Tamaño', key: 'tamano' }, { title: 'Rubro', key: 'rubro' }]
 </script>
 
 <template>

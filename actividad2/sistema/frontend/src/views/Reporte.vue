@@ -32,11 +32,9 @@ const periodo = q.get('periodo') || (filtro.desde || filtro.hasta
   ? `Respuestas del ${filtro.desde ?? 'inicio'} al ${filtro.hasta ?? 'día de hoy'}`
   : 'Todas las respuestas recibidas')
 
-// Gráfico de cada pregunta: barras horizontales en %, salvo números (cantidad por valor)
-const graficoVariable = (v) => (v.tipo === 'numero'
-  ? barras(v.frecuencias)
-  : barras(v.frecuencias, { horizontal: true, porcentaje: true }))
-const altoVariable = (v) => (v.tipo === 'numero' ? 240 : Math.max(140, v.frecuencias.length * 34 + 50))
+// Gráfico de cada pregunta: barras horizontales con el porcentaje de cada respuesta
+const graficoVariable = (v) => barras(v.frecuencias, { horizontal: true, porcentaje: true })
+const altoVariable = (v) => Math.max(140, v.frecuencias.length * 34 + 50)
 const extra = { encuesta, variables, formato: 'excel' }
 
 const PERFIL = ['perfil_conoce_perfil', 'perfil_coherente_desempeno', 'perfil_titulo_consistente', 'perfil_competencias_laborales', 'perfil_valores', 'perfil_desempeno_destacado', 'perfil_confianza']

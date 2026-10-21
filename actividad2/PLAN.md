@@ -4,8 +4,8 @@
 
 **Captura de datos:** dos formularios externos distintos (ya transcritos en
 `actvidad2.tex`) — titulados responden por Microsoft Forms
-(forms.cloud.microsoft), empleadores por Google Forms. Las 5 empresas
-confirmadas con el docente se encuestan por este segundo medio.
+(forms.cloud.microsoft), empleadores por Google Forms. La encuesta a
+empleadores recibió respuestas de 53 organizaciones.
 
 **Sistema propio (confirmado con el docente — no basta con Forms + Excel):**
 
@@ -215,10 +215,11 @@ estrictamente a la versión de una variable.
 El libro menciona (en la prueba de la distancia, sección 3.3) que cuando
 una categoría tiene muy pocos datos esperados, hay que agruparla con las
 vecinas para que ninguna celda quede con frecuencia esperada menor a 5 —
-esto aplica igual acá: si "rubro de la organización" tiene 14 categorías
-posibles y solo encuestamos 5 empresas, casi todas las celdas van a tener
-$FE_{ij}<5$. Hay que preguntarle al docente si agrupamos categorías poco
-frecuentes como "Otros", o qué criterio prefiere.
+esto aplica igual acá: variables con muchas categorías posibles (como
+"rubro de la organización", con 14) frente a una muestra chica siguen
+dando $FE_{ij}<5$ en varias celdas aunque ya no sean solo 5 organizaciones.
+Hay que preguntarle al docente si agrupamos categorías poco frecuentes
+como "Otros", o qué criterio prefiere.
 
 ---
 
@@ -342,10 +343,12 @@ Notas:
   nivel del programa ya cursado", sobre el subgrupo con
   `formacion_complementaria` = SI (chico), y no corresponde a ningún
   indicador ARCU-SUR (ver la nota sobre 1.5.1 en 5.1). Queda como opcional.
-- **Empleadores = solo descriptivo.** Con 5 empresas no se puede hacer
-  chi-cuadrada ni intervalo de confianza: todas las celdas tendrían
-  $FE<5$. Se presentan las frecuencias tal cual (U11), empresa por empresa
-  si hace falta, y se dice explícitamente en el informe por qué.
+- **Empleadores = solo descriptivo (por ahora).** Se definió así cuando el
+  plan consideraba 5 organizaciones ($FE<5$ en todas las celdas). La
+  encuesta real reunió 53 organizaciones, así que esto queda pendiente
+  de revisar: con esa cantidad podría ser posible aplicar chi-cuadrada
+  también a empleadores (ver `[Confirmar]` en `Informe.tex`, Marco
+  Metodológico).
 
 ### 5.4. Simulación — descartada
 

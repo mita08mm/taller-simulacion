@@ -1,43 +1,43 @@
 # Sistema — Observatorio de Titulados (Actividad 2)
 
-Sistema propio que importa los datos exportados de las dos encuestas
-(titulados por Microsoft Forms, empleadores por Google Forms, ambos como
-CSV), calcula los indicadores y cruces definidos en `../PLAN.md` sección 5
-(según los criterios ARCU-SUR) y los muestra en un dashboard.
+Sistema propio para recolectar y analizar las encuestas a titulados y a
+empleadores de Ingeniería de Sistemas (UMSS). Recibe respuestas por su propio
+formulario o importa los CSV de Microsoft Forms (titulados) y Google Forms
+(empleadores), las guarda en PostgreSQL y responde a los criterios ARCU-SUR
+con indicadores, cruces de variables y reportes.
 
 ## Estructura
 
 ```
 sistema/
-  backend/    Java puro (com.sun.net.httpserver, sin Maven ni dependencias)
+  backend/    Java 21 puro (com.sun.net.httpserver, sin Maven) + PostgreSQL (driver en backend/lib/)
   frontend/   Vue 3 + Vite + Naive UI (componentes) + ECharts (gráficos)
 ```
 
 ## Cómo correrlo
 
-**1. Base de datos (una sola vez).** Requiere PostgreSQL (probado con la versión 18).
-Crear un usuario y una base para el sistema:
+**1. Base de datos (una sola vez).** Requiere PostgreSQL (probado con la versión 18):
 ```
-psql -U postgres -c "CREATE ROLE actividad2 LOGIN PASSWORD 'una_clave_segura';"
-psql -U postgres -c "CREATE DATABASE actividad2 OWNER actividad2;"
+psql -U postgres -h localhost -c "CREATE ROLE actividad2 LOGIN PASSWORD 'una_clave_segura';"
+psql -U postgres -h localhost -c "CREATE DATABASE actividad2 OWNER actividad2;"
 ```
-Y crear `backend/db.properties` (no se sube a git) con:
+Crear `backend/db.properties` (no se sube a git):
 ```
 url=jdbc:postgresql://localhost:5432/actividad2
 user=actividad2
 password=una_clave_segura
 ```
-Al iniciar, el backend crea las tablas (`src/main/resources/schema.sql`), carga
-las dos encuestas (`Semilla.java`) y, si no hay respuestas, el dataset de prueba
-con origen «prueba».
+Al iniciar, el backend crea las tablas (`src/main/resources/schema.sql`) y carga
+la estructura de las dos encuestas (`Semilla.java`) si todavía no existe.
 
-**2. Backend** (JDK 21; el driver de PostgreSQL está en `backend/lib/`):
+**2. Backend:**
 ```
 cd backend
 javac -cp lib/postgresql-42.7.5.jar -d target/classes src/main/java/com/actividad2/*.java
 java -cp target/classes:src/main/resources:lib/postgresql-42.7.5.jar com.actividad2.Main
 ```
-Sirve en `http://localhost:7070`.
+Sirve en `http://localhost:7070` (otro puerto: `PUERTO=7071 java ...`). Si sale
+`Address already in use`, ya hay un backend corriendo en ese puerto.
 
 **3. Frontend** (en otra terminal):
 ```
@@ -47,6 +47,36 @@ pnpm run dev
 ```
 Panel: `http://localhost:5173`. Formulario público:
 `http://localhost:5173/#/encuesta/titulados` y `…/#/encuesta/empleadores`.
+Para usar otro backend: `VITE_API_URL=http://localhost:7071 pnpm run dev`.
+
+**4. Cargar las respuestas reales** (una vez, o cada vez que haya un CSV nuevo de Forms):
+en el panel, *Administración → Importar y exportar*, arrastrar el CSV tal como lo
+exporta Forms. O por consola:
+```
+cd backend
+# simular (muestra qué texto se tradujo a qué código y qué no se reconoció; no guarda nada):
+java -cp target/classes com.actividad2.FormsImport titulados "archivo.csv"
+# guardar en la base (reemplaza la importación anterior de esa encuesta, no duplica):
+java -cp target/classes:src/main/resources:lib/postgresql-42.7.5.jar com.actividad2.FormsImport titulados "archivo.csv" --guardar
+```
+Los CSV reales tienen datos personales: se guardan en `backend/src/main/resources/`
+y están en `.gitignore`. **No se suben a git.**
+
+## Panel
+
+| Menú | Pantalla | Qué muestra |
+|---|---|---|
+| Inicio | Respuesta a los criterios ARCU-SUR | Una tarjeta por criterio con sus aspectos favorables |
+| Criterios ARCU-SUR | 2.1.2, 2.1.7, 2.4.1, 2.4.2, 3.2.1, 3.2.2, 3.2.3 | Qué pide el criterio, valoración (favorable si > 50%), 3 indicadores, gráficos, relaciones entre preguntas y "Más detalle" |
+| Herramientas | Comparar dos preguntas | Tabla cruzada, mapa de calor y conclusión de la prueba chi-cuadrada en una frase |
+| Herramientas | Generar reporte | Reporte a medida: encuesta, período (gestión, semestre, mes, fechas) y preguntas; se imprime o guarda en PDF y se exporta a Excel |
+| Administración | Preguntas de la encuesta | Editor de secciones, preguntas y opciones |
+| Administración | Respuestas | Enlaces del formulario, listado y detalle, revisión de calidad (casi vacías, nombres sin sentido, duplicados) |
+| Administración | Importar y exportar | Carga de CSV de Forms y descarga de datos y tablas cruzadas |
+
+La barra superior tiene el filtro de período: todos los indicadores se recalculan
+solo con las respuestas de ese período. Cada gráfico tiene un botón para bajarlo
+como imagen PNG. Cada pantalla tiene su propia dirección (`#/empleo`, `#/perfil`, ...).
 
 ## Base de datos
 
@@ -54,45 +84,30 @@ PostgreSQL con un diseño mixto (justificación en el informe):
 
 | Tabla | Contenido |
 |---|---|
-| `encuesta`, `seccion`, `pregunta`, `opcion` | Estructura de las encuestas, relacional con claves foráneas. La edita el panel (*Encuestas → Editor de preguntas*). |
-| `respuesta` | Una fila por persona; sus respuestas en la columna `datos` (JSONB): `{"codigo_pregunta": valor o [valores]}`. Guarda `origen` (formulario, importado, prueba), `fecha` y la `version` de la encuesta respondida. |
+| `encuesta`, `seccion`, `pregunta`, `opcion` | Estructura de las encuestas, relacional con claves foráneas. La edita el panel. |
+| `respuesta` | Una fila por persona; sus respuestas en la columna `datos` (JSONB): `{"codigo_pregunta": valor o [valores]}`. Guarda `origen` (formulario o importado), `fecha` y la `version` de la encuesta respondida. |
 | `contacto` | Email, teléfono y LinkedIn, separados de las respuestas; nunca entran al análisis. |
 
 Reglas: una pregunta u opción con respuestas no se borra (se desactiva) y no se
 le cambia el código ni el tipo; cada cambio sube la versión de la encuesta.
 
-## Historias de usuario → pantallas y endpoints
+## Servicios (API)
 
-**Formulario y CRUD (nuevos):**
+Todos los GET de análisis y las exportaciones aceptan `?desde=aaaa-mm-dd&hasta=aaaa-mm-dd`.
 
-| Función | Endpoints |
+| Uso | Endpoints |
 |---|---|
 | Formulario público | `GET /api/encuestas/{titulados\|empleadores}`, `POST /api/respuestas/{titulados\|empleadores}` |
-| CRUD de la encuesta | `GET /api/admin/encuestas[/{encuesta}]`, `POST/PUT/DELETE /api/admin/secciones[/{id}]`, `…/preguntas[/{id}]`, `…/opciones[/{id}]` |
-| CRUD de respuestas | `GET /api/admin/respuestas`, `GET/PUT/DELETE /api/admin/respuestas/{id}`, `DELETE /api/admin/respuestas?origen=prueba`, `GET /api/admin/respuestas-por-dia` |
+| Editor de la encuesta | `GET /api/admin/encuestas[/{encuesta}]`, `POST/PUT/DELETE /api/admin/secciones[/{id}]`, `…/preguntas[/{id}]`, `…/opciones[/{id}]` |
+| Respuestas | `GET /api/admin/respuestas`, `GET/PUT/DELETE /api/admin/respuestas/{id}`, `GET /api/admin/respuestas/revisar?encuesta=…`, `GET /api/admin/respuestas-por-dia` |
+| Criterios ARCU-SUR | `GET /api/criterios` |
+| Indicadores | `GET /api/estado`, `/api/demografia`, `/api/empleabilidad`, `/api/formacion`, `/api/financiamiento`, `/api/competencias`, `/api/empleadores` |
+| Cruces | `GET /api/cruces` (los 7 del estudio), `GET /api/variables`, `GET /api/cruce-libre?filas=…&columnas=…&agrupar=1` |
+| Reporte a medida | `GET /api/reporte/variables?encuesta=…`, `GET /api/reporte?encuesta=…&variables=a,b,c` |
+| Importar / exportar | `POST /api/importar?tipo=…`, `GET /api/exportar?que=titulados\|empleadores\|libre\|C1…C7\|reporte\|reporte-datos` |
 
-**Análisis:**
-
-| HU | Pantalla | Endpoint | Criterio ARCU-SUR |
-|---|---|---|---|
-| 1 Antigüedad y empleabilidad | HU1 · Empleabilidad | `GET /api/empleabilidad` | 3.2.3 |
-| 2 Formación continua | HU2–3 · Formación y financiamiento | `GET /api/formacion` | 2.4.1 / 1.1.5 |
-| 3 Financiamiento | HU2–3 · Formación y financiamiento | `GET /api/financiamiento` | (cruce C7, opcional) |
-| 4 Brechas en competencias | HU4 · Competencias (incluye radar) | `GET /api/competencias` | 3.2.1 / 2.1.2 / 2.1.7 |
-| 5 Matrices cruzadas y exportación | HU5 · Matrices cruzadas (mapas de calor) e Importar/exportar | `GET /api/cruces`, `GET /api/exportar?que=…`, `POST /api/importar?tipo=…` | — |
-| — | Empleadores | `GET /api/empleadores` | 2.1.2 / 2.4.2 |
-
-Otros: `GET /api/estado`, `GET /api/demografia`, `POST /api/restablecer`.
-
-**Cruce libre** (pantalla *Cruces de variables → Cruce libre*): `GET /api/variables`
-lista las preguntas de opción única que se pueden cruzar y
-`GET /api/cruce-libre?filas=<columna>&columnas=<columna>&agrupar=1` aplica la
-prueba chi-cuadrada a las dos elegidas (con `agrupar=1` usa las mismas
-agrupaciones de C1–C7).
-
-**Exportar para Excel:** agregar `formato=excel` a `/api/exportar`
-(separador `;`, decimales con coma y BOM UTF-8, para Excel en español).
-La importación detecta sola si el archivo viene separado por `,` o `;`.
+`formato=excel` en `/api/exportar` usa separador `;`, decimales con coma y BOM UTF-8,
+para que Excel en español lo abra en columnas.
 
 ## Backend (`backend/src/main/java/com/actividad2/`)
 
@@ -100,64 +115,42 @@ La importación detecta sola si el archivo viene separado por `,` o `;`.
 |---|---|
 | `Main.java` | Servidor HTTP (un hilo virtual por petición) y rutas |
 | `Db.java` | Conexión a PostgreSQL con pool de conexiones y transacciones; crea el esquema |
-| `Semilla.java` | Carga inicial de las dos encuestas (preguntas del Anexo + año de titulación) |
-| `Encuestas.java` | Estructura de las encuestas y su CRUD (con caché del formulario) |
-| `Respuestas.java` | Envío y validación del formulario, CRUD de respuestas, importación y conversión al `Dataset` del análisis |
-| `Csv.java` | Lectura/escritura CSV (campos entre comillas) |
-| `Dataset.java` | Respuestas de una encuesta; elimina email/teléfono/LinkedIn/correo al cargar |
-| `Catalogo.java` | Códigos → etiquetas en el orden del formulario, agrupaciones de los cruces, punto medio de los rangos de tiempo, homologación de cargos |
-| `Estadistica.java` | Media, desviación, IC 95% (cap6 6.1), frecuencias, chi-cuadrada de tabla de contingencia con valor teórico α = 0.05 |
-| `Analisis.java` | Indicadores U1–U11 y cruces C1–C7 (PLAN.md 5.2–5.3) |
+| `Semilla.java` | Estructura inicial de las dos encuestas (réplica de los formularios de Forms + año de titulación) |
+| `Encuestas.java` | Estructura de las encuestas y su edición (con caché del formulario) |
+| `Respuestas.java` | Envío y validación del formulario, gestión de respuestas y conversión al `Dataset` del análisis |
+| `FormsImport.java` | Importa los CSV de Microsoft/Google Forms: traduce el texto de preguntas y opciones a códigos e informa lo no reconocido |
+| `Revision.java` | Revisión de calidad: respuestas casi vacías, nombres de organización sin sentido y posibles duplicados |
+| `Dataset.java` | Respuestas de una encuesta en forma de tabla; filtro por fecha |
+| `Catalogo.java` | Etiquetas, agrupaciones de los cruces, punto medio de los rangos de tiempo, homologación de cargos |
+| `Estadistica.java` | Media, mediana, desviación, IC 95% (Coss Bu cap. 6), frecuencias, chi-cuadrada de tabla de contingencia (α = 0.05) |
+| `Analisis.java` | Indicadores y los 7 cruces del estudio |
+| `Criterios.java` | Valoración de cada criterio ARCU-SUR (la usan el panel y el informe) |
+| `Abiertas.java` | Codificación de las preguntas abiertas de empleadores en categorías por palabras clave |
+| `Reportes.java` | Reporte a medida: tablas de frecuencia de las preguntas elegidas y su exportación |
+| `ReporteTex.java` | Escribe los desarrollos paso a paso del informe en `../tex/generado/` |
+| `Csv.java`, `Json.java` | Lectura y escritura de CSV y JSON |
 
-Las decisiones de procesamiento sobre el formulario (punto medio de los
-rangos, ramas que no responden una pregunta, escala de empleadores sin
-media, etc.) están en `../PLAN.md` sección 5.6 y en comentarios del código.
+Las decisiones de procesamiento (punto medio de los rangos, ramas que no
+responden una pregunta, escala de empleadores sin media, etc.) están en
+`../PLAN.md` sección 5.6 y en comentarios del código.
 
 ## Generar los desarrollos del informe
 
 `ReporteTex.java` escribe en `../tex/generado/` los desarrollos paso a paso
-del informe (Paso 1 … Paso 6, con cada suma y división a la vista), usando
-los mismos cálculos del sistema. `Informe.tex` los incluye con `\input`.
+(Paso 1 … Paso 6, con cada suma y división a la vista) con los mismos
+cálculos del sistema, leyendo las respuestas de la base. `Informe.tex` los
+incluye con `\input`. No editar a mano esos archivos: se sobrescriben.
 
 ```
 cd backend
-javac -d target/classes src/main/java/com/actividad2/*.java
-# con el dataset de prueba:
-java -cp target/classes:src/main/resources com.actividad2.ReporteTex ../../tex/generado
-# con los datos reales (CSV ya con los nombres cortos de columna):
-java -cp target/classes:src/main/resources com.actividad2.ReporteTex ../../tex/generado titulados.csv empleadores.csv
-# con fecha de corte (desde hasta, aaaa-mm-dd; "-" = sin límite):
-java -cp target/classes:src/main/resources com.actividad2.ReporteTex ../../tex/generado titulados.csv empleadores.csv - 2026-10-31
+java -cp target/classes:src/main/resources:lib/postgresql-42.7.5.jar com.actividad2.ReporteTex ../../tex/generado
+# solo un período (aaaa-mm-dd; "-" = sin límite):
+java -cp target/classes:src/main/resources:lib/postgresql-42.7.5.jar com.actividad2.ReporteTex ../../tex/generado - 2026-01-01 2026-12-31
 ```
+Después, compilar el informe con `latexmk -pdf Informe.tex` desde `../tex/`.
 
-Con datos reales, los fragmentos salen sin la marca **[Datos de prueba]**.
-No editar a mano los archivos de `tex/generado/`: se sobrescriben.
-
-## Filtro por fecha de respuesta
-
-Cada respuesta guarda su fecha en la columna `fecha_respuesta`. Al
-importar, el sistema la toma de «Hora de finalización» (Microsoft Forms)
-o «Marca temporal» (Google Forms) y la convierte a `aaaa-mm-dd`; con
-fechas tipo `03/04/2026` asume día/mes. Todos los endpoints GET y las
-exportaciones aceptan `?desde=aaaa-mm-dd&hasta=aaaa-mm-dd`, y el
-dashboard tiene el selector «Período de respuestas» en el menú lateral.
-Las filas sin fecha quedan fuera cuando hay un período elegido.
-
-## Importar datos reales
-
-En la pantalla *Importar / exportar* se sube el CSV. Las columnas deben
-llamarse como en los CSV de prueba (`backend/src/main/resources/`). Las
-exportaciones de Microsoft Forms y Google Forms ponen como encabezado el
-texto completo de la pregunta, así que antes de importar hay que
-renombrar las columnas (una sola vez, en Excel) a esos nombres cortos.
-Los CSV con respuestas reales **no se suben a git**.
-
-## Dataset de prueba
-
-Datos sintéticos (no son respuestas reales) con los campos exactos de los
-instrumentos de `../actvidad2.tex`:
-
-- `dataset_titulados.csv` — 100 filas.
-- `dataset_empleadores.csv` — 20 filas, con nombres de empresa ficticios.
-  Incluye cargos, las 3 preguntas abiertas y los 10 criterios de
-  "Formación y perfil profesional".
+Para revisar la codificación de las preguntas abiertas (qué respuestas quedaron
+sin categoría):
+```
+java -cp target/classes:src/main/resources:lib/postgresql-42.7.5.jar com.actividad2.Abiertas
+```

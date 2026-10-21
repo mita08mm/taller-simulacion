@@ -59,6 +59,7 @@ public class ReporteTex {
         escribir(salida, "ic_tiempo_primer_empleo.tex", icTiempoPrimerEmpleo());
         escribir(salida, "ic_vida_profesional.tex", icNumerica("anios_vida_profesional", "años de vida profesional", "años"));
         escribir(salida, "ic_desempleo.tex", icNumerica("anios_desempleado", "años desempleado", "años"));
+        escribir(salida, "experiencia.tex", experiencia());
         escribir(salida, "destino_laboral.tex", destinoLaboral());
         escribir(salida, "formacion.tex", formacion());
         escribir(salida, "valoracion.tex", valoracion());
@@ -69,6 +70,7 @@ public class ReporteTex {
         escribir(salida, "criterios_arcusur.tex", criterios());
         escribir(salida, "empleadores.tex", empleadores());
         escribir(salida, "preguntas_abiertas.tex", preguntasAbiertas());
+        escribir(salida, "organizaciones.tex", organizaciones());
         System.out.println("Fragmentos generados en " + salida.toAbsolutePath());
         System.exit(0); // cierra las conexiones del pool
     }
@@ -292,6 +294,75 @@ public class ReporteTex {
             "Los valores son numéricos y se agrupan por valor repetido ($x_i$ con su frecuencia $f_i$). Se descartan las filas en que los años desempleado superan los años de vida profesional (" + descartadas + " en esta muestra).");
     }
 
+    /** HU1: mediana de los años de vida profesional (paso a paso) y segmentación junior / consolidados. */
+    @SuppressWarnings("unchecked")
+    private static String experiencia() {
+        Map<String, Object> e = Analisis.empleabilidad(titulados);
+        Object med = e.get("medianaVidaProfesional");
+        if (med == null) return "No hay respuestas para calcular la mediana.\n\n";
+        double m = d(med);
+        int n = i(mapa(e.get("aniosVidaProfesional")).get("n"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("\\textit{Paso 1. Ordenar los datos.} Se ordenan de menor a mayor los ").append(n)
+          .append(" valores de años de vida profesional usados en el intervalo anterior.\n\n");
+        sb.append("\\textit{Paso 2. Ubicar el centro.} ");
+        if (n % 2 == 1) {
+            sb.append("Como $n = ").append(n).append("$ es impar, la mediana es el valor en la posición $\\frac{n+1}{2} = ").append((n + 1) / 2).append("$.\n\n");
+        } else {
+            sb.append("Como $n = ").append(n).append("$ es par, la mediana es el promedio de los valores en las posiciones $\\frac{n}{2} = ").append(n / 2)
+              .append("$ y $\\frac{n}{2}+1 = ").append(n / 2 + 1).append("$.\n\n");
+        }
+        double media = d(mapa(e.get("aniosVidaProfesional")).get("media"));
+        sb.append("\\textit{Paso 3. Resultado.} Mediana $= ").append(fmtX(m)).append("$ años, frente a una media de $").append(n(media, 2))
+          .append("$ años. ").append(media > m ? "La media es mayor que la mediana porque unos pocos titulados con muchos años de experiencia la elevan; la mediana describe mejor al titulado típico." : "Media y mediana son cercanas, por lo que los datos no están muy sesgados.").append(marca()).append("\n\n");
+        sb.append("El enunciado pide distinguir a los profesionales junior de los mandos consolidados. Se usa la mediana como corte: la mitad con menos experiencia frente a la mitad con más. Para cada grupo se indica qué proporción de quienes declararon un cargo ocupa un cargo ejecutivo.\n\n");
+        sb.append("\\begin{mitabla}{Titulados por experiencia profesional (corte en la mediana, $n=").append(n).append("$)").append(marca()).append("}\n");
+        sb.append("\\begin{tabular}{llccc}\n\\toprule\nGrupo & Años de vida profesional & $f_i$ & $f_i/n$ & Cargo ejecutivo \\\\\n\\midrule\n");
+        for (Map<String, Object> g : (List<Map<String, Object>>) e.get("segmentosExperiencia")) {
+            int c = i(g.get("casos")), cc = i(g.get("conCargo")), ej = i(g.get("ejecutivos"));
+            sb.append(g.get("segmento")).append(" & ").append(t((String) g.get("criterio"))).append(" & ").append(c).append(" & $").append(c).append("/").append(n).append(" = ").append(n(n == 0 ? 0 : (double) c / n, 3))
+              .append("$ & ").append(cc == 0 ? "---" : ej + " de " + cc + " (" + n(100.0 * ej / cc, 1) + "\\%)").append(" \\\\\n");
+        }
+        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+        return sb.toString();
+    }
+
+    /** HU2: qué tan concentradas están las preferencias en las dos áreas más elegidas (el enunciado usa el 70\% como referencia). */
+    private static String concentracion(List<Map<String, Object>> areas, int n) {
+        List<Map<String, Object>> orden = new ArrayList<>(areas);
+        orden.sort((a, b) -> Integer.compare(i(b.get("frecuencia")), i(a.get("frecuencia"))));
+        if (orden.size() < 2 || n == 0) return "";
+        int f1 = i(orden.get(0).get("frecuencia")), f2 = i(orden.get(1).get("frecuencia"));
+        double p = (double) (f1 + f2) / n;
+        return "\\textit{Concentración de las preferencias.} Las dos áreas más elegidas, ``" + t((String) orden.get(0).get("etiqueta")) + "'' y ``"
+            + t((String) orden.get(1).get("etiqueta")) + "'', reúnen $\\frac{" + f1 + " + " + f2 + "}{" + n + "} = " + n(p, 3) + "$ (" + n(100 * p, 1)
+            + "\\%) de las preferencias. El enunciado toma como referencia una concentración mayor al 70\\% para justificar la apertura de programas modulares; "
+            + (p > 0.7 ? "esta muestra la supera." : "esta muestra queda " + (p > 0.6 ? "cerca de ese valor, sin alcanzarlo" : "por debajo") + ", por lo que la demanda está más repartida entre áreas.")
+            + marca() + "\n\n";
+    }
+
+    /** Organizaciones encuestadas, como pide el enunciado (individualizar las empresas), sin atribuirles resultados. */
+    @SuppressWarnings("unchecked")
+    private static String organizaciones() {
+        List<Map<String, Object>> empresas = new ArrayList<>((List<Map<String, Object>>) Analisis.empleadores(empleadores).get("empresas"));
+        empresas.sort((a, b) -> ((String) a.get("nombre")).compareToIgnoreCase((String) b.get("nombre")));
+        long publicas = empresas.stream().filter(e -> "Público".equals(e.get("tipo"))).count();
+        long privadas = empresas.stream().filter(e -> "Privado".equals(e.get("tipo"))).count();
+        long software = empresas.stream().filter(e -> String.valueOf(e.get("rubro")).toLowerCase().contains("software")).count();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Se encuestaron ").append(empresas.size()).append(" organizaciones: ").append(publicas).append(" del ámbito público y ").append(privadas)
+          .append(" del privado; ").append(software).append(" declaran como rubro principal el desarrollo de software. Con ello se cumple el mínimo del enunciado (al menos tres empresas de desarrollo de software, una pública y una privada). La lista respalda la toma de datos en campo; ningún resultado de este informe se atribuye a una organización con nombre.\n\n");
+        sb.append("{\\small\n\\begin{longtable}{rL{6.2cm}lL{4.6cm}}\n\\caption{Organizaciones encuestadas}\\\\\n\\toprule\nN.º & Organización & Tipo & Rubro \\\\\n\\midrule\n\\endfirsthead\n");
+        sb.append("\\toprule\nN.º & Organización & Tipo & Rubro \\\\\n\\midrule\n\\endhead\n\\bottomrule\n\\endlastfoot\n");
+        int k = 1;
+        for (Map<String, Object> e : empresas) {
+            sb.append(k++).append(" & ").append(t(((String) e.get("nombre")).trim())).append(" & ").append(t(String.valueOf(e.get("tipo")))).append(" & ")
+              .append(t(String.valueOf(e.get("rubro")))).append(" \\\\\n");
+        }
+        sb.append("\\end{longtable}\n}\n\n");
+        return sb.toString();
+    }
+
     private static String destinoLaboral() {
         Map<String, Object> dest = mapa(Analisis.empleabilidad(titulados).get("destinoLaboral"));
         int n = titulados.valores("sector_publico_privado", f -> "trabajando".equals(f.get("situacion_laboral"))).size();
@@ -315,6 +386,7 @@ public class ReporteTex {
         sb.append("Proporción con interés en un posgrado: $").append(nInt).append("/").append(i(ip.get("total"))).append(" = ")
           .append(n(d(ip.get("proporcion")), 3)).append("$ (").append(n(100 * d(ip.get("proporcion")), 1)).append("\\%).").append(marca()).append("\n\n");
         sb.append(tablaFrecuencias("Área de interés para un posgrado (interesados, $n=" + nInt + "$)", lista(f.get("areaInteres")), "Área", nInt, false));
+        sb.append(concentracion(lista(f.get("areaInteres")), nInt));
         sb.append(tablaFrecuencias("Institución donde estudiaría el posgrado ($n=" + nInt + "$)", lista(f.get("organizacionInteres")), "Institución", nInt, false));
         sb.append(tablaFrecuencias("Nivel del programa cursado (con formación complementaria, $n=" + nCurso + "$)", lista(f.get("programaNivel")), "Nivel", nCurso, false));
         sb.append(tablaFrecuencias("Fuente de financiamiento del programa cursado ($n=" + nCurso + "$)", lista(fin.get("programaFinanciamiento")), "Financiamiento", nCurso, false));

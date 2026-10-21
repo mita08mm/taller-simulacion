@@ -86,9 +86,8 @@ public class Reportes {
                         // valor no numérico: no entra al cálculo
                     }
                 }
-                List<Map<String, Object>> frec = new ArrayList<>();
-                conteo.forEach((x, n) -> frec.add(fila(fmt(x), fmt(x), n, numeros.size())));
-                v.put("frecuencias", frec);
+                v.put("frecuencias", conteo.size() <= 10 ? porValor(conteo, numeros.size()) : porRango(numeros));
+                if (conteo.size() > 10) v.put("nota", "Los valores se agrupan en rangos de igual ancho.");
                 v.put("estadistica", Estadistica.intervaloConfianza95(numeros));
             }
             default -> {
@@ -108,6 +107,30 @@ public class Reportes {
             }
         }
         return v;
+    }
+
+    private static List<Map<String, Object>> porValor(TreeMap<Double, Integer> conteo, int n) {
+        List<Map<String, Object>> frec = new ArrayList<>();
+        conteo.forEach((x, k) -> frec.add(fila(fmt(x), fmt(x), k, n)));
+        return frec;
+    }
+
+    /** Muchos valores distintos: se agrupan en unos 6 rangos de igual ancho (ancho entero). */
+    private static List<Map<String, Object>> porRango(List<Double> numeros) {
+        double min = Math.floor(numeros.stream().mapToDouble(x -> x).min().orElse(0));
+        double max = numeros.stream().mapToDouble(x -> x).max().orElse(0);
+        int ancho = (int) Math.max(1, Math.ceil((max - min + 1) / 6));
+        boolean enteros = numeros.stream().allMatch(x -> x == Math.rint(x));
+        int rangos = (int) Math.ceil((max - min + 1) / ancho);
+        int[] conteo = new int[rangos];
+        for (double x : numeros) conteo[(int) Math.min(rangos - 1, Math.floor((x - min) / ancho))]++;
+        List<Map<String, Object>> frec = new ArrayList<>();
+        for (int i = 0; i < rangos; i++) {
+            double a = min + (double) i * ancho, b = a + ancho;
+            String etiqueta = enteros ? fmt(a) + " a " + fmt(b - 1) : fmt(a) + " a menos de " + fmt(b);
+            frec.add(fila(etiqueta, etiqueta, conteo[i], numeros.size()));
+        }
+        return frec;
     }
 
     /** Frecuencia de cada opción de la pregunta (también las que nadie eligió), con la etiqueta de la encuesta. */

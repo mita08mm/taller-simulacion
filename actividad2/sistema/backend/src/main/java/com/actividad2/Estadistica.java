@@ -45,6 +45,14 @@ public class Estadistica {
         return Math.sqrt(suma / (datos.size() - 1));
     }
 
+    /** Mediana: el valor del centro de los datos ordenados (promedio de los dos centrales si n es par). */
+    public static double mediana(List<Double> datos) {
+        if (datos.isEmpty()) return Double.NaN;
+        List<Double> orden = datos.stream().sorted().toList();
+        int n = orden.size();
+        return n % 2 == 1 ? orden.get(n / 2) : (orden.get(n / 2 - 1) + orden.get(n / 2)) / 2;
+    }
+
     public static double tValor95(int gl) {
         return (gl >= 1 && gl <= 30) ? T_95[gl] : 1.960;
     }

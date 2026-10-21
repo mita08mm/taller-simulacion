@@ -43,6 +43,18 @@ const concordancia = computed(() => d.value && [
       </Tarjeta>
     </template>
     <template #detalle>
+      <Tarjeta v-if="d && d.medianaVidaProfesional != null" titulo="Experiencia profesional: junior y consolidados" style="margin-bottom: 14px"
+        :nota="`La mitad de los titulados tiene hasta ${d.medianaVidaProfesional} años de vida profesional (mediana); la media es ${d.aniosVidaProfesional.media.toFixed(1)} porque unos pocos con muchos años la elevan. El corte entre grupos es la mediana.`">
+        <n-table size="small" :bordered="false" :single-line="false">
+          <thead><tr><th>Grupo</th><th>Años de vida profesional</th><th>Titulados</th><th>Ocupan un cargo ejecutivo</th></tr></thead>
+          <tbody>
+            <tr v-for="g in d.segmentosExperiencia" :key="g.segmento">
+              <td><b>{{ g.segmento }}</b></td><td>{{ g.criterio }}</td><td>{{ g.casos }}</td>
+              <td>{{ g.conCargo ? `${g.ejecutivos} de ${g.conCargo} (${(100 * g.ejecutivos / g.conCargo).toFixed(1)}%)` : '—' }}</td>
+            </tr>
+          </tbody>
+        </n-table>
+      </Tarjeta>
       <div v-if="d" class="rejilla rejilla-2">
         <Tarjeta titulo="Situación laboral actual"><v-chart class="grafico" :option="dona(d.situacionLaboral)" autoresize /></Tarjeta>
         <Tarjeta titulo="Razón por la que no trabaja"><v-chart class="grafico" :option="barras(d.razonNoTrabaja, { horizontal: true })" autoresize /></Tarjeta>
