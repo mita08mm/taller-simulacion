@@ -72,6 +72,47 @@
   agregada respecto de Forms: `anio_titulacion` (decisión del usuario; conviene
   confirmarla con el docente). El resto replica el formulario de Forms.
 
+- **Informe de Calidad y Validación (2026-10-28):** `referencias/calidad_validacion.tex`
+  es **solo una referencia**, no un estándar ni un entregable (su contenido,
+  tiempos de espera de clientes, es de otro contexto; aclarado por el
+  usuario). Sirve para comparar si a `tex/Informe.tex` le sobran o le
+  faltan secciones. No crear un documento nuevo con esa estructura ni
+  copiar sus datos.
+
+- **Cruces (tablas de contingencia), 2026-11-04:** siguen el procedimiento
+  que el docente resolvió en pizarra (posgrado × financiamiento):
+  descripción del problema con $X$ = variable independiente (filas) e $Y$ =
+  dependiente (columnas) → hipótesis $H_0$/$H_1$ → datos (T1…T10) → $FO_{ij}$
+  → $FE_{ij}$ → $X_0^2$ → teórico $X^2_{(f-1)(c-1),\alpha}$ → relación →
+  conclusión Si/Sino → recomendación. Son 13 (C1–C13, `Analisis.CRUCES`);
+  C8–C13 agregan patrones demográficos y la experiencia (junior/consolidado,
+  corte en la mediana). El panel muestra todos los pasos (el usuario los
+  pidió visibles por el ejemplo del docente). En la pizarra el docente anotó
+  1.63 como teórico para gl=6 (cola izquierda); el sistema usa la cola
+  derecha (12.592), como Coss Bu — pendiente confirmar con el docente.
+
+- **Uniformidad e independencia (2026-11-23, corrección del docente "Uniformidad"):**
+  los apuntes (cap. 3) separan dos principios. Los cruces chi-cuadrada cubren
+  **independencia**; la **uniformidad** se cubre con la prueba de las frecuencias
+  ($FE = n/k$, $x_0^2$ vs $x^2_{\alpha,k-1}$, conclusión "Uniformidad"/"No
+  uniformidad"), 6 pasos del apunte. 8 pruebas F1–F8 (`Analisis.UNIFORMIDAD`,
+  `Estadistica.pruebaFrecuencias`), en el informe (sección "Pruebas de
+  Uniformidad", fragmentos `uniformidad_F*.tex` + `resumen_uniformidad.tex`) y en
+  el panel ("¿Hay respuestas preferidas?" por criterio). Ejemplo de la
+  Formulación: áreas de los 10 titulados del apunte multivariable (3,2,3,2 → 0.4).
+  La prueba de los promedios no se aplicó: necesita la media real de la población.
+  Otras correcciones del docente aún pendientes: factores de riesgo, mapas de
+  calor en el PDF, secciones "Análisis descriptivo"/"Análisis exploratorio",
+  incidencia de unas variables sobre otras.
+
+- **Informe 100% dinámico (2026-11-04, pedido del usuario: "para que nuestras
+  encuestas puedan actualizar"):** ningún número de resultados va escrito a mano
+  en `tex/Informe.tex`. Resumen, interpretación de abiertas, conclusiones y
+  propuestas se generan en `ReporteTex.java` (frases condicionadas al
+  resultado de cada prueba). Solo los ejemplos de la Formulación (5 titulados
+  y los 10 de la pizarra) son fijos, por ser ilustrativos. Botón "Actualizar
+  informe" en el panel regenera y compila.
+
 ## Archivos clave
 - `actvidad2.tex` — enunciado original transcrito (fuente de verdad del
   enunciado, no editar como informe).
@@ -118,6 +159,13 @@
   No mostrar códigos internos (C1–C7, U1…, HU…) en la interfaz: los cruces se
   nombran por su título. Cada pantalla tiene su URL (`#/empleo`, `#/perfil`…).
   Ver `sistema/README.md` para cómo correrlo.
+  **Pruebas unitarias (2026-11-11):** `backend/src/test/java/com/actividad2/`
+  (JUnit 5, lanzador independiente en `backend/lib/`, sin Maven) — cubren las
+  clases sin base de datos: `Estadistica` (IC, chi-cuadrada, con los mismos
+  ejemplos de `Informe.tex` 2.5), `Csv` (comillas, separador `;`, BOM) y
+  `Dataset` (que de verdad borra los datos personales al construirse, no solo
+  que dice hacerlo; normalización de fechas ambiguas). Correr desde
+  `sistema/README.md`, sección "Pruebas unitarias".
 - `GLOSARIO.md` — glosario personal de términos (estadística, metodología,
   software), no es parte del informe.
 

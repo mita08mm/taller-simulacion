@@ -1,0 +1,59 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\subsubsection*{F5. Satisfacción global con la formación}
+
+Verificar si las respuestas de satisfacción con la formación se reparten por igual entre las cuatro opciones o se concentran en alguna.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Población: todos los titulados; tamaño $n = 147$; opciones de la pregunta $k = 4$; $\alpha = 0.05$.
+
+\begin{itemize}[nosep]
+  \item $H_0$: Las respuestas de «Satisfacción» se reparten por igual entre las 4 opciones (uniformidad).
+  \item $H_1$: Las respuestas de «Satisfacción» no se reparten por igual: hay opciones preferidas.
+\end{itemize}
+
+\textit{Paso 2. Calcular la frecuencia esperada.} Si las respuestas se repartieran por igual, cada opción tendría:
+\[
+FE = \frac{n}{k} = \frac{147}{4} = 36.75
+\]
+
+\textit{Paso 3. Calcular el estadístico chi-cuadrado.} Se cuenta la frecuencia observada $FO_i$ de cada opción y se calcula $\frac{(FO_i - FE)^2}{FE}$.
+
+\begin{mitabla}{F5: prueba de las frecuencias, Satisfacción}
+\begin{tabular}{L{6cm}ccc}
+\toprule
+Opción & $FO_i$ & $FE$ & $\frac{(FO_i-FE)^2}{FE}$ \\
+\midrule
+Totalmente en desacuerdo & 5 & 36.75 & $\frac{(5-36.75)^2}{36.75} = 27.4303$ \\[3pt]
+En desacuerdo & 33 & 36.75 & $\frac{(33-36.75)^2}{36.75} = 0.3827$ \\[3pt]
+De acuerdo & 98 & 36.75 & $\frac{(98-36.75)^2}{36.75} = 102.0833$ \\[3pt]
+Totalmente de acuerdo & 11 & 36.75 & $\frac{(11-36.75)^2}{36.75} = 18.0425$ \\[3pt]
+\midrule
+Total & 147 & 147 & $x_0^2 = 147.9388$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+x_0^2 = \sum_{i=1}^{4} \frac{(FO_i - FE)^2}{FE} = 147.9388
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} $x^2_{\alpha,\,k-1} = x^2_{0.05,\,4-1} = x^2_{0.05,\,3} = 7.815$ (tabla chi-cuadrada).
+
+\textit{Paso 5. Establecer la relación entre estadísticos.} $x_0^2 < x^2_{\alpha,\,k-1}$ $\rightarrow$ $147.9388 \ge 7.815$ $\rightarrow$ no.
+
+\textit{Paso 6. Conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
+\quad ``Uniformidad''\\
+Sino\\
+\quad \fbox{No ``Uniformidad''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$: las respuestas no se reparten por igual, hay opciones preferidas. La más elegida es «De acuerdo» (98 de 147, 66.7\%).
+
+\textit{Recomendación.} Las respuestas se concentran en algunas opciones: la opinión de los titulados es clara y sirve como evidencia del resultado formativo.
+

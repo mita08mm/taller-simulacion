@@ -7,7 +7,8 @@ import java.util.Map;
 
 /**
  * Formulas de referencias/cap6_analisis_resultados.tex (6.1, intervalo de
- * confianza) y de la prueba de las frecuencias (chi-cuadrado) de
+ * confianza), de la prueba de las frecuencias (uniformidad, FE = n/k) y de la
+ * prueba de independencia (chi-cuadrado) de
  * referencias/apuntes_simulacion.tex, extendida a tabla de contingencia
  * (FE_ij = fila * columna / N -- generalizacion estandar, no textual en
  * las referencias, pendiente de confirmar con el docente).
@@ -117,6 +118,49 @@ public class Estadistica {
         r.put("casos", casos);
         r.put("total", total);
         r.put("proporcion", total == 0 ? 0.0 : (double) casos / total);
+        return r;
+    }
+
+    /**
+     * Prueba de las frecuencias (principio de uniformidad), apuntes de clase cap. 3 y Coss Bu 3.2:
+     * FE = n/k ; X0^2 = sum (FO_i - FE)^2 / FE ; si X0^2 < X^2_{alfa, k-1} -> "Uniformidad".
+     * Recibe las k categorías (todas las opciones, incluso las que nadie eligió) y su FO.
+     */
+    public static Map<String, Object> pruebaFrecuencias(List<String> categorias, List<Integer> fo) {
+        int k = categorias.size();
+        int n = fo.stream().mapToInt(Integer::intValue).sum();
+        Map<String, Object> r = new LinkedHashMap<>();
+        r.put("n", n);
+        r.put("k", k);
+        r.put("categorias", categorias);
+        r.put("observada", fo);
+        r.put("alfa", 0.05);
+        if (n == 0 || k < 2) {
+            r.put("esperada", null);
+            r.put("aportes", List.of());
+            r.put("chiCuadrada", null);
+            r.put("gradosLibertad", 0);
+            r.put("chiTeorico", null);
+            r.put("uniforme", null);
+            return r;
+        }
+        double fe = (double) n / k;
+        double x0 = 0;
+        List<Double> aportes = new ArrayList<>();
+        for (int f : fo) {
+            double aporte = (f - fe) * (f - fe) / fe;
+            aportes.add(aporte);
+            x0 += aporte;
+        }
+        int gl = k - 1;
+        double teorico = chiTeorico05(gl);
+        r.put("esperada", fe);
+        r.put("aportes", aportes);
+        r.put("chiCuadrada", x0);
+        r.put("gradosLibertad", gl);
+        r.put("chiTeorico", teorico);
+        r.put("uniforme", x0 < teorico);
+        r.put("feMenor5", fe < 5);
         return r;
     }
 

@@ -3,7 +3,7 @@ import VChart from 'vue-echarts'
 import CriterioPagina from '../../components/CriterioPagina.vue'
 import Tarjeta from '../../components/Tarjeta.vue'
 import { useApi } from '../../useApi'
-import { barras } from '../../graficos'
+import { barras, SECUNDARIO } from '../../graficos'
 
 const { datos: d } = useApi('/api/competencias')
 const { datos: e } = useApi('/api/empleadores')
@@ -18,7 +18,7 @@ const abiertas = [
   <CriterioPagina pantalla="curricular">
     <div v-if="d" class="rejilla rejilla-2">
       <Tarjeta titulo="Asignaturas que dieron ventaja en el trabajo"><v-chart class="grafico-alto" :option="barras(d.asignaturasVentaja, { horizontal: true, porcentaje: true })" autoresize /></Tarjeta>
-      <Tarjeta titulo="Asignaturas poco útiles"><v-chart class="grafico-alto" :option="barras(d.asignaturasPocoUtiles, { horizontal: true, porcentaje: true, color: '#334155' })" autoresize /></Tarjeta>
+      <Tarjeta titulo="Asignaturas poco útiles"><v-chart class="grafico-alto" :option="barras(d.asignaturasPocoUtiles, { horizontal: true, porcentaje: true, color: SECUNDARIO })" autoresize /></Tarjeta>
     </div>
     <Tarjeta v-if="e" titulo="Lo que piden los empleadores (menciones en preguntas abiertas)" style="margin-top: 14px">
       <div class="rejilla rejilla-3">
@@ -34,6 +34,6 @@ const abiertas = [
 </template>
 
 <style scoped>
-.mencion { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f1f1f3; font-size: 13.5px; }
+.mencion { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--borde-suave); font-size: 13.5px; }
 .cuenta { color: var(--suave); font-variant-numeric: tabular-nums; }
 </style>

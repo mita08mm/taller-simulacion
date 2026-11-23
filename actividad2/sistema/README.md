@@ -39,6 +39,20 @@ java -cp target/classes:src/main/resources:lib/postgresql-42.7.5.jar com.activid
 Sirve en `http://localhost:7070` (otro puerto: `PUERTO=7071 java ...`). Si sale
 `Address already in use`, ya hay un backend corriendo en ese puerto.
 
+**Pruebas unitarias (caja blanca):** `src/test/java/com/actividad2/` tiene
+las pruebas de las clases sin dependencia de la base de datos (`Estadistica`,
+`Csv`, `Dataset`) con JUnit 5, usando el lanzador independiente en `lib/`
+(sin Maven, igual que el resto del proyecto):
+```
+cd backend
+javac -cp "lib/postgresql-42.7.5.jar:lib/junit-platform-console-standalone.jar:target/classes" \
+  -d target/test-classes src/test/java/com/actividad2/*.java
+java -jar lib/junit-platform-console-standalone.jar execute \
+  -cp "target/classes:target/test-classes" --scan-classpath target/test-classes
+```
+Para agregar pruebas de una clase nueva: crear `NombreTest.java` en esa misma
+carpeta con métodos `@Test`, y volver a correr los dos comandos de arriba.
+
 **3. Frontend** (en otra terminal):
 ```
 cd frontend
@@ -70,7 +84,7 @@ y están en `.gitignore`. **No se suben a git.**
 | Criterios ARCU-SUR | 2.1.2, 2.1.7, 2.4.1, 2.4.2, 3.2.1, 3.2.2, 3.2.3 | Qué pide el criterio, valoración (favorable si > 50%), 3 indicadores, gráficos, relaciones entre preguntas y "Más detalle" |
 | Herramientas | Comparar dos preguntas | Tabla cruzada, mapa de calor y conclusión de la prueba chi-cuadrada en una frase |
 | Herramientas | Generar reporte | Reporte a medida: encuesta, período (gestión, semestre, mes, fechas) y preguntas; se imprime o guarda en PDF y se exporta a Excel |
-| Administración | Preguntas de la encuesta | Editor de secciones, preguntas y opciones |
+| Administración | Preguntas de la encuesta | Editor de secciones, preguntas y opciones (el orden de las preguntas y opciones se cambia arrastrando desde el asa de 6 puntos, con `vue-draggable-plus`) |
 | Administración | Respuestas | Enlaces del formulario, listado y detalle, revisión de calidad (casi vacías, nombres sin sentido, duplicados) |
 | Administración | Importar y exportar | Carga de CSV de Forms y descarga de datos y tablas cruzadas |
 
@@ -98,7 +112,7 @@ Todos los GET de análisis y las exportaciones aceptan `?desde=aaaa-mm-dd&hasta=
 | Uso | Endpoints |
 |---|---|
 | Formulario público | `GET /api/encuestas/{titulados\|empleadores}`, `POST /api/respuestas/{titulados\|empleadores}` |
-| Editor de la encuesta | `GET /api/admin/encuestas[/{encuesta}]`, `POST/PUT/DELETE /api/admin/secciones[/{id}]`, `…/preguntas[/{id}]`, `…/opciones[/{id}]` |
+| Editor de la encuesta | `GET /api/admin/encuestas[/{encuesta}]`, `POST/PUT/DELETE /api/admin/secciones[/{id}]`, `…/preguntas[/{id}]`, `…/opciones[/{id}]`; orden por arrastre: `PUT /api/admin/encuestas/{encuesta}/orden`, `PUT /api/admin/preguntas/{id}/opciones/orden` |
 | Respuestas | `GET /api/admin/respuestas`, `GET/PUT/DELETE /api/admin/respuestas/{id}`, `GET /api/admin/respuestas/revisar?encuesta=…`, `GET /api/admin/respuestas-por-dia` |
 | Criterios ARCU-SUR | `GET /api/criterios` |
 | Indicadores | `GET /api/estado`, `/api/demografia`, `/api/empleabilidad`, `/api/formacion`, `/api/financiamiento`, `/api/competencias`, `/api/empleadores` |
@@ -133,6 +147,18 @@ para que Excel en español lo abra en columnas.
 Las decisiones de procesamiento (punto medio de los rangos, ramas que no
 responden una pregunta, escala de empleadores sin media, etc.) están en
 `../PLAN.md` sección 5.6 y en comentarios del código.
+
+## Actualizar el informe con respuestas nuevas
+
+En el panel, *Administración → Importar y exportar → Informe → Actualizar informe*
+(`POST /api/admin/informe`): regenera todos los fragmentos de `../tex/generado/`
+con las respuestas actuales de la base y compila `Informe.tex` con `latexmk`;
+*Descargar PDF* (`GET /api/admin/informe/pdf`) baja el resultado. Ningún número
+de resultados está escrito a mano en `Informe.tex`: el resumen, las
+interpretaciones, las conclusiones y las propuestas también se generan
+(`resumen_resultados.tex`, `abiertas_interpretacion.tex`, `conclusiones.tex`,
+`propuestas.tex`, `valores.tex`). La carpeta del informe se puede cambiar con
+la variable `TEX_DIR` (por defecto `../../tex`, relativa a `sistema/backend`).
 
 ## Generar los desarrollos del informe
 

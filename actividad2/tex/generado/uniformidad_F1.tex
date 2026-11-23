@@ -1,0 +1,60 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\subsubsection*{F1. Área de interés para el posgrado}
+
+Verificar si los titulados interesados en un posgrado se reparten por igual entre las áreas temáticas o si hay áreas preferidas.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Población: interesados en posgrado; tamaño $n = 123$; opciones de la pregunta $k = 5$; $\alpha = 0.05$.
+
+\begin{itemize}[nosep]
+  \item $H_0$: Las respuestas de «Área de interés» se reparten por igual entre las 5 opciones (uniformidad).
+  \item $H_1$: Las respuestas de «Área de interés» no se reparten por igual: hay opciones preferidas.
+\end{itemize}
+
+\textit{Paso 2. Calcular la frecuencia esperada.} Si las respuestas se repartieran por igual, cada opción tendría:
+\[
+FE = \frac{n}{k} = \frac{123}{5} = 24.60
+\]
+
+\textit{Paso 3. Calcular el estadístico chi-cuadrado.} Se cuenta la frecuencia observada $FO_i$ de cada opción y se calcula $\frac{(FO_i - FE)^2}{FE}$.
+
+\begin{mitabla}{F1: prueba de las frecuencias, Área de interés}
+\begin{tabular}{L{6cm}ccc}
+\toprule
+Opción & $FO_i$ & $FE$ & $\frac{(FO_i-FE)^2}{FE}$ \\
+\midrule
+IA & 54 & 24.60 & $\frac{(54-24.60)^2}{24.60} = 35.1366$ \\[3pt]
+Robótica & 5 & 24.60 & $\frac{(5-24.60)^2}{24.60} = 15.6163$ \\[3pt]
+Ing. de Software & 29 & 24.60 & $\frac{(29-24.60)^2}{24.60} = 0.7870$ \\[3pt]
+Base de Datos & 10 & 24.60 & $\frac{(10-24.60)^2}{24.60} = 8.6650$ \\[3pt]
+Redes y Seguridad & 25 & 24.60 & $\frac{(25-24.60)^2}{24.60} = 0.0065$ \\[3pt]
+\midrule
+Total & 123 & 123 & $x_0^2 = 60.2114$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+x_0^2 = \sum_{i=1}^{5} \frac{(FO_i - FE)^2}{FE} = 60.2114
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} $x^2_{\alpha,\,k-1} = x^2_{0.05,\,5-1} = x^2_{0.05,\,4} = 9.488$ (tabla chi-cuadrada).
+
+\textit{Paso 5. Establecer la relación entre estadísticos.} $x_0^2 < x^2_{\alpha,\,k-1}$ $\rightarrow$ $60.2114 \ge 9.488$ $\rightarrow$ no.
+
+\textit{Paso 6. Conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
+\quad ``Uniformidad''\\
+Sino\\
+\quad \fbox{No ``Uniformidad''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$: las respuestas no se reparten por igual, hay opciones preferidas. La más elegida es «IA» (54 de 123, 43.9\%).
+
+\textit{Recomendación.} Hay áreas preferidas: priorizar la apertura de programas de posgrado en el área más elegida.
+

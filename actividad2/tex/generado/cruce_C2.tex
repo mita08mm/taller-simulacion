@@ -2,29 +2,61 @@
 % Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C2. Sector $\times$ pertinencia del puesto}
 
-\textit{Propósito.} Determinar si la concordancia entre la titulación y el empleo depende del sector, público o privado, en que trabaja el titulado. Respalda el criterio ARCU-SUR 3.2.3. Se aplica sobre: trabajan en una organización, con nivel de significancia $\alpha = 0.05$.
+\textit{Paso 1. Describir el problema.} Determinar si la concordancia entre la titulación y el empleo depende del sector, público o privado, en que trabaja el titulado.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 108$).
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Sector.
+  \item Variable dependiente $Y$: Pertinencia del puesto.
+  \item Población: trabajan en una organización ($N = 108$). Criterio ARCU-SUR: 3.2.3. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Sector» (X) y «Pertinencia del puesto» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Sector» (X) y «Pertinencia del puesto» (Y).
+\end{itemize}
 
-\begin{mitabla}{C2: frecuencia observada $FO_{ij}$}
-\begin{tabular}{lcc|c}
+\textit{Datos.} Primeros 10 de los 108 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C2: datos de los primeros titulados}
+\begin{tabular}{lll}
 \toprule
-Sector & En desacuerdo & De acuerdo & Total fila \\
+Titulado & $X$: Sector & $Y$: Pertinencia del puesto \\
 \midrule
-Público & 2 & 19 & 21 \\
-Privado & 8 & 79 & 87 \\
-\midrule
-Total columna & 10 & 98 & $N=108$ \\
+T1 & Privado & De acuerdo \\
+T2 & Privado & De acuerdo \\
+T3 & Privado & De acuerdo \\
+T4 & Público & De acuerdo \\
+T5 & Privado & De acuerdo \\
+T6 & Privado & De acuerdo \\
+T7 & Privado & De acuerdo \\
+T8 & Privado & De acuerdo \\
+T9 & Privado & De acuerdo \\
+T10 & Privado & De acuerdo \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Público -- En desacuerdo'': $FE_{11} = 21 \times 10 / 108 = 1.9444$.
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 108$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C2: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Sector \textbackslash{} $Y$: Pertinencia del puesto & En desacuerdo & De acuerdo & Total \\
+\midrule
+Público & 2 & 19 & 21 \\
+Privado & 8 & 79 & 87 \\
+\midrule
+Total & 10 & 98 & $N = 108$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Público y En desacuerdo:
+\[
+FE_{11} = \frac{(21)(10)}{108} = 1.94
+\]
 
 \begin{mitabla}{C2: frecuencia esperada $FE_{ij}$}
-\begin{tabular}{lcc}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
 \toprule
-Sector & En desacuerdo & De acuerdo \\
+$X$: Sector \textbackslash{} $Y$: Pertinencia del puesto & En desacuerdo & De acuerdo \\
 \midrule
 Público & $21\cdot10/108 = 1.94$ & $21\cdot98/108 = 19.06$ \\
 Privado & $87\cdot10/108 = 8.06$ & $87\cdot98/108 = 78.94$ \\
@@ -32,40 +64,41 @@ Privado & $87\cdot10/108 = 8.06$ & $87\cdot98/108 = 78.94$ \\
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
 
 \begin{mitabla}{C2: cálculo de $X_0^2$ celda por celda}
-\begin{tabular}{L{5.4cm}cccc}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
 \toprule
-Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
+$X$: Sector \textbackslash{} $Y$: Pertinencia del puesto & En desacuerdo & De acuerdo & Suma fila \\
 \midrule
-Público -- En desacuerdo & 2 & 1.9444 & 0.0031 & 0.0016 \\
-Público -- De acuerdo & 19 & 19.0556 & 0.0031 & 0.0002 \\
-Privado -- En desacuerdo & 8 & 8.0556 & 0.0031 & 0.0004 \\
-Privado -- De acuerdo & 79 & 78.9444 & 0.0031 & 0.0000 \\
-\midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 0.0022 \\
+Público & $\dfrac{(2-1.94)^2}{1.94}$\newline $= 0.0016$ & $\dfrac{(19-19.06)^2}{19.06}$\newline $= 0.0002$ & $0.0017$ \\[6pt]
+Privado & $\dfrac{(8-8.06)^2}{8.06}$\newline $= 0.0004$ & $\dfrac{(79-78.94)^2}{78.94}$\newline $= 0.0000$ & $0.0004$ \\[6pt]
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $k = 2$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (2-1)(2-1) = 1$. De la tabla de chi-cuadrada: $X_{0.05,\,1}^2 = 3.841$.
+\[
+X_0^2 = 0.0017 + 0.0004 = 0.0022
+\]
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 0.0022 < 3.841$.
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
 
-\textit{Paso 6. Conclusión.}
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
 
 \begin{center}
 \begin{tabular}{l}
-Si ($X_0^2 < X_{0.05,\,1}^2$)\\
-\quad \fbox{Independencia}\\
+$0.0022 < 3.841 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
 Sino\\
-\quad Relación entre las variables\\
+\quad NO ``Independencia''\\
 FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que sector y pertinencia del puesto sean independientes.
+No se rechaza $H_0$: con estos datos, «Pertinencia del puesto» no depende de «Sector».
 
 \textit{Observación:} 1 de 4 celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.
+
+\textit{Recomendación.} La pertinencia del puesto es parecida en el sector público y en el privado: los convenios de prácticas pueden abarcar ambos sectores.
 

@@ -3,7 +3,7 @@ import VChart from 'vue-echarts'
 import CriterioPagina from '../../components/CriterioPagina.vue'
 import Tarjeta from '../../components/Tarjeta.vue'
 import { useApi } from '../../useApi'
-import { barras, dona, likertApilado } from '../../graficos'
+import { barras, dona, likertApilado, SECUNDARIO } from '../../graficos'
 
 const { datos: d } = useApi('/api/formacion')
 const { datos: fin } = useApi('/api/financiamiento')
@@ -14,7 +14,7 @@ const { datos: fin } = useApi('/api/financiamiento')
     <template v-if="d">
       <div class="rejilla rejilla-2">
         <Tarjeta titulo="Área que les interesa estudiar"><v-chart class="grafico" :option="barras(d.areaInteres, { horizontal: true, porcentaje: true })" autoresize /></Tarjeta>
-        <Tarjeta titulo="Dónde lo estudiarían"><v-chart class="grafico" :option="barras(d.organizacionInteres, { horizontal: true, porcentaje: true, color: '#334155' })" autoresize /></Tarjeta>
+        <Tarjeta titulo="Dónde lo estudiarían"><v-chart class="grafico" :option="barras(d.organizacionInteres, { horizontal: true, porcentaje: true, color: SECUNDARIO })" autoresize /></Tarjeta>
       </div>
       <Tarjeta titulo="¿La FCyT tiene posgrados afines a Ingeniería de Sistemas?" style="margin-top: 14px">
         <v-chart style="height: 110px" :option="likertApilado([{ nombre: 'La oferta de posgrado de la FCyT es afín', frecuencias: d.ofertaPosgradoFcyt.frecuencias }])" autoresize />

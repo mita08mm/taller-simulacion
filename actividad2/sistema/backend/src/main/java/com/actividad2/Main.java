@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,7 +25,8 @@ import java.util.regex.Pattern;
  * Grupos de rutas:
  *  - Formulario público: GET /api/encuestas/{encuesta}, POST /api/respuestas/{encuesta}
  *  - Panel (CRUD): /api/admin/encuestas, /api/admin/secciones, /api/admin/preguntas,
- *    /api/admin/opciones, /api/admin/respuestas
+ *    /api/admin/opciones, /api/admin/respuestas; orden por arrastre: PUT /api/admin/encuestas/{codigo}/orden
+ *    y PUT /api/admin/preguntas/{id}/opciones/orden
  *  - Análisis: /api/empleabilidad, /api/cruces, ... (aceptan ?desde=&hasta=)
  *  - Datos: /api/importar, /api/exportar
  */
@@ -31,6 +34,8 @@ public class Main {
 
     private static final int PUERTO = Integer.parseInt(System.getenv().getOrDefault("PUERTO", "7070"));
     private static final String ENCUESTA = "(titulados|empleadores)";
+    // Carpeta del informe; por defecto relativa a sistema/backend (cambiable con la variable TEX_DIR)
+    private static final Path CARPETA_TEX = Path.of(System.getenv().getOrDefault("TEX_DIR", "../../tex")).toAbsolutePath().normalize();
 
     // Columnas mínimas que debe traer cada CSV importado
     private static final List<String> REQUERIDAS_TITULADOS = List.of(
@@ -88,6 +93,7 @@ public class Main {
         // ---------- Panel: CRUD de la encuesta ----------
         ruta("GET", "/api/admin/encuestas", p -> Encuestas.listar());
         ruta("GET", "/api/admin/encuestas/" + ENCUESTA, p -> Encuestas.estructura(p.parte(0), true));
+        ruta("PUT", "/api/admin/encuestas/" + ENCUESTA + "/orden", p -> Encuestas.reordenar(p.parte(0), p.cuerpo()));
         ruta("POST", "/api/admin/secciones", p -> Encuestas.crearSeccion(p.cuerpo()));
         ruta("PUT", "/api/admin/secciones/(\\d+)", p -> Encuestas.editarSeccion(p.id(0), p.cuerpo()));
         ruta("DELETE", "/api/admin/secciones/(\\d+)", p -> Encuestas.borrarSeccion(p.id(0)));
@@ -96,6 +102,7 @@ public class Main {
         ruta("DELETE", "/api/admin/preguntas/(\\d+)", p -> Encuestas.borrarPregunta(p.id(0)));
         ruta("POST", "/api/admin/opciones", p -> Encuestas.crearOpcion(p.cuerpo()));
         ruta("PUT", "/api/admin/opciones/(\\d+)", p -> Encuestas.editarOpcion(p.id(0), p.cuerpo()));
+        ruta("PUT", "/api/admin/preguntas/(\\d+)/opciones/orden", p -> Encuestas.reordenarOpciones(p.id(0), p.cuerpo()));
         ruta("DELETE", "/api/admin/opciones/(\\d+)", p -> Encuestas.borrarOpcion(p.id(0)));
 
         // ---------- Panel: CRUD de respuestas ----------
@@ -120,6 +127,7 @@ public class Main {
         ruta("GET", "/api/financiamiento", p -> Analisis.financiamiento(p.titulados()));
         ruta("GET", "/api/competencias", p -> Analisis.competencias(p.titulados(), p.empleadores()));
         ruta("GET", "/api/cruces", p -> Analisis.cruces(p.titulados()));
+        ruta("GET", "/api/uniformidad", p -> Analisis.uniformidades(p.titulados(), p.empleadores()));
         ruta("GET", "/api/variables", p -> variablesCruzables());
         ruta("GET", "/api/reporte/variables", p -> Reportes.variables(encuestaDe(p)));
         ruta("GET", "/api/reporte", p -> Reportes.generar(encuestaDe(p), datosDe(p), lista(p.q().get("variables"))));
@@ -133,6 +141,20 @@ public class Main {
         // ---------- Datos ----------
         ruta("POST", "/api/importar", Main::importar);
         ruta("GET", "/api/exportar", Main::exportar);
+        // Informe: regenerar con los datos actuales y descargar el PDF (carpeta tex/ de la actividad)
+        ruta("POST", "/api/admin/informe", p -> {
+            try {
+                return ReporteTex.actualizarInforme(CARPETA_TEX);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Se interrumpió la compilación del informe");
+            }
+        });
+        ruta("GET", "/api/admin/informe/pdf", p -> {
+            Path pdf = CARPETA_TEX.resolve("pdf/Informe.pdf");
+            if (!Files.exists(pdf)) throw new Encuestas.NoEncontrado("Todavía no se generó el informe");
+            return new ArchivoBinario("Informe.pdf", "application/pdf", Files.readAllBytes(pdf));
+        });
 
         HttpServer servidor = HttpServer.create(new InetSocketAddress(PUERTO), 0);
         servidor.createContext("/api/", Main::despachar);
@@ -162,7 +184,12 @@ public class Main {
                 List<String> partes = new ArrayList<>();
                 for (int i = 1; i <= m.groupCount(); i++) partes.add(m.group(i));
                 Object res = r.manejador().atender(new Peticion(ex, parametros(ex), partes));
-                if (res instanceof Archivo a) {
+                if (res instanceof ArchivoBinario b) {
+                    ex.getResponseHeaders().add("Content-Disposition", "attachment; filename=\"" + b.nombre() + "\"");
+                    ex.getResponseHeaders().add("Content-Type", b.tipo());
+                    ex.sendResponseHeaders(200, b.bytes().length);
+                    try (OutputStream out = ex.getResponseBody()) { out.write(b.bytes()); }
+                } else if (res instanceof Archivo a) {
                     ex.getResponseHeaders().add("Content-Disposition", "attachment; filename=\"" + a.nombre() + "\"");
                     responder(ex, 200, "text/csv", a.contenido());
                 } else {
@@ -190,6 +217,7 @@ public class Main {
     }
 
     record Archivo(String nombre, String contenido) {}
+    record ArchivoBinario(String nombre, String tipo, byte[] bytes) {}
 
     /** n filtrado, n total, origen y período de fechas de cada encuesta. */
     private static Map<String, Object> estado(Peticion p) {

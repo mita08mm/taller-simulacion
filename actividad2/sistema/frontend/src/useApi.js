@@ -1,5 +1,6 @@
 import { ref, watch, inject, reactive } from 'vue'
 import { obtener } from './api'
+import { textoError } from './useAccion'
 
 /** Fechas del filtro como parámetros desde/hasta (aaaa-mm-dd) de la API. */
 export function parametrosFiltro(filtro) {
@@ -23,9 +24,7 @@ export function useApi(ruta, parametros = () => ({})) {
     try {
       datos.value = await obtener(ruta, { ...parametrosFiltro(filtro), ...parametros() })
     } catch (e) {
-      error.value = e.message.includes('fetch')
-        ? 'No se pudo conectar con el backend (¿está corriendo en el puerto 7070?).'
-        : e.message
+      error.value = textoError(e)
     } finally {
       cargando.value = false
     }

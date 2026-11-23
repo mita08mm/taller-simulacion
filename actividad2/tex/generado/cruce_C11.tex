@@ -1,0 +1,102 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\subsubsection*{C11. Formación complementaria $\times$ interés en posgrado}
+
+\textit{Paso 1. Describir el problema.} Establecer si haber cursado formación complementaria influye en el interés por seguir estudiando un posgrado.
+
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Formación complementaria.
+  \item Variable dependiente $Y$: Interés en posgrado.
+  \item Población: todos los titulados ($N = 148$). Criterio ARCU-SUR: 2.4.1. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Formación complementaria» (X) y «Interés en posgrado» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Formación complementaria» (X) y «Interés en posgrado» (Y).
+\end{itemize}
+
+\textit{Datos.} Primeros 10 de los 148 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C11: datos de los primeros titulados}
+\begin{tabular}{lll}
+\toprule
+Titulado & $X$: Formación complementaria & $Y$: Interés en posgrado \\
+\midrule
+T1 & Sí & Sí \\
+T2 & Sí & Sí \\
+T3 & Sí & Sí \\
+T4 & Sí & Sí \\
+T5 & Sí & Sí \\
+T6 & Sí & Sí \\
+T7 & Sí & Sí \\
+T8 & Sí & Sí \\
+T9 & Sí & Sí \\
+T10 & Sí & Sí \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 148$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C11: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Formación complementaria \textbackslash{} $Y$: Interés en posgrado & Sí & No & Total \\
+\midrule
+Sí & 86 & 12 & 98 \\
+No & 37 & 13 & 50 \\
+\midrule
+Total & 123 & 25 & $N = 148$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Sí y Sí:
+\[
+FE_{11} = \frac{(98)(123)}{148} = 81.45
+\]
+
+\begin{mitabla}{C11: frecuencia esperada $FE_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Formación complementaria \textbackslash{} $Y$: Interés en posgrado & Sí & No \\
+\midrule
+Sí & $98\cdot123/148 = 81.45$ & $98\cdot25/148 = 16.55$ \\
+No & $50\cdot123/148 = 41.55$ & $50\cdot25/148 = 8.45$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
+
+\begin{mitabla}{C11: cálculo de $X_0^2$ celda por celda}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
+\toprule
+$X$: Formación complementaria \textbackslash{} $Y$: Interés en posgrado & Sí & No & Suma fila \\
+\midrule
+Sí & $\dfrac{(86-81.45)^2}{81.45}$\newline $= 0.2546$ & $\dfrac{(12-16.55)^2}{16.55}$\newline $= 1.2528$ & $1.5075$ \\[6pt]
+No & $\dfrac{(37-41.55)^2}{41.55}$\newline $= 0.4991$ & $\dfrac{(13-8.45)^2}{8.45}$\newline $= 2.4555$ & $2.9546$ \\[6pt]
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+X_0^2 = 1.5075 + 2.9546 = 4.4621
+\]
+
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
+
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+$4.4621 \ge 3.841 \rightarrow$ falso\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad ``Independencia''\\
+Sino\\
+\quad \fbox{NO ``Independencia''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$ y se acepta $H_1$: «Interés en posgrado» depende de «Formación complementaria». Porcentaje de cada fila en la columna ``Sí'': Sí $86/98 = 87.8\%$; No $37/50 = 74.0\%$.
+
+\textit{Recomendación.} Quienes ya cursaron formación complementaria quieren seguir estudiando: ofrecer rutas de continuidad (diplomado, especialidad, maestría) a quienes ya terminaron un programa.
+

@@ -2,30 +2,62 @@
 % Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C1. Situación laboral $\times$ satisfacción con la formación}
 
-\textit{Propósito.} Determinar si la valoración de la formación recibida cambia según la situación laboral actual del titulado, como evidencia del resultado del proceso formativo frente a las condiciones de empleo. Respalda el criterio ARCU-SUR 3.2.1 / 3.2.3. Se aplica sobre: todos los titulados, con nivel de significancia $\alpha = 0.05$.
+\textit{Paso 1. Describir el problema.} Determinar si la valoración de la formación recibida cambia según la situación laboral actual del titulado, como evidencia del resultado del proceso formativo frente a las condiciones de empleo.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 147$).
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Situación laboral.
+  \item Variable dependiente $Y$: Satisfacción con la formación.
+  \item Población: todos los titulados ($N = 147$). Criterio ARCU-SUR: 3.2.1. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Situación laboral» (X) y «Satisfacción con la formación» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Situación laboral» (X) y «Satisfacción con la formación» (Y).
+\end{itemize}
 
-\begin{mitabla}{C1: frecuencia observada $FO_{ij}$}
-\begin{tabular}{lcc|c}
+\textit{Datos.} Primeros 10 de los 147 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C1: datos de los primeros titulados}
+\begin{tabular}{lll}
 \toprule
-Situación laboral & En desacuerdo & De acuerdo & Total fila \\
+Titulado & $X$: Situación laboral & $Y$: Satisfacción con la formación \\
+\midrule
+T1 & Emprendimiento propio & En desacuerdo \\
+T2 & Trabaja en una organización & De acuerdo \\
+T3 & Trabaja en una organización & En desacuerdo \\
+T4 & Trabaja en una organización & De acuerdo \\
+T5 & Emprendimiento propio & De acuerdo \\
+T6 & Trabaja en una organización & De acuerdo \\
+T7 & Trabaja en una organización & De acuerdo \\
+T8 & Trabaja en una organización & En desacuerdo \\
+T9 & No trabaja & De acuerdo \\
+T10 & Trabaja en una organización & En desacuerdo \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 147$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C1: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Situación laboral \textbackslash{} $Y$: Satisfacción con la formación & En desacuerdo & De acuerdo & Total \\
 \midrule
 Trabaja en una organización & 27 & 81 & 108 \\
 Emprendimiento propio & 5 & 9 & 14 \\
 No trabaja & 6 & 19 & 25 \\
 \midrule
-Total columna & 38 & 109 & $N=147$ \\
+Total & 38 & 109 & $N = 147$ \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Trabaja en una organización -- En desacuerdo'': $FE_{11} = 108 \times 38 / 147 = 27.9184$.
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Trabaja en una organización y En desacuerdo:
+\[
+FE_{11} = \frac{(108)(38)}{147} = 27.92
+\]
 
 \begin{mitabla}{C1: frecuencia esperada $FE_{ij}$}
-\begin{tabular}{lcc}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
 \toprule
-Situación laboral & En desacuerdo & De acuerdo \\
+$X$: Situación laboral \textbackslash{} $Y$: Satisfacción con la formación & En desacuerdo & De acuerdo \\
 \midrule
 Trabaja en una organización & $108\cdot38/147 = 27.92$ & $108\cdot109/147 = 80.08$ \\
 Emprendimiento propio & $14\cdot38/147 = 3.62$ & $14\cdot109/147 = 10.38$ \\
@@ -34,42 +66,42 @@ No trabaja & $25\cdot38/147 = 6.46$ & $25\cdot109/147 = 18.54$ \\
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
 
 \begin{mitabla}{C1: cálculo de $X_0^2$ celda por celda}
-\begin{tabular}{L{5.4cm}cccc}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
 \toprule
-Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
+$X$: Situación laboral \textbackslash{} $Y$: Satisfacción con la formación & En desacuerdo & De acuerdo & Suma fila \\
 \midrule
-Trabaja en una organización -- En desacuerdo & 27 & 27.9184 & 0.8434 & 0.0302 \\
-Trabaja en una organización -- De acuerdo & 81 & 80.0816 & 0.8434 & 0.0105 \\
-Emprendimiento propio -- En desacuerdo & 5 & 3.6190 & 1.9070 & 0.5269 \\
-Emprendimiento propio -- De acuerdo & 9 & 10.3810 & 1.9070 & 0.1837 \\
-No trabaja -- En desacuerdo & 6 & 6.4626 & 0.2140 & 0.0331 \\
-No trabaja -- De acuerdo & 19 & 18.5374 & 0.2140 & 0.0115 \\
-\midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 0.7960 \\
+Trabaja en una organización & $\dfrac{(27-27.92)^2}{27.92}$\newline $= 0.0302$ & $\dfrac{(81-80.08)^2}{80.08}$\newline $= 0.0105$ & $0.0407$ \\[6pt]
+Emprendimiento propio & $\dfrac{(5-3.62)^2}{3.62}$\newline $= 0.5269$ & $\dfrac{(9-10.38)^2}{10.38}$\newline $= 0.1837$ & $0.7106$ \\[6pt]
+No trabaja & $\dfrac{(6-6.46)^2}{6.46}$\newline $= 0.0331$ & $\dfrac{(19-18.54)^2}{18.54}$\newline $= 0.0115$ & $0.0447$ \\[6pt]
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $k = 3$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (3-1)(2-1) = 2$. De la tabla de chi-cuadrada: $X_{0.05,\,2}^2 = 5.991$.
+\[
+X_0^2 = 0.0407 + 0.7106 + 0.0447 = 0.7960
+\]
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,2}^2 \;\Rightarrow\; 0.7960 < 5.991$.
+\textit{Paso 5. Estadístico teórico.} Con $f = 3$ filas y $c = 2$ columnas: $gl = (3-1)(2-1) = 2$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{2,\,0.05} = 5.991$.
 
-\textit{Paso 6. Conclusión.}
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
 
 \begin{center}
 \begin{tabular}{l}
-Si ($X_0^2 < X_{0.05,\,2}^2$)\\
-\quad \fbox{Independencia}\\
+$0.7960 < 5.991 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
 Sino\\
-\quad Relación entre las variables\\
+\quad NO ``Independencia''\\
 FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que situación laboral y satisfacción sean independientes.
+No se rechaza $H_0$: con estos datos, «Satisfacción con la formación» no depende de «Situación laboral».
 
 \textit{Observación:} 1 de 6 celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.
+
+\textit{Recomendación.} La satisfacción con la formación no depende de la situación laboral: las mejoras del plan de estudios pueden dirigirse a todos los titulados por igual.
 

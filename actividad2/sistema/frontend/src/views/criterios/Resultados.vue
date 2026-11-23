@@ -4,7 +4,7 @@ import VChart from 'vue-echarts'
 import CriterioPagina from '../../components/CriterioPagina.vue'
 import Tarjeta from '../../components/Tarjeta.vue'
 import { useApi } from '../../useApi'
-import { barras, likertApilado } from '../../graficos'
+import { barras, likertApilado, SECUNDARIO } from '../../graficos'
 
 const { datos: d } = useApi('/api/competencias')
 const valoracion = computed(() => d.value && [
@@ -20,7 +20,7 @@ const valoracion = computed(() => d.value && [
       </Tarjeta>
       <div class="rejilla rejilla-2" style="margin-top: 14px">
         <Tarjeta titulo="Lo que más les sirvió de la carrera"><v-chart class="grafico" :option="barras(d.aspectosUtilidad, { horizontal: true, porcentaje: true })" autoresize /></Tarjeta>
-        <Tarjeta titulo="Lo que piden mejorar"><v-chart class="grafico" :option="barras(d.aspectosMejorar, { horizontal: true, porcentaje: true, color: '#334155' })" autoresize /></Tarjeta>
+        <Tarjeta titulo="Lo que piden mejorar"><v-chart class="grafico" :option="barras(d.aspectosMejorar, { horizontal: true, porcentaje: true, color: SECUNDARIO })" autoresize /></Tarjeta>
       </div>
       <div class="nota">Elección múltiple: el porcentaje es sobre el número de titulados, por eso puede sumar más de 100%.</div>
     </template>

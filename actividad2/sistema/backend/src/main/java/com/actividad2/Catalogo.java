@@ -96,23 +96,23 @@ public class Catalogo {
     public static final Map<String, String> ITEMS_PERFIL = new LinkedHashMap<>();
     static {
         ITEMS_PERFIL.put("perfil_confianza", "La Carrera brinda confianza como formadora");
-        ITEMS_PERFIL.put("perfil_titulo_consistente", "El título es consistente con las competencias");
-        ITEMS_PERFIL.put("perfil_consulta_autoridades", "Las autoridades consultan nuestra opinión");
-        ITEMS_PERFIL.put("perfil_conoce_perfil", "Conozco el perfil profesional declarado");
-        ITEMS_PERFIL.put("perfil_coherente_desempeno", "El perfil es coherente con el desempeño");
-        ITEMS_PERFIL.put("perfil_desempeno_destacado", "Desempeño destacado profesional e integral");
-        ITEMS_PERFIL.put("perfil_opinion_practicas", "Consideran nuestra opinión en prácticas y pasantías");
-        ITEMS_PERFIL.put("perfil_competencias_laborales", "Evidencian competencias laborales");
-        ITEMS_PERFIL.put("perfil_valores", "Demuestran valores y ética profesional");
-        ITEMS_PERFIL.put("perfil_participo_retroalimentacion", "He participado en procesos de retroalimentación");
+        ITEMS_PERFIL.put("perfil_titulo_consistente", "El título es consistente con las competencias de los titulados");
+        ITEMS_PERFIL.put("perfil_consulta_autoridades", "Las autoridades de la Carrera consultan a los empleadores");
+        ITEMS_PERFIL.put("perfil_conoce_perfil", "Los empleadores conocen el perfil profesional declarado");
+        ITEMS_PERFIL.put("perfil_coherente_desempeno", "El perfil de egreso es coherente con el desempeño de los titulados");
+        ITEMS_PERFIL.put("perfil_desempeno_destacado", "La formación permite a los titulados un desempeño destacado");
+        ITEMS_PERFIL.put("perfil_opinion_practicas", "La Carrera considera a los empleadores en prácticas y pasantías");
+        ITEMS_PERFIL.put("perfil_competencias_laborales", "Los titulados muestran competencias laborales");
+        ITEMS_PERFIL.put("perfil_valores", "Los titulados muestran valores y ética profesional");
+        ITEMS_PERFIL.put("perfil_participo_retroalimentacion", "Los empleadores participaron en procesos de retroalimentación");
         ITEMS_PERFIL.put("perfil_vinculos_oportunidades", "La Carrera mantiene vínculos que generan oportunidades");
-        ITEMS_PERFIL.put("perfil_participo_vinculacion_entorno", "He participado en vinculación con el entorno laboral");
-        ITEMS_PERFIL.put("perfil_participo_difusion", "He participado en difusión de oportunidades laborales");
-        ITEMS_PERFIL.put("perfil_participo_vinculacion_profesionales", "He participado en vinculación entre profesionales");
-        ITEMS_PERFIL.put("perfil_consultado_desempeno", "He sido consultado sobre el desempeño de los titulados");
-        ITEMS_PERFIL.put("perfil_consultada_pertinencia", "Han consultado nuestra opinión sobre la pertinencia");
-        ITEMS_PERFIL.put("perfil_recurre_umss", "Recurrimos a la UMSS cuando requerimos profesionales");
-        ITEMS_PERFIL.put("perfil_consultado_autoevaluacion", "He sido consultado en la autoevaluación de la Carrera");
+        ITEMS_PERFIL.put("perfil_participo_vinculacion_entorno", "Los empleadores participaron en vinculación con el entorno laboral");
+        ITEMS_PERFIL.put("perfil_participo_difusion", "Los empleadores participaron en difusión de oportunidades laborales");
+        ITEMS_PERFIL.put("perfil_participo_vinculacion_profesionales", "Los empleadores participaron en vinculación entre profesionales");
+        ITEMS_PERFIL.put("perfil_consultado_desempeno", "La Carrera consultó a los empleadores sobre el desempeño de los titulados");
+        ITEMS_PERFIL.put("perfil_consultada_pertinencia", "La Carrera consultó a los empleadores sobre la pertinencia de la formación");
+        ITEMS_PERFIL.put("perfil_recurre_umss", "Las organizaciones recurren a la UMSS para contratar");
+        ITEMS_PERFIL.put("perfil_consultado_autoevaluacion", "La Carrera consultó a los empleadores en su autoevaluación");
     }
 
     /**

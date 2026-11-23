@@ -1,13 +1,22 @@
+/* Colores del panel: todas las vistas usan estas variables (no colores sueltos).
+   Los mismos valores, para Naive UI y ECharts, están en tema.js. */
 :root {
   --fondo: #f6f6f7;
   --superficie: #ffffff;
   --texto: #18181b;
+  --texto-secundario: #52525b;
   --suave: #6b6b76;
+  --tenue: #a1a1aa;
   --borde: #e7e7ea;
+  --borde-suave: #f1f1f3;
   --acento: #4f46e5;
   --acento-suave: #eef2ff;
+  --acento-borde: #c7d2fe;
+  --sobre-acento: #ffffff;
   --bien: #15803d;
   --mal: #be123c;
+  --aviso: #92400e;
+  --aviso-suave: #fef3c7;
 }
 * { box-sizing: border-box; }
 html, body, #app { margin: 0; height: 100%; }
@@ -28,6 +37,26 @@ body {
 .rejilla { display: grid; gap: 14px; }
 .rejilla-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .rejilla-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.barra-acciones { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.espaciador { flex: 1; }
+.cargando { padding: 40px; display: grid; place-items: center; }
+/* Reordenar arrastrando (orden.js + AsaArrastre.vue): asa de 6 puntos arriba de la tarjeta, como en Google Forms */
+.asa-arrastre {
+  display: flex; justify-content: center; align-items: center; color: var(--suave); cursor: grab;
+  height: 22px; margin: 0 auto; width: 56px; border-radius: 6px; user-select: none;
+  opacity: 0.45; transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+/* Se resalta el asa de la tarjeta bajo el mouse (solo la suya: hijo directo, no las de tarjetas internas) */
+.arrastrable:hover > .asa-arrastre, .asa-arrastre:focus-visible { opacity: 1; }
+.asa-arrastre:hover { color: var(--acento); background: var(--acento-suave); }
+.asa-arrastre:active { cursor: grabbing; }
+.asa-arrastre:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+.asa-lateral { height: auto; width: 22px; margin: 0; align-self: stretch; }
+/* Hueco donde va a caer: recuadro punteado del acento, sin el contenido */
+.fantasma { background: var(--acento-suave) !important; border: 2px dashed var(--acento) !important; box-shadow: none !important; }
+.fantasma > * { visibility: hidden; }
+.arrastrada { opacity: 0.95; box-shadow: 0 8px 24px rgba(24, 24, 27, 0.18) !important; }
+@media (hover: none) { .asa-arrastre { opacity: 1; } }
 @media (max-width: 900px) {
   .pagina { padding: 20px 16px 40px; }
   .rejilla-2, .rejilla-3 { grid-template-columns: minmax(0, 1fr); }

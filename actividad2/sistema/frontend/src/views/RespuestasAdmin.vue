@@ -1,16 +1,16 @@
 <script setup>
 import { ref, reactive, computed, watch, inject, h } from 'vue'
 import VChart from 'vue-echarts'
-import { useMessage, NTag, NButton, NSpace, NPopconfirm } from 'naive-ui'
+import { NTag, NButton, NSpace, NPopconfirm } from 'naive-ui'
 import Kpi from '../components/Kpi.vue'
 import { obtener, enviar } from '../api'
-import { barras, COLORES } from '../graficos'
+import { useAccion, textoError } from '../useAccion'
+import { barras, COLORES, COLOR_ORIGEN } from '../graficos'
 
 // CRUD de respuestas guardadas en la base: listado, detalle, eliminación y enlaces del formulario
-const mensaje = useMessage()
+const { accion, mensaje } = useAccion()
 const filtro = inject('filtro')
 const version = inject('version')
-const alImportar = inject('alImportar')
 
 const encuesta = ref('titulados')
 const origen = ref(null)
@@ -37,7 +37,7 @@ async function cargar() {
     porDia.value = d
     estructura.value = e
   } catch (e) {
-    mensaje.error(e.message)
+    mensaje.error(textoError(e))
   } finally {
     cargando.value = false
   }
@@ -73,7 +73,7 @@ async function verDetalle(id) {
   try {
     detalle.value = await obtener(`/api/admin/respuestas/${id}`)
   } catch (e) {
-    mensaje.error(e.message)
+    mensaje.error(textoError(e))
   }
 }
 const filasDetalle = computed(() => {
@@ -85,14 +85,7 @@ const filasDetalle = computed(() => {
 })
 
 async function eliminar(id) {
-  try {
-    await enviar('DELETE', `/api/admin/respuestas/${id}`)
-    mensaje.success('Respuesta eliminada')
-    detalle.value = null
-    alImportar()
-  } catch (e) {
-    mensaje.error(e.message)
-  }
+  if (await accion(() => enviar('DELETE', `/api/admin/respuestas/${id}`), { exito: 'Respuesta eliminada' })) detalle.value = null
 }
 // Revisión de calidad: respuestas casi vacías, con nombre sin sentido o repetidas (el sistema solo avisa, no borra)
 const avisos = ref(null)
@@ -102,7 +95,7 @@ async function revisar() {
   try {
     avisos.value = await obtener('/api/admin/respuestas/revisar', { encuesta: encuesta.value })
   } catch (e) {
-    mensaje.error(e.message)
+    mensaje.error(textoError(e))
   } finally {
     revisando.value = false
   }
@@ -186,8 +179,8 @@ const graficoDias = computed(() => barras(porDia.value.map((d) => ({ etiqueta: d
     </div>
 
     <n-grid v-if="actual" :cols="4" :x-gap="14" :y-gap="14" responsive="screen" item-responsive>
-      <n-gi span="4 m:2 l:1"><Kpi titulo="Del formulario propio" color="#14b8a6" :valor="String(actual.respuestas.formulario)" /></n-gi>
-      <n-gi span="4 m:2 l:1"><Kpi titulo="Importadas de Forms" color="#0ea5e9" :valor="String(actual.respuestas.importado)" /></n-gi>
+      <n-gi span="4 m:2 l:1"><Kpi titulo="Del formulario propio" :color="COLOR_ORIGEN.formulario" :valor="String(actual.respuestas.formulario)" /></n-gi>
+      <n-gi span="4 m:2 l:1"><Kpi titulo="Importadas de Forms" :color="COLOR_ORIGEN.importado" :valor="String(actual.respuestas.importado)" /></n-gi>
       <n-gi span="4 m:2 l:1"><Kpi titulo="Para revisar" :valor="avisos ? String(new Set(avisos.map((a) => a.id)).size) : '…'" detalle="Respuestas con algún aviso de calidad" /></n-gi>
       <n-gi span="4 m:2 l:1"><Kpi titulo="Versión de la encuesta" :valor="String(actual.version)" detalle="Sube con cada cambio en el editor" /></n-gi>
     </n-grid>
@@ -244,10 +237,10 @@ const graficoDias = computed(() => barras(porDia.value.map((d) => ({ etiqueta: d
 
 <style scoped>
 .barra { display: flex; align-items: center; gap: 10px; margin: 16px 0 14px; flex-wrap: wrap; }
-.enlace { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid #e4e4e7; border-radius: 10px; padding: 10px 12px; }
+.enlace { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--borde); border-radius: 10px; padding: 10px 12px; }
 .enlace-titulo { font-weight: 600; font-size: 13.5px; }
-.enlace-url { color: #71717a; font-size: 12px; word-break: break-all; }
-.dato { padding: 8px 0; border-bottom: 1px solid #f4f4f5; }
-.dato-pregunta { color: #71717a; font-size: 12.5px; }
+.enlace-url { color: var(--suave); font-size: 12px; word-break: break-all; }
+.dato { padding: 8px 0; border-bottom: 1px solid var(--borde-suave); }
+.dato-pregunta { color: var(--suave); font-size: 12.5px; }
 .dato-valor { font-size: 14px; margin-top: 2px; }
 </style>

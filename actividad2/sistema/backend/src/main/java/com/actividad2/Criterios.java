@@ -16,9 +16,10 @@ import java.util.TreeMap;
  */
 public class Criterios {
 
+    // Ítems de la escala de empleadores sobre el perfil de egreso (los mismos 7 que muestra el gráfico del panel)
+    static final List<String> ITEMS_PERFIL_EGRESO = List.of("perfil_conoce_perfil", "perfil_coherente_desempeno", "perfil_titulo_consistente",
+        "perfil_competencias_laborales", "perfil_valores", "perfil_desempeno_destacado", "perfil_confianza");
     // Ítems de la escala de empleadores que miden la relación de la Carrera con las organizaciones
-    private static final List<String> ITEMS_PERFIL_EGRESO = List.of("perfil_coherente_desempeno", "perfil_competencias_laborales",
-        "perfil_valores", "perfil_titulo_consistente", "perfil_conoce_perfil");
     static final List<String> ITEMS_RELACION = List.of("perfil_consulta_autoridades", "perfil_opinion_practicas",
         "perfil_participo_retroalimentacion", "perfil_vinculos_oportunidades", "perfil_participo_vinculacion_entorno",
         "perfil_participo_difusion", "perfil_participo_vinculacion_profesionales", "perfil_consultado_desempeno",
@@ -41,6 +42,7 @@ public class Criterios {
         double conc = acuerdo(mapa(emp.get("concordanciaRequerimientos")));
         Map<String, Object> c = criterio("3.2.3", "Condiciones de empleo", "empleo",
             "Que la calidad de la formación se refleje en las condiciones de empleo de los graduados: tasa de empleo, tiempo para conseguir el primer empleo, destino laboral y concordancia entre titulación y empleo.");
+        fuente(c, "titulados", titulados.n(), "% de titulados");
         indicador(c, "Tasa de empleo", pct(d(tasa.get("proporcion"))), tasa.get("casos") + " de " + tasa.get("total") + " titulados trabajan o emprenden");
         indicador(c, "Tiempo medio al primer empleo", num(d(tpe.get("media")), 1) + " meses",
             "Entre " + num(d(tpe.get("limiteInferior")), 1) + " y " + num(d(tpe.get("limiteSuperior")), 1) + " meses con 95% de confianza");
@@ -48,7 +50,7 @@ public class Criterios {
         valorar(c, d(tasa.get("proporcion")), "Titulados con empleo o emprendimiento");
         valorar(c, pert, "Consideran pertinentes a su formación las labores de su puesto");
         valorar(c, conc, "Perciben concordancia entre su formación y lo que pide el mercado");
-        c.put("cruces", List.of("C2", "C6"));
+        c.put("cruces", List.of("C2", "C6", "C9", "C10", "C12"));
         lista.add(c);
 
         // 3.2.1 Resultados del proceso formativo
@@ -57,6 +59,7 @@ public class Criterios {
         List<Map<String, Object>> utiles = (List<Map<String, Object>>) comp.get("aspectosUtilidad");
         c = criterio("3.2.1", "Resultados del proceso formativo", "resultados",
             "Evaluar el resultado del proceso formativo y usar esa evaluación para hacer ajustes.");
+        fuente(c, "titulados", titulados.n(), "% de titulados de acuerdo (de acuerdo o totalmente de acuerdo)");
         indicador(c, "Satisfechos con la formación", pct(sat), "De acuerdo o totalmente de acuerdo");
         if (!utiles.isEmpty()) indicador(c, "Lo más útil de la carrera", (String) utiles.get(0).get("etiqueta"), "Lo señala el " + pct(d(utiles.get(0).get("relativa"))));
         if (!mejorar.isEmpty()) indicador(c, "Lo que más piden mejorar", (String) mejorar.get(0).get("etiqueta"), "Lo señala el " + pct(d(mejorar.get(0).get("relativa"))));
@@ -67,11 +70,19 @@ public class Criterios {
         // 2.1.2 Perfil de egreso
         c = criterio("2.1.2", "Perfil de egreso", "perfil",
             "Coherencia entre el perfil de egreso y las competencias que demandan los empleadores.");
-        indicador(c, "Organizaciones encuestadas", String.valueOf(empleadores.n()), "Públicas y privadas");
-        Map<String, Object> coherente = item(perfil, "perfil_coherente_desempeno");
-        if (coherente != null) indicador(c, "Perfil coherente con el desempeño", pct(d(coherente.get("porcentajeAcuerdo"))), "Empleadores de acuerdo (total o parcialmente)");
+        fuente(c, "empleadores", empleadores.n(), "% de empleadores de acuerdo (total o parcialmente)");
+        List<Map<String, Object>> tipos = (List<Map<String, Object>>) empl.get("tipo_organizacion");
+        Map<String, Object> priv = frecuencia(tipos, "Privado"), pub = frecuencia(tipos, "Publico");
+        indicador(c, "Organizaciones encuestadas", String.valueOf(empleadores.n()),
+            (priv == null ? 0 : priv.get("frecuencia")) + " privadas · " + (pub == null ? 0 : pub.get("frecuencia")) + " públicas");
+        List<Map<String, Object>> cargos = (List<Map<String, Object>>) empl.get("cargos");
+        if (!cargos.isEmpty()) {
+            String cargo = (String) cargos.get(0).get("etiqueta");
+            indicador(c, "Cargo que más ocupan los titulados", cargo.contains(" (") ? cargo.substring(0, cargo.indexOf(" (")) : cargo,
+                "Lo indica el " + pct(d(cargos.get(0).get("relativa"))) + " de los empleadores");
+        }
         Map<String, Object> licenciatura = frecuencia((List<Map<String, Object>>) empl.get("nivel_formacion_demandado"), "Licenciatura");
-        if (licenciatura != null) indicador(c, "Les basta la licenciatura", pct(d(licenciatura.get("relativa"))), "Nivel de formación que demandan");
+        if (licenciatura != null) indicador(c, "Piden licenciatura", pct(d(licenciatura.get("relativa"))), "Nivel de formación que piden a los titulados");
         for (Map<String, Object> p : perfil) {
             if (ITEMS_PERFIL_EGRESO.contains(p.get("codigo"))) valorar(c, d(p.get("porcentajeAcuerdo")), (String) p.get("criterio"));
         }
@@ -83,6 +94,7 @@ public class Criterios {
         Map<String, Object> actualizar = frecuencia(mejorar, "actualizacion_plan_estudios");
         c = criterio("2.1.7", "Actualización curricular", "curricular",
             "Mecanismos permanentes para actualizar el plan de estudios según la evolución de la profesión.");
+        fuente(c, "titulados y empleadores", titulados.n() + empleadores.n(), "% de titulados");
         if (!ventaja.isEmpty()) indicador(c, "Asignatura con más ventaja", (String) ventaja.get(0).get("etiqueta"), "La elige el " + pct(d(ventaja.get(0).get("relativa"))));
         if (!poco.isEmpty()) indicador(c, "Asignatura menos útil", (String) poco.get(0).get("etiqueta"), "La elige el " + pct(d(poco.get(0).get("relativa"))));
         if (actualizar != null) indicador(c, "Piden actualizar el plan", pct(d(actualizar.get("relativa"))), "Como aspecto a mejorar");
@@ -98,19 +110,21 @@ public class Criterios {
         double propUmss = totalOrg == 0 ? 0 : (double) umss / totalOrg;
         c = criterio("2.4.1", "Actualización profesional y posgrado", "posgrado",
             "Ofrecer a los graduados cursos de actualización y posgrados afines a la carrera, y promover estudios de posgrado (incluye el criterio 1.1.5).");
+        fuente(c, "titulados", titulados.n(), "% de titulados (o de los interesados en un posgrado)");
         indicador(c, "Con formación complementaria", pct(d(fc.get("proporcion"))), fc.get("casos") + " de " + fc.get("total") + " titulados");
         indicador(c, "Interesados en un posgrado", pct(d(ip.get("proporcion"))), ip.get("casos") + " de " + ip.get("total") + " titulados");
         indicador(c, "Lo estudiarían en la UMSS", pct(propUmss), "EUPG o Dirección de Posgrado FCyT");
         valorar(c, d(ip.get("proporcion")), "Titulados interesados en un posgrado");
         valorar(c, acuerdo(mapa(form.get("ofertaPosgradoFcyt"))), "Consideran afín la oferta de posgrado de la FCyT");
         valorar(c, propUmss, "Interesados que elegirían la UMSS");
-        c.put("cruces", List.of("C3", "C4", "C5", "C7"));
+        c.put("cruces", List.of("C3", "C4", "C5", "C7", "C8", "C11", "C13"));
         lista.add(c);
 
         // 3.2.2 Seguimiento a graduados
         Map<String, Object> red = mapa(dem.get("redContactos"));
         c = criterio("3.2.2", "Seguimiento a graduados", "seguimiento",
             "Un sistema de seguimiento que permita conocer la situación de los graduados e instancias para que participen en la mejora de la carrera.");
+        fuente(c, "titulados", titulados.n(), "% de titulados");
         indicador(c, "Respuestas de titulados", String.valueOf(titulados.n()), periodo(titulados));
         indicador(c, "Respuestas de empleadores", String.valueOf(empleadores.n()), periodo(empleadores));
         indicador(c, "Quieren integrar la red de la Carrera", pct(d(red.get("proporcion"))), red.get("casos") + " de " + red.get("total") + " titulados");
@@ -124,6 +138,7 @@ public class Criterios {
         Map<String, Object> recurre = item(perfil, "perfil_recurre_umss");
         c = criterio("2.4.2", "Relaciones con el sector público y privado", "relaciones",
             "Relaciones con empresas y organizaciones públicas y privadas para cooperar en actividades conjuntas.");
+        fuente(c, "empleadores", empleadores.n(), "% de organizaciones de acuerdo (total o parcialmente)");
         if (contrato != null) indicador(c, "Contrataron titulados (últimos 5 años)", pct(d(contrato.get("relativa"))), "De las organizaciones encuestadas");
         if (alta != null) indicador(c, "Alta probabilidad de contratar", pct(d(alta.get("relativa"))), "En los próximos años");
         if (recurre != null) indicador(c, "Recurren a la UMSS para contratar", pct(d(recurre.get("porcentajeAcuerdo"))), "Empleadores de acuerdo");
@@ -136,6 +151,13 @@ public class Criterios {
     }
 
     // ---------------- armado ----------------
+
+    /** Quién respondió las preguntas del criterio y qué mide el porcentaje de cada aspecto (para que el panel lo diga). */
+    private static void fuente(Map<String, Object> c, String quienes, int n, String medida) {
+        c.put("fuente", quienes);
+        c.put("nFuente", n);
+        c.put("medida", medida);
+    }
 
     private static Map<String, Object> criterio(String id, String nombre, String pantalla, String quePide) {
         Map<String, Object> c = new LinkedHashMap<>();
@@ -213,10 +235,10 @@ public class Criterios {
     }
 
     private static String pct(double v) {
-        return String.format(Locale.US, "%.1f%%", 100 * v);
+        return String.format(Locale.US, "%.1f%%", 100 * v).replace('.', ',');
     }
 
     private static String num(double v, int dec) {
-        return String.format(Locale.US, "%." + dec + "f", v);
+        return String.format(Locale.US, "%." + dec + "f", v).replace('.', ',');
     }
 }

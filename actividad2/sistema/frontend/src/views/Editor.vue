@@ -1,173 +1,93 @@
 <script setup>
-import { ref, reactive, computed, watch, inject, h } from 'vue'
-import { useMessage, useDialog, NTag, NButton, NSpace, NInput, NPopconfirm } from 'naive-ui'
+import { ref, computed, watch, inject, h } from 'vue'
+import { useDialog, NInput } from 'naive-ui'
 import { obtener, enviar, TIPOS_PREGUNTA, conOpciones } from '../api'
+import { useAccion, textoError } from '../useAccion'
+import { VueDraggable } from 'vue-draggable-plus'
+import { ARRASTRE, cambioOrden, moverUno } from '../orden'
+import PreguntaPanel from '../components/PreguntaPanel.vue'
+import AsaArrastre from '../components/AsaArrastre.vue'
 
-// CRUD de la encuesta: secciones, preguntas y opciones guardadas en PostgreSQL
-const mensaje = useMessage()
+// CRUD de la encuesta: secciones, preguntas y opciones guardadas en PostgreSQL.
+// El orden de las preguntas se cambia arrastrándolas por su asa, como en Google Forms.
 const dialogo = useDialog()
-const alImportar = inject('alImportar')
+const { accion, mensaje } = useAccion()
+const version = inject('version', ref(0))
 
+const encuestas = ref([])
+obtener('/api/admin/encuestas').then((l) => (encuestas.value = l)).catch((e) => mensaje.error(textoError(e)))
 const codigo = ref('titulados')
 const encuesta = ref(null)
 const cargando = ref(false)
 
+// Cada carga lleva un número: si se cambia de encuesta rápido, una respuesta atrasada no pisa a la actual
+let ultimaCarga = 0
 async function cargar() {
+  const n = ++ultimaCarga
   cargando.value = true
   try {
-    encuesta.value = await obtener(`/api/admin/encuestas/${codigo.value}`)
+    const e = await obtener(`/api/admin/encuestas/${codigo.value}`)
+    if (n === ultimaCarga) encuesta.value = e
   } catch (e) {
-    mensaje.error(e.message)
+    if (n === ultimaCarga) mensaje.error(textoError(e))
   } finally {
-    cargando.value = false
+    if (n === ultimaCarga) cargando.value = false
   }
 }
-watch(codigo, cargar, { immediate: true })
+// Toda acción exitosa sube la versión (useAccion), así que el editor se recarga solo después de cada cambio
+watch([codigo, version], cargar, { immediate: true })
+watch(codigo, () => { encuesta.value = null; panel.value.visible = false })
 
-const preguntasTodas = computed(() => (encuesta.value?.secciones ?? []).flatMap((s) => s.preguntas))
+const secciones = computed(() => encuesta.value?.secciones ?? [])
 const etiquetaTipo = (t) => TIPOS_PREGUNTA.find((x) => x.value === t)?.label ?? t
 const urlFormulario = computed(() => `${location.origin}${location.pathname}#/encuesta/${codigo.value}`)
-
-async function ejecutar(promesa, exito) {
-  try {
-    const r = await promesa
-    if (r?.resultado === 'desactivada') mensaje.warning('Tenía respuestas: se desactivó en vez de eliminarse, para no perder datos.')
-    else if (exito) mensaje.success(exito)
-    await cargar()
-    alImportar?.()
-    return r
-  } catch (e) {
-    mensaje.error(e.message)
-    throw e
-  }
-}
+const mayuscula = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
 // ---------- Secciones ----------
 function editarSeccion(s) {
   const titulo = ref(s?.titulo ?? '')
   dialogo.create({
     title: s ? 'Renombrar sección' : 'Nueva sección',
-    content: () => h(NInput, { value: titulo.value, 'onUpdate:value': (v) => (titulo.value = v), placeholder: 'Título de la sección' }),
+    content: () => h(NInput, { value: titulo.value, 'onUpdate:value': (v) => (titulo.value = v), placeholder: 'Título de la sección', autofocus: true }),
     positiveText: 'Guardar',
     negativeText: 'Cancelar',
-    onPositiveClick: () => (s
-      ? ejecutar(enviar('PUT', `/api/admin/secciones/${s.id}`, { titulo: titulo.value }), 'Sección actualizada')
-      : ejecutar(enviar('POST', '/api/admin/secciones', { encuesta: codigo.value, titulo: titulo.value }), 'Sección creada')),
+    // Devolver false deja el diálogo abierto si el backend rechazó el cambio
+    onPositiveClick: async () => (await accion(
+      () => (s
+        ? enviar('PUT', `/api/admin/secciones/${s.id}`, { titulo: titulo.value })
+        : enviar('POST', '/api/admin/secciones', { encuesta: codigo.value, titulo: titulo.value })),
+      { exito: s ? 'Sección actualizada' : 'Sección creada' },
+    )) !== null,
   })
 }
-const borrarSeccion = (s) => ejecutar(enviar('DELETE', `/api/admin/secciones/${s.id}`), 'Sección eliminada')
-async function moverSeccion(i, delta) {
-  const lista = encuesta.value.secciones
-  const a = lista[i], b = lista[i + delta]
-  await enviar('PUT', `/api/admin/secciones/${a.id}`, { orden: b.orden })
-  await ejecutar(enviar('PUT', `/api/admin/secciones/${b.id}`, { orden: a.orden }))
+const borrarSeccion = (s) => accion(() => enviar('DELETE', `/api/admin/secciones/${s.id}`), { exito: 'Sección eliminada' })
+
+// ---------- Orden de las preguntas (arrastrar) ----------
+// La librería mueve la pregunta en pantalla (también a otra sección: todas comparten el grupo
+// «preguntas») y al soltar se guarda el orden completo en una sola transacción. La pantalla ya
+// muestra el orden nuevo, así que no se recarga la encuesta (eso hacía lento cada arrastre):
+// solo se suma la versión que subió el backend. Si lo rechaza, se recarga el orden guardado.
+async function guardarOrden() {
+  const cuerpo = { secciones: secciones.value.map((s) => ({ id: s.id, preguntas: s.preguntas.map((p) => p.id) })) }
+  const r = await accion(() => enviar('PUT', `/api/admin/encuestas/${codigo.value}/orden`, cuerpo), { avisar: false })
+  if (r) encuesta.value.version++
+  else cargar()
+}
+const alSoltar = (e) => cambioOrden(e) && guardarOrden()
+// ↑/↓ con el asa enfocada: mueve un lugar dentro de la sección
+function moverConTeclado(s, i, delta) {
+  const nueva = moverUno(s.preguntas, i, delta)
+  if (!nueva) return
+  s.preguntas = nueva
+  guardarOrden()
 }
 
 // ---------- Preguntas ----------
-const drawer = ref(false)
-const form = reactive({})
-const nuevaOpcion = reactive({ codigo: '', etiqueta: '' })
-const opcionesForm = ref([])
-
-function abrirPregunta(p, seccion) {
-  Object.keys(form).forEach((k) => delete form[k])
-  Object.assign(form, p
-    ? { ...p, dependeValores: [...(p.dependeValores ?? [])] }
-    : { id: null, seccionId: seccion.id, codigo: '', texto: '', ayuda: '', tipo: 'unica', obligatoria: true, dependeDe: null,
-        dependeValores: [], maxSelecciones: null, valorMinimo: null, valorMaximo: null, esContacto: false, activa: true, respuestas: 0 })
-  opcionesForm.value = (p?.opciones ?? []).map((o) => ({ ...o }))
-  nuevaOpcion.codigo = ''
-  nuevaOpcion.etiqueta = ''
-  drawer.value = true
-}
-
-const opcionesDependencia = computed(() =>
-  preguntasTodas.value.filter((p) => p.codigo !== form.codigo && conOpciones(p.tipo)).map((p) => ({ label: `${p.texto.slice(0, 70)} (${p.codigo})`, value: p.codigo })))
-const valoresDependencia = computed(() =>
-  (preguntasTodas.value.find((p) => p.codigo === form.dependeDe)?.opciones ?? []).map((o) => ({ label: o.etiqueta, value: o.codigo })))
-const seccionesOpciones = computed(() => (encuesta.value?.secciones ?? []).map((s) => ({ label: s.titulo, value: s.id })))
-
-async function guardarPregunta() {
-  const cuerpo = {
-    encuesta: codigo.value, seccionId: form.seccionId, codigo: form.codigo, texto: form.texto, ayuda: form.ayuda, tipo: form.tipo,
-    obligatoria: form.obligatoria, dependeDe: form.dependeDe || null, dependeValores: form.dependeDe ? form.dependeValores : [],
-    maxSelecciones: form.tipo === 'multiple' ? form.maxSelecciones : null,
-    valorMinimo: form.tipo === 'numero' ? form.valorMinimo : null, valorMaximo: form.tipo === 'numero' ? form.valorMaximo : null,
-    esContacto: form.esContacto, activa: form.activa,
-  }
-  if (form.id) {
-    await ejecutar(enviar('PUT', `/api/admin/preguntas/${form.id}`, cuerpo), 'Pregunta actualizada')
-  } else {
-    const r = await ejecutar(enviar('POST', '/api/admin/preguntas', cuerpo), 'Pregunta creada')
-    form.id = r.id
-    if (!conOpciones(form.tipo)) drawer.value = false
-    return
-  }
-  drawer.value = false
-}
-const borrarPregunta = (p) => ejecutar(enviar('DELETE', `/api/admin/preguntas/${p.id}`), 'Pregunta eliminada')
-const alternarActiva = (p) => ejecutar(enviar('PUT', `/api/admin/preguntas/${p.id}`, { activa: !p.activa }), p.activa ? 'Pregunta desactivada' : 'Pregunta activada')
-async function moverPregunta(s, i, delta) {
-  const a = s.preguntas[i], b = s.preguntas[i + delta]
-  await enviar('PUT', `/api/admin/preguntas/${a.id}`, { orden: b.orden })
-  await ejecutar(enviar('PUT', `/api/admin/preguntas/${b.id}`, { orden: a.orden }))
-}
-
-// ---------- Opciones (dentro del panel de la pregunta) ----------
-async function recargarOpciones() {
-  await cargar()
-  const p = preguntasTodas.value.find((x) => x.id === form.id)
-  opcionesForm.value = (p?.opciones ?? []).map((o) => ({ ...o }))
-}
-async function agregarOpcion() {
-  if (!form.id) return mensaje.warning('Guarde primero la pregunta')
-  try {
-    await enviar('POST', '/api/admin/opciones', { preguntaId: form.id, codigo: nuevaOpcion.codigo, etiqueta: nuevaOpcion.etiqueta })
-    nuevaOpcion.codigo = ''
-    nuevaOpcion.etiqueta = ''
-    await recargarOpciones()
-  } catch (e) { mensaje.error(e.message) }
-}
-async function guardarOpcion(o) {
-  try {
-    await enviar('PUT', `/api/admin/opciones/${o.id}`, { codigo: o.codigo, etiqueta: o.etiqueta })
-    mensaje.success('Opción guardada')
-    await recargarOpciones()
-  } catch (e) { mensaje.error(e.message) }
-}
-async function borrarOpcion(o) {
-  try {
-    const r = await enviar('DELETE', `/api/admin/opciones/${o.id}`)
-    if (r.resultado === 'desactivada') mensaje.warning('La opción ya fue elegida en respuestas: se desactivó en vez de eliminarse.')
-    await recargarOpciones()
-  } catch (e) { mensaje.error(e.message) }
-}
-async function moverOpcion(i, delta) {
-  const a = opcionesForm.value[i], b = opcionesForm.value[i + delta]
-  try {
-    await enviar('PUT', `/api/admin/opciones/${a.id}`, { orden: b.orden })
-    await enviar('PUT', `/api/admin/opciones/${b.id}`, { orden: a.orden })
-    await recargarOpciones()
-  } catch (e) { mensaje.error(e.message) }
-}
-const columnasOpciones = [
-  { title: 'Código', key: 'codigo', width: 150, render: (o) => h(NInput, { size: 'small', value: o.codigo, disabled: o.respuestas > 0, 'onUpdate:value': (v) => (o.codigo = v) }) },
-  { title: 'Texto que ve quien responde', key: 'etiqueta', render: (o) => h(NInput, { size: 'small', value: o.etiqueta, 'onUpdate:value': (v) => (o.etiqueta = v) }) },
-  { title: 'Resp.', key: 'respuestas', width: 60 },
-  {
-    title: '', key: 'acciones', width: 190,
-    render: (o, i) => h(NSpace, { size: 4, wrap: false }, () => [
-      h(NButton, { size: 'tiny', quaternary: true, disabled: i === 0, onClick: () => moverOpcion(i, -1) }, () => '↑'),
-      h(NButton, { size: 'tiny', quaternary: true, disabled: i === opcionesForm.value.length - 1, onClick: () => moverOpcion(i, 1) }, () => '↓'),
-      h(NButton, { size: 'tiny', secondary: true, onClick: () => guardarOpcion(o) }, () => 'Guardar'),
-      h(NPopconfirm, { onPositiveClick: () => borrarOpcion(o) }, {
-        trigger: () => h(NButton, { size: 'tiny', quaternary: true, type: 'error' }, () => 'Quitar'),
-        default: () => (o.respuestas > 0 ? 'Tiene respuestas: se desactivará.' : '¿Eliminar la opción?'),
-      }),
-      o.activa ? null : h(NTag, { size: 'tiny', bordered: false }, () => 'inactiva'),
-    ]),
-  },
-]
+const panel = ref({ visible: false, preguntaId: null, seccionId: null })
+const abrirPregunta = (p, s) => (panel.value = { visible: true, preguntaId: p?.id ?? null, seccionId: s?.id ?? p.seccionId })
+const borrarPregunta = (p) => accion(() => enviar('DELETE', `/api/admin/preguntas/${p.id}`), { exito: 'Pregunta eliminada' })
+const alternarActiva = (p) => accion(() => enviar('PUT', `/api/admin/preguntas/${p.id}`, { activa: !p.activa }),
+  { exito: p.activa ? 'Pregunta desactivada' : 'Pregunta activada' })
 </script>
 
 <template>
@@ -175,34 +95,32 @@ const columnasOpciones = [
     <div class="etiqueta-criterio">Encuestas · CRUD de la encuesta</div>
     <h1 class="pagina-titulo">Editor de preguntas</h1>
     <p class="pagina-sub">
-      Las preguntas se guardan en la base de datos y el formulario se arma a partir de ellas. Una pregunta u opción que ya tiene respuestas
-      no se borra: se desactiva, y no se puede cambiar su código ni su tipo, para no perder datos.
+      Las preguntas se guardan en la base de datos y el formulario se arma a partir de ellas. Para cambiar el orden de una
+      pregunta, arrástrela desde su asa (los seis puntos arriba de la tarjeta); también se puede soltar en otra sección. Una pregunta u opción
+      que ya tiene respuestas no se borra: se desactiva, y no se puede cambiar su código ni su tipo, para no perder datos.
     </p>
 
     <n-card size="small">
-      <div class="barra">
+      <div class="barra-acciones">
         <n-radio-group v-model:value="codigo" size="small">
-          <n-radio-button value="titulados">Titulados</n-radio-button>
-          <n-radio-button value="empleadores">Empleadores</n-radio-button>
+          <n-radio-button v-for="e in encuestas" :key="e.codigo" :value="e.codigo" :title="e.nombre">{{ mayuscula(e.codigo) }}</n-radio-button>
         </n-radio-group>
         <n-tag v-if="encuesta" :bordered="false" round>Versión {{ encuesta.version }}</n-tag>
-        <span class="flex" />
+        <span class="espaciador" />
         <n-button size="small" tag="a" :href="urlFormulario" target="_blank" secondary>Ver formulario</n-button>
         <n-button size="small" type="primary" @click="editarSeccion(null)">Nueva sección</n-button>
       </div>
     </n-card>
 
-    <div v-if="cargando && !encuesta" style="padding: 40px; display: grid; place-items: center"><n-spin /></div>
+    <div v-if="cargando && !encuesta" class="cargando"><n-spin /></div>
 
-    <n-card v-for="(s, i) in encuesta?.secciones ?? []" :key="s.id" size="small" style="margin-top: 14px">
+    <n-card v-for="(s, i) in secciones" :key="s.id" size="small" class="seccion">
       <template #header>
         <span class="num">{{ i + 1 }}</span> {{ s.titulo }}
-        <span class="nota" style="margin-left: 8px">{{ s.preguntas.length }} preguntas</span>
+        <span class="nota cantidad">{{ s.preguntas.length }} preguntas</span>
       </template>
       <template #header-extra>
         <n-space size="small">
-          <n-button size="tiny" quaternary :disabled="i === 0" @click="moverSeccion(i, -1)">↑</n-button>
-          <n-button size="tiny" quaternary :disabled="i === encuesta.secciones.length - 1" @click="moverSeccion(i, 1)">↓</n-button>
           <n-button size="tiny" secondary @click="editarSeccion(s)">Renombrar</n-button>
           <n-popconfirm @positive-click="borrarSeccion(s)">
             <template #trigger><n-button size="tiny" quaternary type="error">Eliminar</n-button></template>
@@ -212,106 +130,62 @@ const columnasOpciones = [
         </n-space>
       </template>
 
-      <div v-for="(p, j) in s.preguntas" :key="p.id" class="fila" :class="{ inactiva: !p.activa }">
-        <div class="orden">
-          <n-button size="tiny" quaternary :disabled="j === 0" @click="moverPregunta(s, j, -1)">↑</n-button>
-          <n-button size="tiny" quaternary :disabled="j === s.preguntas.length - 1" @click="moverPregunta(s, j, 1)">↓</n-button>
+      <VueDraggable v-model="s.preguntas" v-bind="ARRASTRE" group="preguntas" class="lista-preguntas" @end="alSoltar">
+        <div v-for="(p, j) in s.preguntas" :key="p.id" class="pregunta arrastrable" :class="{ inactiva: !p.activa }">
+          <AsaArrastre @keydown.up.prevent="moverConTeclado(s, j, -1)" @keydown.down.prevent="moverConTeclado(s, j, 1)" />
+          <div class="pregunta-cuerpo">
+            <button type="button" class="contenido" @click="abrirPregunta(p)">
+              <span class="texto">{{ p.texto }}</span>
+              <n-space size="small" class="etiquetas">
+                <n-tag size="tiny" :bordered="false">{{ p.codigo }}</n-tag>
+                <n-tag size="tiny" :bordered="false" type="info">{{ etiquetaTipo(p.tipo) }}</n-tag>
+                <n-tag v-if="p.obligatoria" size="tiny" :bordered="false" type="warning">obligatoria</n-tag>
+                <n-tag v-if="p.dependeDe" size="tiny" :bordered="false">si {{ p.dependeDe }} = {{ p.dependeValores.join(' o ') || 'cualquiera' }}</n-tag>
+                <n-tag v-if="p.esContacto" size="tiny" :bordered="false" type="error">dato personal</n-tag>
+                <n-tag v-if="conOpciones(p.tipo)" size="tiny" :bordered="false">{{ p.opciones.length }} opciones</n-tag>
+                <n-tag size="tiny" :bordered="false" type="success">{{ p.respuestas }} respuestas</n-tag>
+                <n-tag v-if="!p.activa" size="tiny" :bordered="false">inactiva</n-tag>
+              </n-space>
+            </button>
+            <n-space size="small" :wrap="false">
+              <n-button size="tiny" secondary @click="abrirPregunta(p)">Editar</n-button>
+              <n-button size="tiny" quaternary @click="alternarActiva(p)">{{ p.activa ? 'Desactivar' : 'Activar' }}</n-button>
+              <n-popconfirm @positive-click="borrarPregunta(p)">
+                <template #trigger><n-button size="tiny" quaternary type="error">Eliminar</n-button></template>
+                {{ p.respuestas > 0 ? 'Tiene respuestas: se desactivará en vez de eliminarse.' : '¿Eliminar la pregunta y sus opciones?' }}
+              </n-popconfirm>
+            </n-space>
+          </div>
         </div>
-        <div class="contenido" @click="abrirPregunta(p)">
-          <div class="texto">{{ p.texto }}</div>
-          <n-space size="small" style="margin-top: 4px">
-            <n-tag size="tiny" :bordered="false">{{ p.codigo }}</n-tag>
-            <n-tag size="tiny" :bordered="false" type="info">{{ etiquetaTipo(p.tipo) }}</n-tag>
-            <n-tag v-if="p.obligatoria" size="tiny" :bordered="false" type="warning">obligatoria</n-tag>
-            <n-tag v-if="p.dependeDe" size="tiny" :bordered="false">si {{ p.dependeDe }} = {{ p.dependeValores.join(' o ') }}</n-tag>
-            <n-tag v-if="p.esContacto" size="tiny" :bordered="false" type="error">dato personal</n-tag>
-            <n-tag v-if="conOpciones(p.tipo)" size="tiny" :bordered="false">{{ p.opciones.length }} opciones</n-tag>
-            <n-tag size="tiny" :bordered="false" type="success">{{ p.respuestas }} respuestas</n-tag>
-            <n-tag v-if="!p.activa" size="tiny" :bordered="false">inactiva</n-tag>
-          </n-space>
-        </div>
-        <n-space size="small" :wrap="false">
-          <n-button size="tiny" secondary @click="abrirPregunta(p)">Editar</n-button>
-          <n-button size="tiny" quaternary @click="alternarActiva(p)">{{ p.activa ? 'Desactivar' : 'Activar' }}</n-button>
-          <n-popconfirm @positive-click="borrarPregunta(p)">
-            <template #trigger><n-button size="tiny" quaternary type="error">Eliminar</n-button></template>
-            {{ p.respuestas > 0 ? 'Tiene respuestas: se desactivará en vez de eliminarse.' : '¿Eliminar la pregunta y sus opciones?' }}
-          </n-popconfirm>
-        </n-space>
-      </div>
-      <div v-if="!s.preguntas.length" class="nota">Sección vacía.</div>
+      </VueDraggable>
     </n-card>
 
-    <n-drawer v-model:show="drawer" :width="620" placement="right">
-      <n-drawer-content :title="form.id ? 'Editar pregunta' : 'Nueva pregunta'" closable>
-        <n-alert v-if="form.respuestas > 0" type="info" :bordered="false" style="margin-bottom: 14px">
-          Esta pregunta tiene {{ form.respuestas }} respuestas: se puede cambiar el texto y las condiciones, pero no el código ni el tipo.
-        </n-alert>
-        <n-form label-placement="top" :show-feedback="false">
-          <n-grid :cols="2" :x-gap="12" :y-gap="12">
-            <n-gi :span="2"><n-form-item label="Texto de la pregunta"><n-input v-model:value="form.texto" type="textarea" :autosize="{ minRows: 2 }" /></n-form-item></n-gi>
-            <n-gi><n-form-item label="Código (nombre para el análisis)"><n-input v-model:value="form.codigo" :disabled="form.respuestas > 0" placeholder="ej. anio_titulacion" /></n-form-item></n-gi>
-            <n-gi><n-form-item label="Tipo"><n-select v-model:value="form.tipo" :options="TIPOS_PREGUNTA" :disabled="form.respuestas > 0" /></n-form-item></n-gi>
-            <n-gi :span="2"><n-form-item label="Ayuda (opcional)"><n-input v-model:value="form.ayuda" /></n-form-item></n-gi>
-            <n-gi><n-form-item label="Sección"><n-select v-model:value="form.seccionId" :options="seccionesOpciones" /></n-form-item></n-gi>
-            <n-gi>
-              <n-form-item label="Opciones">
-                <n-space vertical :size="6">
-                  <n-checkbox v-model:checked="form.obligatoria">Obligatoria</n-checkbox>
-                  <n-checkbox v-model:checked="form.esContacto">Dato personal (no entra al análisis)</n-checkbox>
-                  <n-checkbox v-model:checked="form.activa">Activa</n-checkbox>
-                </n-space>
-              </n-form-item>
-            </n-gi>
-            <n-gi v-if="form.tipo === 'multiple'"><n-form-item label="Máximo de opciones a elegir"><n-input-number v-model:value="form.maxSelecciones" :min="1" clearable /></n-form-item></n-gi>
-            <template v-if="form.tipo === 'numero'">
-              <n-gi><n-form-item label="Valor mínimo"><n-input-number v-model:value="form.valorMinimo" clearable /></n-form-item></n-gi>
-              <n-gi><n-form-item label="Valor máximo"><n-input-number v-model:value="form.valorMaximo" clearable /></n-form-item></n-gi>
-            </template>
-            <n-gi :span="2">
-              <n-form-item label="Mostrar solo si… (lógica condicional)">
-                <n-select v-model:value="form.dependeDe" :options="opcionesDependencia" clearable filterable placeholder="Siempre visible" />
-              </n-form-item>
-            </n-gi>
-            <n-gi v-if="form.dependeDe" :span="2">
-              <n-form-item label="…la respuesta es">
-                <n-select v-model:value="form.dependeValores" :options="valoresDependencia" multiple placeholder="Cualquier respuesta" />
-              </n-form-item>
-            </n-gi>
-          </n-grid>
-        </n-form>
-
-        <template v-if="conOpciones(form.tipo)">
-          <n-divider title-placement="left">Opciones de respuesta</n-divider>
-          <div v-if="!form.id" class="nota">Guarde la pregunta para agregar sus opciones.</div>
-          <template v-else>
-            <n-data-table size="small" :columns="columnasOpciones" :data="opcionesForm" :row-key="(o) => o.id" />
-            <n-space style="margin-top: 10px" :wrap="false">
-              <n-input v-model:value="nuevaOpcion.codigo" size="small" placeholder="Código (ej. 1_4_meses)" style="width: 170px" />
-              <n-input v-model:value="nuevaOpcion.etiqueta" size="small" placeholder="Texto de la opción" />
-              <n-button size="small" type="primary" secondary @click="agregarOpcion">Agregar</n-button>
-            </n-space>
-          </template>
-        </template>
-
-        <template #footer>
-          <n-space>
-            <n-button @click="drawer = false">Cerrar</n-button>
-            <n-button type="primary" @click="guardarPregunta">{{ form.id ? 'Guardar cambios' : 'Crear pregunta' }}</n-button>
-          </n-space>
-        </template>
-      </n-drawer-content>
-    </n-drawer>
+    <PreguntaPanel
+      v-model:show="panel.visible" :encuesta="encuesta" :codigo="codigo"
+      :pregunta-id="panel.preguntaId" :seccion-id="panel.seccionId"
+    />
   </div>
 </template>
 
 <style scoped>
-.barra { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.flex { flex: 1; }
-.num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: #eef2ff; color: #4f46e5; font-size: 12px; font-weight: 700; margin-right: 6px; }
-.fila { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid #f4f4f5; }
-.fila.inactiva { opacity: 0.55; }
-.orden { display: flex; flex-direction: column; }
-.contenido { flex: 1; cursor: pointer; min-width: 0; }
-.texto { font-size: 14px; }
+.seccion { margin-top: 18px; border-top: 6px solid var(--acento); }
+.num { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--acento-suave); color: var(--acento); font-size: 12px; font-weight: 700; margin-right: 6px; }
+.cantidad { margin-left: 8px; }
+/* Cada pregunta es una tarjeta, como en Google Forms: al pasar el mouse se marca con una franja a la izquierda */
+.pregunta {
+  background: var(--superficie); border: 1px solid var(--borde); border-radius: 10px; padding: 2px 16px 14px; margin-top: 10px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pregunta:hover { border-color: var(--acento-borde); box-shadow: inset 4px 0 0 var(--acento), 0 1px 6px rgba(24, 24, 27, 0.06); }
+.pregunta.inactiva .pregunta-cuerpo { opacity: 0.55; }
+.pregunta-cuerpo { display: flex; align-items: center; gap: 10px; }
+/* Botón sin aspecto de botón: toda la pregunta se abre con clic o con Enter */
+.contenido { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; border-radius: 4px; }
+.contenido:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.texto { display: block; font-size: 14px; }
+.etiquetas { margin-top: 4px; }
+/* Una sección vacía sigue siendo un destino: la lista conserva alto y muestra el aviso (sin elementos extra
+   dentro, porque la librería trata cada hijo como un elemento arrastrable) */
+.lista-preguntas:empty { min-height: 56px; margin-top: 10px; border: 1px dashed var(--borde); border-radius: 10px; display: grid; place-items: center; }
+.lista-preguntas:empty::before { content: 'Sección vacía: agregue una pregunta o arrastre aquí una de otra sección.'; color: var(--suave); font-size: 12.5px; }
 </style>

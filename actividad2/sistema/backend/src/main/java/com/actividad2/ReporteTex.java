@@ -51,8 +51,36 @@ public class ReporteTex {
             titulados = titulados.entreFechas(desde, hasta);
             empleadores = empleadores.entreFechas(desde, hasta);
         }
-        if (titulados.n() == 0) throw new IllegalStateException("No hay respuestas de titulados para generar el informe");
+        escribirTodo(salida);
+        System.out.println("Fragmentos generados en " + salida.toAbsolutePath());
+        System.exit(0); // cierra las conexiones del pool
+    }
 
+    /**
+     * Desde el panel: regenera los fragmentos con las respuestas actuales de la base y compila el informe con
+     * latexmk. Devuelve el resultado de la compilación. Se sincroniza porque usa los datasets estáticos.
+     */
+    public static synchronized Map<String, Object> actualizarInforme(Path carpetaTex) throws IOException, InterruptedException {
+        titulados = Respuestas.dataset("titulados");
+        empleadores = Respuestas.dataset("empleadores");
+        prueba = titulados.origen.contains("prueba") || empleadores.origen.contains("prueba");
+        escribirTodo(carpetaTex.resolve("generado"));
+        Process proc = new ProcessBuilder("latexmk", "-pdf", "-interaction=nonstopmode", "Informe.tex")
+            .directory(carpetaTex.toFile()).redirectErrorStream(true).start();
+        String salida = new String(proc.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        boolean ok = proc.waitFor() == 0 && Files.exists(carpetaTex.resolve("pdf/Informe.pdf"));
+        Map<String, Object> r = new LinkedHashMap<>();
+        r.put("ok", ok);
+        r.put("titulados", titulados.n());
+        r.put("empleadores", empleadores.n());
+        r.put("mensaje", ok ? "Informe actualizado con " + titulados.n() + " titulados y " + empleadores.n() + " empleadores."
+            : "Los fragmentos se generaron, pero la compilación falló: " + salida.substring(Math.max(0, salida.length() - 600)));
+        return r;
+    }
+
+    private static void escribirTodo(Path salida) throws IOException {
+        Files.createDirectories(salida);
+        if (titulados.n() == 0) throw new IllegalStateException("No hay respuestas de titulados para generar el informe");
         escribir(salida, "periodo.tex", periodo());
         escribir(salida, "demografia.tex", demografia());
         escribir(salida, "tasa_empleo.tex", tasaEmpleo());
@@ -67,12 +95,22 @@ public class ReporteTex {
             escribir(salida, "cruce_" + c.id() + ".tex", cruce(Analisis.cruce(titulados, c)));
         }
         escribir(salida, "resumen_cruces.tex", resumenCruces());
+        for (Analisis.Uniformidad u : Analisis.UNIFORMIDAD) {
+            Dataset d = u.encuesta().equals("titulados") ? titulados : empleadores;
+            escribir(salida, "uniformidad_" + u.id() + ".tex", uniformidad(Analisis.uniformidad(d, u)));
+        }
+        escribir(salida, "resumen_uniformidad.tex", resumenUniformidad());
         escribir(salida, "criterios_arcusur.tex", criterios());
         escribir(salida, "empleadores.tex", empleadores());
         escribir(salida, "preguntas_abiertas.tex", preguntasAbiertas());
         escribir(salida, "organizaciones.tex", organizaciones());
-        System.out.println("Fragmentos generados en " + salida.toAbsolutePath());
-        System.exit(0); // cierra las conexiones del pool
+        // Textos del informe que citan resultados: se regeneran con los datos, nada se escribe a mano
+        escribir(salida, "valores.tex", valores());
+        escribir(salida, "resumen_resultados.tex", resumenResultados());
+        escribir(salida, "abiertas_interpretacion.tex", abiertasInterpretacion());
+        escribir(salida, "conclusiones.tex", conclusiones());
+        escribir(salida, "propuestas.tex", propuestas());
+        escribir(salida, "multivariable.tex", multivariable());
     }
 
     // ===================== utilidades =====================
@@ -429,6 +467,10 @@ public class ReporteTex {
 
     // ===================== Cruces (prueba chi-cuadrada) =====================
 
+    /**
+     * Un cruce del estudio con el mismo algoritmo de la Formulación (Sección 2): Paso 1 describir el problema
+     * e hipótesis, datos, Paso 2 tabla de contingencia, Paso 3 FE, Paso 4 X0^2, Paso 5 teórico, Paso 6 conclusión.
+     */
     @SuppressWarnings("unchecked")
     private static String cruce(Map<String, Object> c) {
         List<String> filas = (List<String>) c.get("filas");
@@ -438,88 +480,207 @@ public class ReporteTex {
         List<Integer> tf = (List<Integer>) c.get("totalFila");
         List<Integer> tc = (List<Integer>) c.get("totalColumna");
         int nTot = i(c.get("n"));
-        int k = filas.size();
+        int f = filas.size();
         int m = cols.size();
         String id = (String) c.get("id");
+        String vx = t((String) c.get("variableFilas")), vy = t((String) c.get("variableColumnas"));
+        String esquina = "$X$: " + vx + " \\textbackslash{} $Y$: " + vy;
+        String cabeceraY = String.join(" & ", cols.stream().map(ReporteTex::t).toList());
+        // Anchos fijos para que los nombres largos de las categorías pasen de línea en vez de salirse del margen
+        String colY = "C{" + n(Math.min(3.0, 10.0 / m), 2) + "cm}";
+        String colY4 = "C{" + n(Math.min(3.2, 10.4 / m), 2) + "cm}";
 
         StringBuilder sb = new StringBuilder();
         sb.append("\\subsubsection*{").append(id).append(". ").append(t((String) c.get("titulo"))).append("}\n\n");
-        sb.append("\\textit{Propósito.} ").append(t((String) c.get("proposito"))).append(" Respalda el criterio ARCU-SUR ").append(t((String) c.get("criterio")))
-          .append(". Se aplica sobre: ").append(t(((String) c.get("poblacion")).toLowerCase())).append(", con nivel de significancia $\\alpha = 0.05$.\n\n");
 
-        sb.append("\\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = ").append(nTot).append("$).\n\n");
-        String cabecera = t((String) c.get("variableFilas")) + " & " + String.join(" & ", cols.stream().map(ReporteTex::t).toList()) + " & Total fila \\\\\n";
-        sb.append("\\begin{mitabla}{").append(id).append(": frecuencia observada $FO_{ij}$").append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{l").append("c".repeat(m)).append("|c}\n\\toprule\n").append(cabecera).append("\\midrule\n");
-        for (int a = 0; a < k; a++) {
+        // Paso 1: problema e hipótesis
+        sb.append("\\textit{Paso 1. Describir el problema.} ").append(t((String) c.get("proposito"))).append("\n\n");
+        sb.append("\\begin{itemize}[nosep]\n");
+        sb.append("  \\item Variable independiente $X$: ").append(vx).append(".\n");
+        sb.append("  \\item Variable dependiente $Y$: ").append(vy).append(".\n");
+        sb.append("  \\item Población: ").append(t(((String) c.get("poblacion")).toLowerCase())).append(" ($N = ").append(nTot)
+          .append("$). Criterio ARCU-SUR: ").append(t((String) c.get("criterio"))).append(". Nivel de significancia $\\alpha = 0.05$.\n");
+        if (c.get("nota") != null) sb.append("  \\item ").append(t((String) c.get("nota"))).append("\n");
+        sb.append("  \\item $H_0$: ").append(t((String) c.get("hipotesisNula"))).append("\n");
+        sb.append("  \\item $H_1$: ").append(t((String) c.get("hipotesisAlterna"))).append("\n");
+        sb.append("\\end{itemize}\n\n");
+
+        // Datos (primeros titulados)
+        List<List<String>> muestra = (List<List<String>>) c.get("muestra");
+        if (muestra != null && !muestra.isEmpty()) {
+            sb.append("\\textit{Datos.} Primeros ").append(muestra.size()).append(" de los ").append(nTot)
+              .append(" titulados que respondieron ambas preguntas (sin datos personales).\n\n");
+            sb.append("\\begin{mitabla}{").append(id).append(": datos de los primeros titulados}\n\\begin{tabular}{lll}\n\\toprule\nTitulado & $X$: ").append(vx)
+              .append(" & $Y$: ").append(vy).append(" \\\\\n\\midrule\n");
+            for (List<String> fila : muestra) sb.append(fila.get(0)).append(" & ").append(t(fila.get(1))).append(" & ").append(t(fila.get(2))).append(" \\\\\n");
+            sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+        }
+
+        // Paso 2: tabla de contingencia
+        sb.append("\\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = ").append(nTot).append("$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).\n\n");
+        sb.append("\\begin{mitabla}{").append(id).append(": tabla de contingencia, frecuencia observada $FO_{ij}$").append(marca()).append("}\n");
+        sb.append("\\begin{tabular}{L{3.8cm}").append(colY.repeat(m)).append("|c}\n\\toprule\n").append(esquina).append(" & ").append(cabeceraY).append(" & Total \\\\\n\\midrule\n");
+        for (int a = 0; a < f; a++) {
             sb.append(t(filas.get(a)));
             for (int b = 0; b < m; b++) sb.append(" & ").append(fo[a][b]);
             sb.append(" & ").append(tf.get(a)).append(" \\\\\n");
         }
-        sb.append("\\midrule\nTotal columna");
+        sb.append("\\midrule\nTotal");
         for (int b = 0; b < m; b++) sb.append(" & ").append(tc.get(b));
-        sb.append(" & $N=").append(nTot).append("$ \\\\\n\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+        sb.append(" & $N = ").append(nTot).append("$ \\\\\n\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
 
-        sb.append("\\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\\text{total fila } i)(\\text{total columna } j)/N$. Por ejemplo, para la celda ``")
-          .append(t(filas.get(0))).append(" -- ").append(t(cols.get(0))).append("'': $FE_{11} = ").append(tf.get(0)).append(" \\times ").append(tc.get(0))
-          .append(" / ").append(nTot).append(" = ").append(n(fe[0][0], 4)).append("$.\n\n");
+        // Paso 3: frecuencia esperada
+        sb.append("\\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda ")
+          .append(t(filas.get(0))).append(" y ").append(t(cols.get(0))).append(":\n\\[\nFE_{11} = \\frac{(").append(tf.get(0)).append(")(").append(tc.get(0))
+          .append(")}{").append(nTot).append("} = ").append(n(fe[0][0], 2)).append("\n\\]\n\n");
         sb.append("\\begin{mitabla}{").append(id).append(": frecuencia esperada $FE_{ij}$").append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{l").append("c".repeat(m)).append("}\n\\toprule\n")
-          .append(t((String) c.get("variableFilas"))).append(" & ").append(String.join(" & ", cols.stream().map(ReporteTex::t).toList())).append(" \\\\\n\\midrule\n");
-        for (int a = 0; a < k; a++) {
+        sb.append("\\begin{tabular}{L{3.8cm}").append(colY.repeat(m)).append("}\n\\toprule\n").append(esquina).append(" & ").append(cabeceraY).append(" \\\\\n\\midrule\n");
+        for (int a = 0; a < f; a++) {
             sb.append(t(filas.get(a)));
             for (int b = 0; b < m; b++) sb.append(" & $").append(tf.get(a)).append("\\cdot").append(tc.get(b)).append("/").append(nTot).append(" = ").append(n(fe[a][b], 2)).append("$");
             sb.append(" \\\\\n");
         }
         sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
 
-        sb.append("\\textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.\n\n");
+        // Paso 4: X0^2 en la misma grilla
+        sb.append("\\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.\n\n");
         sb.append("\\begin{mitabla}{").append(id).append(": cálculo de $X_0^2$ celda por celda").append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{L{5.4cm}cccc}\n\\toprule\nCelda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\\\\n\\midrule\n");
+        sb.append("\\begin{tabular}{L{3.2cm}").append(colY4.repeat(m)).append("|c}\n\\toprule\n").append(esquina).append(" & ").append(cabeceraY).append(" & Suma fila \\\\\n\\midrule\n");
         double suma = 0;
-        for (int a = 0; a < k; a++) {
+        List<String> sumasFila = new ArrayList<>();
+        for (int a = 0; a < f; a++) {
+            sb.append(t(filas.get(a)));
+            double filaSuma = 0;
             for (int b = 0; b < m; b++) {
-                double dif2 = (fo[a][b] - fe[a][b]) * (fo[a][b] - fe[a][b]);
-                double aporte = dif2 / fe[a][b];
-                suma += aporte;
-                sb.append(t(filas.get(a))).append(" -- ").append(t(cols.get(b))).append(" & ").append(fo[a][b]).append(" & ").append(n(fe[a][b], 4))
-                  .append(" & ").append(n(dif2, 4)).append(" & ").append(n(aporte, 4)).append(" \\\\\n");
+                double aporte = (fo[a][b] - fe[a][b]) * (fo[a][b] - fe[a][b]) / fe[a][b];
+                filaSuma += aporte;
+                sb.append(" & $\\dfrac{(").append(fo[a][b]).append("-").append(n(fe[a][b], 2)).append(")^2}{").append(n(fe[a][b], 2)).append("}$\\newline $= ").append(n(aporte, 4)).append("$");
             }
+            suma += filaSuma;
+            sumasFila.add(n(filaSuma, 4));
+            sb.append(" & $").append(n(filaSuma, 4)).append("$ \\\\[6pt]\n");
         }
-        sb.append("\\midrule\n\\multicolumn{4}{r}{$X_0^2 = \\sum$} & ").append(n(suma, 4)).append(" \\\\\n\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+        sb.append("\\[\nX_0^2 = ").append(String.join(" + ", sumasFila)).append(" = ").append(n(suma, 4)).append("\n\\]\n\n");
 
+        // Paso 5: teórico
         int gl = i(c.get("gradosLibertad"));
         double teo = d(c.get("chiTeorico"));
         boolean indep = (Boolean) c.get("independientes");
-        sb.append("\\textit{Paso 4. Determinar el estadístico teórico.} Con $k = ").append(k).append("$ filas y $m = ").append(m)
-          .append("$ columnas, los grados de libertad son $(k-1)(m-1) = (").append(k).append("-1)(").append(m).append("-1) = ").append(gl)
-          .append("$. De la tabla de chi-cuadrada: $X_{0.05,\\,").append(gl).append("}^2 = ").append(n(teo, 3)).append("$.\n\n");
-        sb.append("\\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 ").append(si(indep, "<", "\\ge")).append(" X_{0.05,\\,").append(gl)
-          .append("}^2 \\;\\Rightarrow\\; ").append(n(suma, 4)).append(si(indep, " < ", " \\ge ")).append(n(teo, 3)).append("$.\n\n");
-        sb.append("\\textit{Paso 6. Conclusión.}\n\n\\begin{center}\n\\begin{tabular}{l}\n");
-        sb.append("Si ($X_0^2 < X_{0.05,\\,").append(gl).append("}^2$)\\\\\n");
-        sb.append("\\quad ").append(si(indep, "\\fbox{Independencia}", "Independencia")).append("\\\\\nSino\\\\\n");
-        sb.append("\\quad ").append(si(indep, "Relación entre las variables", "\\fbox{Relación entre las variables}")).append("\\\\\nFinSi\n");
-        sb.append("\\end{tabular}\n\\end{center}\n\n");
+        sb.append("\\textit{Paso 5. Estadístico teórico.} Con $f = ").append(f).append("$ filas y $c = ").append(m).append("$ columnas: $gl = (").append(f)
+          .append("-1)(").append(m).append("-1) = ").append(gl).append("$. De la tabla chi-cuadrada, con $\\alpha = 0.05$: $X^2_{").append(gl).append(",\\,0.05} = ")
+          .append(n(teo, 3)).append("$.\n\n");
+
+        // Paso 6: relación y conclusión
+        sb.append("\\textit{Paso 6. Relación entre estadísticos y conclusión.}\n\n\\begin{center}\n\\begin{tabular}{l}\n");
+        sb.append("$").append(n(suma, 4)).append(indep ? " < " : " \\ge ").append(n(teo, 3)).append(" \\rightarrow$ ").append(indep ? "verdad" : "falso").append("\\\\\n");
+        sb.append("Si ($X_0^2 < X^2_{(f-1)(c-1),\\,\\alpha}$)\\\\\n");
+        sb.append("\\quad ").append(indep ? "\\fbox{``Independencia''}" : "``Independencia''").append("\\\\\nSino\\\\\n");
+        sb.append("\\quad ").append(indep ? "NO ``Independencia''" : "\\fbox{NO ``Independencia''}").append("\\\\\nFinSi\n\\end{tabular}\n\\end{center}\n\n");
         if (indep) {
-            sb.append("No se puede rechazar que ").append(t(((String) c.get("variableFilas")).toLowerCase())).append(" y ")
-              .append(t(((String) c.get("variableColumnas")).toLowerCase())).append(" sean independientes.");
+            sb.append("No se rechaza $H_0$: con estos datos, «").append(vy).append("» no depende de «").append(vx).append("».");
         } else {
-            sb.append("Se rechaza la independencia: hay evidencia de que ").append(t(((String) c.get("variableFilas")).toLowerCase())).append(" y ")
-              .append(t(((String) c.get("variableColumnas")).toLowerCase())).append(" están relacionadas.");
-            sb.append(" Proporción por fila en la primera columna (``").append(t(cols.get(0))).append("''): ");
+            sb.append("Se rechaza $H_0$ y se acepta $H_1$: «").append(vy).append("» depende de «").append(vx).append("»")
+              .append(". Porcentaje de cada fila en la columna ``").append(t(cols.get(0))).append("'': ");
             List<String> partes = new ArrayList<>();
-            for (int a = 0; a < k; a++) {
-                partes.add(t(filas.get(a)) + " $" + fo[a][0] + "/" + tf.get(a) + " = " + n(100.0 * fo[a][0] / tf.get(a), 1) + "\\%$");
-            }
+            for (int a = 0; a < f; a++) partes.add(t(filas.get(a)) + " $" + fo[a][0] + "/" + tf.get(a) + " = " + n(100.0 * fo[a][0] / tf.get(a), 1) + "\\%$");
             sb.append(String.join("; ", partes)).append(".");
         }
         sb.append(marca()).append("\n\n");
         int menor5 = i(c.get("celdasFeMenor5"));
         if (menor5 > 0) {
-            sb.append("\\textit{Observación:} ").append(menor5).append(" de ").append(k * m)
+            sb.append("\\textit{Observación:} ").append(menor5).append(" de ").append(f * m)
               .append(" celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.\n\n");
         }
+        if (c.get("recomendacion") != null) sb.append("\\textit{Recomendación.} ").append(t((String) c.get("recomendacion"))).append("\n\n");
+        return sb.toString();
+    }
+
+    // ===================== Principio de uniformidad: prueba de las frecuencias =====================
+
+    /** Desarrollo de una prueba de las frecuencias con los 6 pasos de los apuntes de clase (cap. 3). */
+    private static String uniformidad(Map<String, Object> u) {
+        String id = (String) u.get("id");
+        int nTot = i(u.get("n")), k = i(u.get("k"));
+        String variable = t((String) u.get("variable"));
+        StringBuilder sb = new StringBuilder();
+        sb.append("\\subsubsection*{").append(id).append(". ").append(t((String) u.get("titulo"))).append("}\n\n");
+        if (u.get("uniforme") == null) {
+            return sb.append("No hay respuestas suficientes en este período para aplicar la prueba.\n\n").toString();
+        }
+        List<String> cats = (List<String>) u.get("categorias");
+        List<Integer> fo = (List<Integer>) u.get("observada");
+        List<Double> aportes = (List<Double>) u.get("aportes");
+        double fe = d(u.get("esperada")), x0 = d(u.get("chiCuadrada")), teo = d(u.get("chiTeorico"));
+        int gl = i(u.get("gradosLibertad"));
+        boolean uniforme = (Boolean) u.get("uniforme");
+
+        sb.append(t((String) u.get("proposito"))).append("\n\n");
+        sb.append("\\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Población: ")
+          .append(t(((String) u.get("poblacion")).toLowerCase())).append("; tamaño $n = ").append(nTot)
+          .append("$; opciones de la pregunta $k = ").append(k).append("$; $\\alpha = 0.05$.\n\n");
+        sb.append("\\begin{itemize}[nosep]\n");
+        sb.append("  \\item $H_0$: ").append(t((String) u.get("hipotesisNula"))).append("\n");
+        sb.append("  \\item $H_1$: ").append(t((String) u.get("hipotesisAlterna"))).append("\n");
+        sb.append("\\end{itemize}\n\n");
+
+        sb.append("\\textit{Paso 2. Calcular la frecuencia esperada.} Si las respuestas se repartieran por igual, cada opción tendría:\n");
+        sb.append("\\[\nFE = \\frac{n}{k} = \\frac{").append(nTot).append("}{").append(k).append("} = ").append(n(fe, 2)).append("\n\\]\n\n");
+
+        sb.append("\\textit{Paso 3. Calcular el estadístico chi-cuadrado.} Se cuenta la frecuencia observada $FO_i$ de cada opción y se calcula $\\frac{(FO_i - FE)^2}{FE}$.\n\n");
+        sb.append("\\begin{mitabla}{").append(id).append(": prueba de las frecuencias, ").append(variable).append(marca()).append("}\n");
+        sb.append("\\begin{tabular}{L{6cm}ccc}\n\\toprule\nOpción & $FO_i$ & $FE$ & $\\frac{(FO_i-FE)^2}{FE}$ \\\\\n\\midrule\n");
+        for (int a = 0; a < k; a++) {
+            sb.append(t(cats.get(a))).append(" & ").append(fo.get(a)).append(" & ").append(n(fe, 2)).append(" & $\\frac{(")
+              .append(fo.get(a)).append("-").append(n(fe, 2)).append(")^2}{").append(n(fe, 2)).append("} = ").append(n(aportes.get(a), 4)).append("$ \\\\[3pt]\n");
+        }
+        sb.append("\\midrule\nTotal & ").append(nTot).append(" & ").append(nTot).append(" & $x_0^2 = ").append(n(x0, 4)).append("$ \\\\\n");
+        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+        sb.append("\\[\nx_0^2 = \\sum_{i=1}^{").append(k).append("} \\frac{(FO_i - FE)^2}{FE} = ").append(n(x0, 4)).append("\n\\]\n\n");
+
+        sb.append("\\textit{Paso 4. Determinar el estadístico teórico.} $x^2_{\\alpha,\\,k-1} = x^2_{0.05,\\,").append(k).append("-1} = x^2_{0.05,\\,")
+          .append(gl).append("} = ").append(n(teo, 3)).append("$ (tabla chi-cuadrada).\n\n");
+        sb.append("\\textit{Paso 5. Establecer la relación entre estadísticos.} $x_0^2 < x^2_{\\alpha,\\,k-1}$ $\\rightarrow$ $")
+          .append(n(x0, 4)).append(uniforme ? " < " : " \\ge ").append(n(teo, 3)).append("$ $\\rightarrow$ ").append(uniforme ? "sí" : "no").append(".\n\n");
+
+        sb.append("\\textit{Paso 6. Conclusión.}\n\n\\begin{center}\n\\begin{tabular}{l}\n");
+        sb.append("Si ($x_0^2 < x^2_{\\alpha,\\,k-1}$)\\\\\n");
+        sb.append("\\quad ").append(uniforme ? "\\fbox{``Uniformidad''}" : "``Uniformidad''").append("\\\\\nSino\\\\\n");
+        sb.append("\\quad ").append(uniforme ? "No ``Uniformidad''" : "\\fbox{No ``Uniformidad''}").append("\\\\\nFinSi\n\\end{tabular}\n\\end{center}\n\n");
+        String masElegida = t((String) u.get("masElegida"));
+        String datoMayor = "«" + masElegida + "» (" + i(u.get("frecuenciaMasElegida")) + " de " + nTot + ", "
+            + pct(d(u.get("proporcionMasElegida"))) + ")";
+        if (uniforme) {
+            sb.append("No se rechaza $H_0$: las respuestas se reparten de forma pareja entre las ").append(k)
+              .append(" opciones; la diferencia que se ve (la más elegida es ").append(datoMayor).append(") puede deberse al azar.");
+        } else {
+            sb.append("Se rechaza $H_0$: las respuestas no se reparten por igual, hay opciones preferidas. La más elegida es ")
+              .append(datoMayor).append(".");
+        }
+        sb.append(marca()).append("\n\n");
+        if (Boolean.TRUE.equals(u.get("feMenor5"))) {
+            sb.append("\\textit{Observación:} $FE = ").append(n(fe, 2))
+              .append(" < 5$: hay pocas respuestas para tantas opciones, por lo que la conclusión debe tomarse con cautela.\n\n");
+        }
+        if (u.get("recomendacion") != null) sb.append("\\textit{Recomendación.} ").append(t((String) u.get("recomendacion"))).append("\n\n");
+        return sb.toString();
+    }
+
+    private static String resumenUniformidad() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\\begin{mitabla}{Resumen de las pruebas de las frecuencias, principio de uniformidad ($\\alpha = 0.05$)").append(marca()).append("}\n");
+        sb.append("\\begin{tabular}{cL{4.4cm}cccccL{3.2cm}}\n\\toprule\nId & Pregunta & $n$ & $k$ & $FE$ & $x_0^2$ & $x_{0.05,\\,k-1}^2$ & Conclusión \\\\\n\\midrule\n");
+        for (Map<String, Object> u : Analisis.uniformidades(titulados, empleadores)) {
+            sb.append(u.get("id")).append(" & ").append(t((String) u.get("titulo"))).append(" & ").append(u.get("n")).append(" & ").append(u.get("k")).append(" & ");
+            if (u.get("uniforme") == null) {
+                sb.append("-- & -- & -- & Sin datos \\\\\n");
+                continue;
+            }
+            boolean uniforme = (Boolean) u.get("uniforme");
+            sb.append(n(d(u.get("esperada")), 2)).append(" & ").append(n(d(u.get("chiCuadrada")), 3)).append(" & ").append(n(d(u.get("chiTeorico")), 3)).append(" & ")
+              .append(uniforme ? "Uniformidad" : "\\textbf{No uniformidad}: «" + t((String) u.get("masElegida")) + "»").append(" \\\\\n");
+        }
+        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
         return sb.toString();
     }
 
@@ -589,7 +750,8 @@ public class ReporteTex {
           .append(", Sección~\\ref{sec:titulados}); tiempo medio para obtener el primer empleo de ").append(n(d(tpe.get("media")), 2)).append(" meses, con IC 95\\% $[")
           .append(n(d(tpe.get("limiteInferior")), 2)).append(",\\ ").append(n(d(tpe.get("limiteSuperior")), 2)).append("]$; el ").append(pct(d(sector.get(1).get("relativa"))))
           .append(" de quienes trabajan en una organización lo hace en el sector privado y el rubro más frecuente es ``").append(t((String) rubro.get("etiqueta")))
-          .append("''; cruces ").append(cr.apply("C2")).append(" y ").append(cr.apply("C6")).append(". El tiempo medio no tiene un valor de referencia en ARCU-SUR, por lo que queda como línea base para el seguimiento.\n\n");
+          .append("''; cruces ").append(cr.apply("C2")).append(", ").append(cr.apply("C6")).append(", ").append(cr.apply("C9")).append(", ")
+          .append(cr.apply("C10")).append(" y ").append(cr.apply("C12")).append(". El tiempo medio no tiene un valor de referencia en ARCU-SUR, por lo que queda como línea base para el seguimiento.\n\n");
         List<String> fav = new ArrayList<>(), des = new ArrayList<>();
         clasificar(d(tasa.get("proporcion")), "titulados empleados", fav, des);
         clasificar(acuerdo(pert), "titulados que consideran pertinentes a su formación las labores de su puesto", fav, des);
@@ -623,7 +785,7 @@ public class ReporteTex {
         fav = new ArrayList<>(); des = new ArrayList<>();
         for (Map<String, Object> p : perfil) {
             String cod = (String) p.get("codigo");
-            if (List.of("perfil_coherente_desempeno", "perfil_competencias_laborales", "perfil_valores", "perfil_titulo_consistente", "perfil_conoce_perfil").contains(cod)) {
+            if (Criterios.ITEMS_PERFIL_EGRESO.contains(cod)) {
                 clasificar(d(p.get("porcentajeAcuerdo")), "``" + t((String) p.get("criterio")) + "''", fav, des);
             }
         }
@@ -651,7 +813,8 @@ public class ReporteTex {
         sb.append("\\textbf{Evidencia del estudio:} el ").append(pct(d(fc.get("proporcion")))).append(" tiene o cursa formación complementaria y el ").append(pct(d(ip.get("proporcion"))))
           .append(" está interesado en un posgrado del área; el área más solicitada es ``").append(t((String) area.get("etiqueta"))).append("''; de los interesados, el ")
           .append(pct(totalOrg == 0 ? 0 : (double) umss / totalOrg)).append(" elegiría la UMSS (EUPG o FCyT); cruces ").append(cr.apply("C3")).append(", ").append(cr.apply("C4"))
-          .append(" y ").append(cr.apply("C5")).append(".\n\n");
+          .append(", ").append(cr.apply("C5")).append(", ").append(cr.apply("C7")).append(", ").append(cr.apply("C8")).append(", ").append(cr.apply("C11"))
+          .append(" y ").append(cr.apply("C13")).append(".\n\n");
         fav = new ArrayList<>(); des = new ArrayList<>();
         clasificar(d(ip.get("proporcion")), "titulados interesados en un posgrado", fav, des);
         clasificar(acuerdo(oferta), "titulados que consideran afín la oferta de posgrado de la FCyT", fav, des);
@@ -690,17 +853,23 @@ public class ReporteTex {
         sb.append(tablaFrecuencias("Nivel de formación que demandan ($n=" + n + "$)", lista(e.get("nivel_formacion_demandado")), "Nivel", n, false));
         sb.append(tablaFrecuencias("Cargos que desempeñan los titulados (elección múltiple, $n=" + n + "$)", lista(e.get("cargos")), "Cargo", n, false).replace("\\midrule\nTotal", "\\midrule\nMenciones"));
 
-        sb.append("\\begin{mitabla}{Formación y perfil profesional: frecuencia $f_i$ y porcentaje $f_i/n$ por opción ($n=").append(n).append("$)").append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{L{4.8cm}C{2.1cm}C{2.1cm}C{2.3cm}C{1.5cm}}\n\\toprule\nCriterio & Tot.\\ de acuerdo & Parc.\\ de acuerdo & Tot.\\ en desacuerdo & No sabe \\\\\n\\midrule\n");
-        for (Map<String, Object> p : lista(e.get("perfil"))) {
-            sb.append(t((String) p.get("criterio")));
-            for (Map<String, Object> f : lista(p.get("frecuencias"))) {
-                int fi = i(f.get("frecuencia"));
-                sb.append(" & ").append(fi).append(" (").append(n(100.0 * fi / n, 0)).append("\\%)");
+        // Dos tablas, igual que en el panel: perfil de egreso (2.1.2) y relación con la Carrera (2.4.2); juntas no caben en una página
+        String[][] grupos = {{"Perfil de egreso (criterio 2.1.2)", "egreso"}, {"Relación con la Carrera (criterio 2.4.2)", "relacion"}};
+        for (String[] g : grupos) {
+            List<String> codigos = g[1].equals("egreso") ? Criterios.ITEMS_PERFIL_EGRESO : Criterios.ITEMS_RELACION;
+            sb.append("\\begin{mitabla}{").append(g[0]).append(": frecuencia $f_i$ y porcentaje $f_i/n$ por opción ($n=").append(n).append("$)").append(marca()).append("}\n");
+            sb.append("\\begin{tabular}{L{5.6cm}C{2.0cm}C{2.0cm}C{2.1cm}C{1.5cm}}\n\\toprule\nAfirmación & Tot.\\ de acuerdo & Parc.\\ de acuerdo & Tot.\\ en desacuerdo & No sabe \\\\\n\\midrule\n");
+            for (Map<String, Object> p : lista(e.get("perfil"))) {
+                if (!codigos.contains(p.get("codigo"))) continue;
+                sb.append(t((String) p.get("criterio")));
+                for (Map<String, Object> f : lista(p.get("frecuencias"))) {
+                    int fi = i(f.get("frecuencia"));
+                    sb.append(" & ").append(fi).append(" (").append(n(100.0 * fi / n, 0)).append("\\%)");
+                }
+                sb.append(" \\\\\n");
             }
-            sb.append(" \\\\\n");
+            sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
         }
-        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
         return sb.toString();
     }
 
@@ -739,6 +908,408 @@ public class ReporteTex {
             for (String[] c : diccionario.get(q.getKey())) sb.append(t(c[0])).append(" & ").append(t(c[1]).replace("*", "$^{*}$")).append(" \\\\\n");
             sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
         }
+        return sb.toString();
+    }
+
+    // ===================== Textos dinámicos (resumen, conclusiones, propuestas) =====================
+
+    private static String fmtN(double v) {
+        return v == Math.rint(v) ? String.valueOf((long) v) : n(v, 2);
+    }
+
+    /** Proporción de una categoría (por código) dentro de una lista de frecuencias. */
+    private static double prop(List<Map<String, Object>> frec, String codigo) {
+        return frec.stream().filter(f -> codigo.equals(f.get("codigo"))).mapToDouble(f -> d(f.get("relativa"))).findFirst().orElse(0);
+    }
+
+    private static List<Map<String, Object>> ordenDesc(List<Map<String, Object>> frec) {
+        List<Map<String, Object>> o = new ArrayList<>(frec);
+        o.sort((a, b) -> Integer.compare(i(b.get("frecuencia")), i(a.get("frecuencia"))));
+        return o;
+    }
+
+    private static Map<String, Map<String, Object>> crucesPorId() {
+        Map<String, Map<String, Object>> m = new LinkedHashMap<>();
+        Analisis.cruces(titulados).forEach(c -> m.put((String) c.get("id"), c));
+        return m;
+    }
+
+    private static boolean dependiente(Map<String, Object> c) {
+        return Boolean.FALSE.equals(c.get("independientes"));
+    }
+
+    /** Columna de Y en la que más difieren las filas, con el porcentaje de cada fila: así se lee la dependencia. */
+    @SuppressWarnings("unchecked")
+    private static String lecturaDependencia(Map<String, Object> c) {
+        List<String> filas = (List<String>) c.get("filas");
+        List<String> cols = (List<String>) c.get("columnas");
+        int[][] fo = (int[][]) c.get("observada");
+        List<Integer> tf = (List<Integer>) c.get("totalFila");
+        int mejor = 0;
+        double rango = -1;
+        for (int j = 0; j < cols.size(); j++) {
+            double min = 1, max = 0;
+            for (int a = 0; a < filas.size(); a++) {
+                double p = tf.get(a) == 0 ? 0 : (double) fo[a][j] / tf.get(a);
+                min = Math.min(min, p);
+                max = Math.max(max, p);
+            }
+            if (max - min > rango) { rango = max - min; mejor = j; }
+        }
+        List<String> partes = new ArrayList<>();
+        for (int a = 0; a < filas.size(); a++) partes.add(t(filas.get(a)) + " " + pct(tf.get(a) == 0 ? 0 : (double) fo[a][mejor] / tf.get(a)));
+        String lectura = "el porcentaje que respondió ``" + t(cols.get(mejor)) + "'' en cada grupo de ``" + t((String) c.get("variableFilas")) + "'' es: " + String.join("; ", partes);
+        int bajos = i(c.get("celdasFeMenor5"));
+        if (bajos > 0) lectura += " (" + bajos + " de " + i(c.get("totalCeldas")) + " celdas con $FE<5$, conclusión tentativa)";
+        return lectura;
+    }
+
+    /** Categoría de Y más elegida en cada fila de X: «fila»: «columna» (porcentaje). */
+    @SuppressWarnings("unchecked")
+    private static String masElegidaPorFila(Map<String, Object> c) {
+        List<String> filas = (List<String>) c.get("filas");
+        List<String> cols = (List<String>) c.get("columnas");
+        int[][] fo = (int[][]) c.get("observada");
+        List<Integer> tf = (List<Integer>) c.get("totalFila");
+        List<String> partes = new ArrayList<>();
+        for (int a = 0; a < filas.size(); a++) {
+            int jm = 0;
+            for (int j = 1; j < cols.size(); j++) if (fo[a][j] > fo[a][jm]) jm = j;
+            partes.add(t(filas.get(a)) + ": " + t(cols.get(jm)) + " (" + pct(tf.get(a) == 0 ? 0 : (double) fo[a][jm] / tf.get(a)) + ")");
+        }
+        return String.join("; ", partes);
+    }
+
+    /** Fila de X con mayor porcentaje en una columna de Y dada. */
+    @SuppressWarnings("unchecked")
+    private static String[] filaConMas(Map<String, Object> c, String columna) {
+        List<String> filas = (List<String>) c.get("filas");
+        List<String> cols = (List<String>) c.get("columnas");
+        int[][] fo = (int[][]) c.get("observada");
+        List<Integer> tf = (List<Integer>) c.get("totalFila");
+        int j = cols.indexOf(columna);
+        if (j < 0) return null;
+        int am = 0;
+        double pm = -1;
+        for (int a = 0; a < filas.size(); a++) {
+            double p = tf.get(a) == 0 ? 0 : (double) fo[a][j] / tf.get(a);
+            if (p > pm) { pm = p; am = a; }
+        }
+        return new String[]{t(filas.get(am)), pct(pm)};
+    }
+
+    private static double propUmss(Map<String, Object> form) {
+        List<Map<String, Object>> org = lista(form.get("organizacionInteres"));
+        int umss = org.stream().filter(f -> List.of("EUPG", "Direccion_Posgrado_FCyT").contains(f.get("codigo"))).mapToInt(f -> i(f.get("frecuencia"))).sum();
+        int tot = org.stream().mapToInt(f -> i(f.get("frecuencia"))).sum();
+        return tot == 0 ? 0 : (double) umss / tot;
+    }
+
+    private static Map<String, Object> criterio(List<Map<String, Object>> crits, String id) {
+        return crits.stream().filter(c -> id.equals(c.get("id"))).findFirst().orElse(Map.of());
+    }
+
+    private static String aspectos(List<Map<String, Object>> lista) {
+        return String.join("; ", lista.stream().map(a -> "``" + t((String) a.get("texto")) + "'' (" + pct(d(a.get("proporcion"))) + ")").toList());
+    }
+
+    private static String valores() {
+        return "\\newcommand{\\nTitulados}{" + titulados.n() + "}\n\\newcommand{\\nEmpleadores}{" + empleadores.n() + "}\n";
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String resumenResultados() {
+        Map<String, Object> emp = Analisis.empleabilidad(titulados);
+        Map<String, Object> comp = Analisis.competencias(titulados, empleadores);
+        Map<String, Object> form = Analisis.formacionContinua(titulados);
+        List<Map<String, Object>> crits = Criterios.evaluar(titulados, empleadores);
+        Map<String, Object> tpe = mapa(mapa(emp.get("tiempoPrimerEmpleo")).get("mesesIC95"));
+        Map<String, Object> mej = lista(comp.get("aspectosMejorar")).get(0);
+        Map<String, Object> area = moda(lista(form.get("areaInteres")));
+        double umss = propUmss(form);
+        List<Double> perfil = new ArrayList<>();
+        Map<String, Object> c212 = criterio(crits, "2.1.2");
+        for (String k : List.of("favorables", "desfavorables")) for (Map<String, Object> a : (List<Map<String, Object>>) c212.getOrDefault(k, List.of())) perfil.add(d(a.get("proporcion")));
+        Map<String, Object> c242 = criterio(crits, "2.4.2");
+        int des242 = ((List<?>) c242.getOrDefault("desfavorables", List.of())).size();
+        int tot242 = des242 + ((List<?>) c242.getOrDefault("favorables", List.of())).size();
+        Map<String, Map<String, Object>> cruces = crucesPorId();
+        List<String> dep = cruces.values().stream().filter(ReporteTex::dependiente)
+            .map(c -> "``" + t((String) c.get("variableFilas")) + "'' con ``" + t((String) c.get("variableColumnas")) + "'' (" + c.get("id") + ")").toList();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Con ").append(titulados.n()).append(" titulados y ").append(empleadores.n()).append(" organizaciones empleadoras, el ")
+          .append(pct(d(mapa(emp.get("tasaEmpleo")).get("proporcion")))).append(" de los titulados trabaja o emprende y tarda en promedio ")
+          .append(n(d(tpe.get("media")), 2)).append(" meses en conseguir su primer empleo (IC 95\\%: ").append(n(d(tpe.get("limiteInferior")), 2))
+          .append(" a ").append(n(d(tpe.get("limiteSuperior")), 2)).append(" meses); el ").append(pct(acuerdo(mapa(emp.get("pertinenciaPuesto")))))
+          .append(" considera que sus labores son pertinentes a su formación y el ").append(pct(acuerdo(mapa(comp.get("satisfaccionGlobal")))))
+          .append(" está satisfecho con ella, y lo que más se pide mejorar es ``").append(t((String) mej.get("etiqueta"))).append("'' (")
+          .append(pct(d(mej.get("relativa")))).append("). El ").append(pct(d(mapa(form.get("interesPosgrado")).get("proporcion"))))
+          .append(" quiere hacer un posgrado, sobre todo en ``").append(t((String) area.get("etiqueta"))).append("'', ")
+          .append(umss > 0.5 ? "y el " : "pero solo el ").append(pct(umss)).append(" de ellos lo haría en la UMSS. ");
+        if (!perfil.isEmpty()) {
+            sb.append("Los empleadores valoran el perfil profesional (entre el ").append(pct(perfil.stream().mapToDouble(x -> x).min().orElse(0)))
+              .append(" y el ").append(pct(perfil.stream().mapToDouble(x -> x).max().orElse(0))).append(" de acuerdo)");
+            sb.append(des242 > 0 ? ", pero en la relación con la Carrera " + des242 + " de " + tot242 + " aspectos tienen menos de la mitad de acuerdo. " : ". ");
+        }
+        sb.append("De los ").append(cruces.size()).append(" cruces de variables, ").append(dep.size()).append(dep.size() == 1 ? " muestra" : " muestran")
+          .append(" dependencia significativa al 5\\%").append(dep.isEmpty() ? "." : ": " + String.join(", ", dep) + ".").append(marca());
+        return sb.toString();
+    }
+
+    private static String abiertasInterpretacion() {
+        Map<String, Object> ab = mapa(Analisis.empleadores(empleadores).get("preguntasAbiertas"));
+        java.util.function.Function<String, List<Map<String, Object>>> top = k -> lista(ab.get(k)).stream()
+            .filter(f -> !"sin_categoria".equals(f.get("codigo")) && i(f.get("frecuencia")) > 0).toList();
+        List<Map<String, Object>> areas = top.apply("areas_emergentes"), herr = top.apply("herramientas"), hab = top.apply("habilidades");
+        java.util.function.Function<Map<String, Object>, String> c = f -> "``" + t((String) f.get("etiqueta")) + "'' (" + pct(d(f.get("relativa"))) + " de las respuestas)";
+        StringBuilder sb = new StringBuilder();
+        if (!areas.isEmpty()) {
+            sb.append("Como área de conocimiento emergente, la categoría más mencionada es ").append(c.apply(areas.get(0)));
+            if (areas.size() > 1) sb.append(", seguida de ").append(c.apply(areas.get(1)));
+            sb.append(". ");
+        }
+        if (!herr.isEmpty()) sb.append("En herramientas, lo más pedido es ").append(c.apply(herr.get(0))).append(". ");
+        if (!hab.isEmpty()) {
+            sb.append("En habilidades, lo más mencionado es ").append(c.apply(hab.get(0)));
+            if (hab.size() > 1) sb.append(", seguido de ").append(c.apply(hab.get(1)));
+            sb.append(".");
+        }
+        return sb.append(marca()).append("\n").toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String conclusiones() {
+        Map<String, Object> emp = Analisis.empleabilidad(titulados);
+        Map<String, Object> comp = Analisis.competencias(titulados, empleadores);
+        Map<String, Object> form = Analisis.formacionContinua(titulados);
+        Map<String, Object> fin = Analisis.financiamiento(titulados);
+        Map<String, Object> empl = Analisis.empleadores(empleadores);
+        List<Map<String, Object>> crits = Criterios.evaluar(titulados, empleadores);
+        Map<String, Map<String, Object>> cruces = crucesPorId();
+        StringBuilder sb = new StringBuilder("\\begin{enumerate}\n");
+
+        // 3.2.3
+        Map<String, Object> c323 = criterio(crits, "3.2.3");
+        List<Map<String, Object>> fav = (List<Map<String, Object>>) c323.getOrDefault("favorables", List.of());
+        List<Map<String, Object>> des = (List<Map<String, Object>>) c323.getOrDefault("desfavorables", List.of());
+        Map<String, Object> tpe = mapa(mapa(emp.get("tiempoPrimerEmpleo")).get("mesesIC95"));
+        Map<String, Object> dest = mapa(emp.get("destinoLaboral"));
+        Map<String, Object> rubro = moda(lista(dest.get("rubro")));
+        sb.append("  \\item \\textbf{Condiciones de empleo (3.2.3).} ").append(fav.size()).append(" de ").append(fav.size() + des.size())
+          .append(" indicadores del criterio son favorables");
+        if (!fav.isEmpty()) sb.append(": ").append(aspectos(fav));
+        sb.append(des.isEmpty() ? ". " : "; desfavorables: " + aspectos(des) + ". ");
+        sb.append("El tiempo medio para conseguir el primer empleo es de ").append(n(d(tpe.get("media")), 2)).append(" meses (IC 95\\%: ")
+          .append(n(d(tpe.get("limiteInferior")), 2)).append(" a ").append(n(d(tpe.get("limiteSuperior")), 2))
+          .append("), y queda como línea base porque ARCU-SUR no fija un valor de referencia. El ")
+          .append(pct(prop(lista(dest.get("sector_publico_privado")), "Privado"))).append(" de quienes trabajan en una organización lo hace en el sector privado, principalmente en ``")
+          .append(t((String) rubro.get("etiqueta"))).append("''.");
+        Object med = emp.get("medianaVidaProfesional");
+        if (med != null) {
+            double media = d(mapa(emp.get("aniosVidaProfesional")).get("media"));
+            sb.append(" La mediana de experiencia es de ").append(fmtN(d(med))).append(" años (media ").append(n(media, 2)).append(")");
+            List<Map<String, Object>> seg = lista(emp.get("segmentosExperiencia"));
+            if (seg.size() == 2 && i(seg.get(0).get("conCargo")) > 0 && i(seg.get(1).get("conCargo")) > 0) {
+                sb.append("; ocupa un cargo ejecutivo el ").append(pct((double) i(seg.get(1).get("ejecutivos")) / i(seg.get(1).get("conCargo"))))
+                  .append(" de los consolidados que declararon un cargo, frente al ").append(pct((double) i(seg.get(0).get("ejecutivos")) / i(seg.get(0).get("conCargo"))))
+                  .append(" de los junior");
+            }
+            sb.append(".");
+        }
+        sb.append("\n");
+
+        // 3.2.1 y 2.1.7
+        Map<String, Object> mej = lista(comp.get("aspectosMejorar")).get(0);
+        Map<String, Object> vent = lista(comp.get("asignaturasVentaja")).get(0);
+        List<Map<String, Object>> areasEmp = lista(mapa(empl.get("preguntasAbiertas")).get("areas_emergentes")).stream()
+            .filter(f -> !"sin_categoria".equals(f.get("codigo")) && i(f.get("frecuencia")) > 0).limit(2).toList();
+        double sat = acuerdo(mapa(comp.get("satisfaccionGlobal")));
+        sb.append("  \\item \\textbf{Resultados de la formación (3.2.1) y actualización curricular (2.1.7).} El ").append(pct(sat))
+          .append(" está satisfecho con la formación recibida, ").append(sat > 0.5 ? "pero" : "y").append(" el ").append(pct(d(mej.get("relativa"))))
+          .append(" señala ``").append(t((String) mej.get("etiqueta"))).append("'' como el aspecto a mejorar más importante. ``")
+          .append(t((String) vent.get("etiqueta"))).append("'' es la asignatura que más ventaja da en el trabajo (").append(pct(d(vent.get("relativa")))).append(")");
+        if (!areasEmp.isEmpty()) sb.append(", y los empleadores piden reforzar sobre todo ").append(String.join(" y ", areasEmp.stream().map(f -> "``" + t((String) f.get("etiqueta")) + "''").toList()));
+        sb.append(".\n");
+
+        // 2.1.2
+        Map<String, Object> c212 = criterio(crits, "2.1.2");
+        List<Map<String, Object>> f212 = (List<Map<String, Object>>) c212.getOrDefault("favorables", List.of());
+        List<Map<String, Object>> d212 = (List<Map<String, Object>>) c212.getOrDefault("desfavorables", List.of());
+        sb.append("  \\item \\textbf{Perfil de egreso (2.1.2).} ").append(f212.size()).append(" de ").append(f212.size() + d212.size())
+          .append(" ítems del perfil son favorables");
+        if (!f212.isEmpty()) sb.append(": ").append(aspectos(f212));
+        sb.append(d212.isEmpty() ? "." : "; desfavorables: " + aspectos(d212) + ".").append("\n");
+
+        // 2.4.1
+        Map<String, Object> c241 = criterio(crits, "2.4.1");
+        List<Map<String, Object>> d241 = (List<Map<String, Object>>) c241.getOrDefault("desfavorables", List.of());
+        Map<String, Object> area = moda(lista(form.get("areaInteres")));
+        int nInt = i(mapa(form.get("interesPosgrado")).get("casos"));
+        List<Map<String, Object>> areas = ordenDesc(lista(form.get("areaInteres")));
+        double conc = areas.size() < 2 || nInt == 0 ? 0 : (double) (i(areas.get(0).get("frecuencia")) + i(areas.get(1).get("frecuencia"))) / nInt;
+        sb.append("  \\item \\textbf{Posgrado (2.4.1 y 1.1.5).} El ").append(pct(d(mapa(form.get("interesPosgrado")).get("proporcion"))))
+          .append(" quiere un posgrado, sobre todo en ``").append(t((String) area.get("etiqueta"))).append("'' (").append(pct(nInt == 0 ? 0 : (double) i(area.get("frecuencia")) / nInt))
+          .append(" de los interesados); las dos áreas más elegidas reúnen el ").append(pct(conc)).append(" de las preferencias, ")
+          .append(conc > 0.7 ? "más del 70\\% que el enunciado toma como referencia para abrir programas modulares" : "frente al 70\\% que el enunciado toma como referencia para abrir programas modulares")
+          .append(". El ").append(pct(acuerdo(mapa(form.get("ofertaPosgradoFcyt"))))).append(" considera afín la oferta de la FCyT y el ").append(pct(propUmss(form)))
+          .append(" de los interesados la elegiría");
+        sb.append(d241.isEmpty() ? "." : "; aspectos desfavorables del criterio: " + aspectos(d241) + ".");
+        sb.append(" El ").append(pct(prop(lista(fin.get("programaFinanciamiento")), "recursos_propios"))).append(" de quienes ya cursaron un programa lo pagó con recursos propios.\n");
+
+        // 2.4.2
+        Map<String, Object> c242 = criterio(crits, "2.4.2");
+        List<Map<String, Object>> f242 = (List<Map<String, Object>>) c242.getOrDefault("favorables", List.of());
+        List<Map<String, Object>> d242 = (List<Map<String, Object>>) c242.getOrDefault("desfavorables", List.of());
+        sb.append("  \\item \\textbf{Relación con las organizaciones (2.4.2).} ").append(f242.size()).append(" de ").append(f242.size() + d242.size())
+          .append(" aspectos son favorables");
+        if (!f242.isEmpty()) sb.append(": ").append(aspectos(f242));
+        sb.append(d242.isEmpty() ? "." : ". Con menos de la mitad de acuerdo: " + aspectos(d242) + ".").append("\n");
+
+        // 3.2.2
+        Map<String, Object> red = mapa(Analisis.demografia(titulados).get("redContactos"));
+        sb.append("  \\item \\textbf{Seguimiento a graduados (3.2.2).} El ").append(pct(d(red.get("proporcion"))))
+          .append(" quiere formar parte de una red de contactos de la Carrera, y la herramienta permite recibir respuestas de forma continua y recalcular los indicadores.\n");
+
+        // Cruces
+        List<Map<String, Object>> dep = cruces.values().stream().filter(ReporteTex::dependiente).toList();
+        List<Map<String, Object>> ind = cruces.values().stream().filter(c -> Boolean.TRUE.equals(c.get("independientes"))).toList();
+        sb.append("  \\item \\textbf{Cruces de variables.} ").append(dep.size()).append(" de los ").append(cruces.size())
+          .append(" cruces muestran dependencia significativa al 5\\% (se rechaza $H_0$)");
+        if (!dep.isEmpty()) {
+            sb.append(":\n  \\begin{itemize}[nosep]\n");
+            for (Map<String, Object> c : dep) {
+                sb.append("    \\item \\emph{").append(t((String) c.get("titulo"))).append(" (").append(c.get("id")).append("):} ``")
+                  .append(t((String) c.get("variableColumnas"))).append("'' depende de ``").append(t((String) c.get("variableFilas")))
+                  .append("''; ").append(lecturaDependencia(c)).append(".\n");
+            }
+            sb.append("  \\end{itemize}\n  ");
+        } else {
+            sb.append(". ");
+        }
+        if (!ind.isEmpty()) {
+            sb.append("En los otros ").append(ind.size()).append(" no se rechaza la independencia: ")
+              .append(String.join(", ", ind.stream().map(c -> t((String) c.get("titulo")) + " (" + c.get("id") + ")").toList())).append(".");
+        }
+        sb.append(marca()).append("\n\\end{enumerate}\n");
+        return sb.toString();
+    }
+
+    private static String propuestas() {
+        Map<String, Object> comp = Analisis.competencias(titulados, empleadores);
+        Map<String, Object> form = Analisis.formacionContinua(titulados);
+        Map<String, Object> fin = Analisis.financiamiento(titulados);
+        Map<String, Object> empl = Analisis.empleadores(empleadores);
+        List<Map<String, Object>> crits = Criterios.evaluar(titulados, empleadores);
+        Map<String, Map<String, Object>> cr = crucesPorId();
+        StringBuilder sb = new StringBuilder("\\begin{itemize}\n");
+
+        // Becas (HU3, C7)
+        sb.append("  \\item \\textbf{Becas y alianzas de financiamiento:} el ").append(pct(prop(lista(fin.get("programaFinanciamiento")), "recursos_propios")))
+          .append(" de quienes cursaron un programa lo financió con recursos propios");
+        Map<String, Object> c7 = cr.get("C7");
+        if (c7 != null && dependiente(c7)) {
+            String[] f = filaConMas(c7, "Con beca (total o parcial)");
+            if (f != null) sb.append(", y las pocas becas se concentran en ``").append(f[0]).append("'' (").append(f[1]).append(" con beca, C7)");
+        }
+        sb.append(". Buscar financiamiento a través de organismos internacionales y convenios con instituciones y empresas para ampliar las becas (HU3).\n");
+
+        // Oferta de posgrado (C8, C11)
+        Map<String, Object> c8 = cr.get("C8"), c11 = cr.get("C11");
+        List<Map<String, Object>> areas = ordenDesc(lista(form.get("areaInteres")));
+        String topAreas = String.join(", ", areas.stream().limit(3).map(f -> "``" + t((String) f.get("etiqueta")) + "''").toList());
+        double umss = propUmss(form);
+        sb.append("  \\item \\textbf{Posgrados modulares} en las áreas de mayor interés (").append(topAreas).append(")");
+        if (umss < 0.5) sb.append(", para captar al ").append(pct(1 - umss)).append(" de interesados que hoy elegiría otra institución");
+        sb.append(" (criterio 2.4.1)");
+        if (c8 != null && dependiente(c8)) sb.append(", orientados por grupo de edad (C8): ").append(masElegidaPorFila(c8));
+        if (c11 != null && dependiente(c11)) sb.append("; y rutas de continuidad (diplomado, especialidad, maestría) para quienes ya cursaron un programa (C11)");
+        sb.append(".\n");
+
+        // Etapa profesional (C9, C10)
+        Map<String, Object> c9 = cr.get("C9"), c10 = cr.get("C10");
+        if ((c9 != null && dependiente(c9)) || (c10 != null && dependiente(c10))) {
+            sb.append("  \\item \\textbf{Formación según la etapa profesional}: especializaciones técnicas para los titulados junior y formación en gestión y dirección para los consolidados, porque la experiencia influye en ")
+              .append(c9 != null && dependiente(c9) && c10 != null && dependiente(c10) ? "la remuneración (C9) y en el cargo (C10)" : c9 != null && dependiente(c9) ? "la remuneración (C9)" : "el cargo (C10)").append(".\n");
+        }
+
+        // Inserción laboral (C12)
+        Map<String, Object> c12 = cr.get("C12");
+        if (c12 != null && dependiente(c12)) {
+            String[] f = filaConMas(c12, "No trabaja");
+            if (f != null) sb.append("  \\item \\textbf{Inserción laboral} (C12): reforzar la bolsa de trabajo y la vinculación con empleadores para el grupo de ``")
+                .append(f[0]).append("'', donde el ").append(f[1]).append(" no trabaja.\n");
+        }
+
+        // Consulta a empleadores (2.4.2)
+        Map<String, Object> c242 = criterio(crits, "2.4.2");
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> d242 = new ArrayList<>((List<Map<String, Object>>) c242.getOrDefault("desfavorables", List.of()));
+        if (!d242.isEmpty()) {
+            d242.sort((a, b) -> Double.compare(d(a.get("proporcion")), d(b.get("proporcion"))));
+            sb.append("  \\item \\textbf{Consulta periódica a empleadores}: incorporar a las organizaciones en los aspectos con menor acuerdo del criterio 2.4.2, en especial ")
+              .append(aspectos(d242.subList(0, Math.min(2, d242.size())))).append(".\n");
+        }
+
+        // Actualización del plan (2.1.7)
+        List<Map<String, Object>> areasEmp = lista(mapa(empl.get("preguntasAbiertas")).get("areas_emergentes")).stream()
+            .filter(f -> !"sin_categoria".equals(f.get("codigo")) && i(f.get("frecuencia")) > 0).limit(3).toList();
+        double actualizar = prop(lista(comp.get("aspectosMejorar")), "actualizacion_plan_estudios");
+        sb.append("  \\item \\textbf{Actualización del plan de estudios}, que pide el ").append(pct(actualizar)).append(" de los titulados");
+        if (!areasEmp.isEmpty()) sb.append(", con los contenidos que más mencionan los empleadores (").append(String.join(", ", areasEmp.stream().map(f -> "``" + t((String) f.get("etiqueta")) + "''").toList())).append(")");
+        sb.append(" (criterio 2.1.7).\n");
+
+        // Observatorio (3.2.2)
+        Map<String, Object> red = mapa(Analisis.demografia(titulados).get("redContactos"));
+        sb.append("  \\item \\textbf{Observatorio permanente de titulados}: mantener abierto el formulario de la herramienta y aprovechar el interés en la red de contactos (")
+          .append(pct(d(red.get("proporcion")))).append(") para aplicar la encuesta de forma periódica (criterio 3.2.2).\n");
+        sb.append("\\end{itemize}\n");
+        return sb.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static String multivariable() {
+        Map<String, Object> m = Analisis.multivariable(titulados);
+        List<Map<String, Object>> filas = (List<Map<String, Object>>) m.get("filas");
+        if (filas.isEmpty()) return "No hay suficientes respuestas con nivel, financiamiento y años de vida profesional a la vez para este análisis.\n\n";
+        int nTotal = i(m.get("nTotal"));
+        double zPromGeneral = d(m.get("zPromGeneral"));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\\textit{Paso 1. Variables.} Sobre los titulados que hicieron formación ")
+          .append("complementaria, se cruzan dos variables cualitativas -- $X$ = nivel del ")
+          .append("programa cursado, $Y$ = fuente de financiamiento -- con una variable ")
+          .append("cuantitativa -- $Z$ = años de vida profesional --, siguiendo la tabulación ")
+          .append("cruzada multivariada de la asignatura: frecuencia ($n$) y promedio de $Z$ ")
+          .append("($\\bar{Z}$) en cada combinación $X$--$Y$ que aparece en los datos.\n\n");
+
+        sb.append("\\textit{Paso 2. Tabulación cruzada de frecuencias y antigüedad promedio.}\n\n");
+        sb.append("\\begin{mitabla}{Nivel del programa ($X$) y fuente de financiamiento ($Y$), con antigüedad promedio ($n=").append(nTotal).append("$)").append(marca()).append("}\n");
+        sb.append("\\begin{tabular}{llcc}\n\\toprule\n$X$ (nivel) & $Y$ (financiamiento) & $n$ & $\\bar{Z}$ (años) \\\\\n\\midrule\n");
+        for (Map<String, Object> f : filas) {
+            sb.append(t((String) f.get("x"))).append(" & ").append(t((String) f.get("y"))).append(" & ")
+              .append(i(f.get("n"))).append(" & ").append(n(d(f.get("zProm")), 2)).append(" \\\\\n");
+        }
+        sb.append("\\midrule\n\\multicolumn{2}{l}{Total / Promedio general} & ").append(nTotal).append(" & ").append(n(zPromGeneral, 2)).append(" \\\\\n");
+        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+
+        sb.append("\\textit{Paso 3. Hallazgos por categoría de $X$.} Para cada nivel de programa, ")
+          .append("la fuente de financiamiento más frecuente y si su antigüedad promedio queda por ")
+          .append("encima o por debajo del promedio general (").append(n(zPromGeneral, 2)).append(" años):\n\n");
+        sb.append("\\begin{itemize}\n");
+        for (Map<String, Object> h : (List<Map<String, Object>>) m.get("hallazgos")) {
+            boolean sobre = (boolean) h.get("sobrePromedio");
+            sb.append("  \\item \\textbf{").append(t((String) h.get("x"))).append("} ($n=").append(i(h.get("n"))).append("$): ")
+              .append("antigüedad promedio de ").append(n(d(h.get("zProm")), 2)).append(" años, ")
+              .append(sobre ? "por encima" : "por debajo").append(" del promedio general. ")
+              .append("La fuente de financiamiento más frecuente es ").append(t(((String) h.get("financiamientoFrecuente")).toLowerCase()))
+              .append(" (").append(n(100 * d(h.get("pctFinanciamientoFrecuente")), 1)).append("\\% de este grupo).\n");
+        }
+        sb.append("\\end{itemize}\n\n");
+        sb.append("\\textit{Interpretación.} A mayor nivel del programa cursado, mayor la ")
+          .append("antigüedad promedio de quienes lo cursaron: quienes ya acumularon más años de ")
+          .append("vida profesional son los que llegan a programas de nivel más alto (maestría o ")
+          .append("doctorado), mientras que los titulados más recientes se concentran en diplomados. ")
+          .append("Los recursos propios dominan el financiamiento en todos los niveles.").append(marca()).append("\n\n");
         return sb.toString();
     }
 }

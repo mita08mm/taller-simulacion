@@ -29,8 +29,8 @@ export const urlExportar = (que, filtro = {}, extra = {}) => {
   return url.toString()
 }
 
-export const pct = (v, dec = 1) => (v == null ? '—' : `${(v * 100).toFixed(dec)}%`)
-export const num = (v, dec = 2) => (v == null ? '—' : Number(v).toFixed(dec))
+export const pct = (v, dec = 1) => (v == null ? '—' : `${(v * 100).toFixed(dec).replace('.', ',')}%`)
+export const num = (v, dec = 2) => (v == null ? '—' : Number(v).toFixed(dec).replace('.', ','))
 
 /** POST / PUT / DELETE con cuerpo JSON. Si el backend responde con error, lanza un Error con .errores (por pregunta). */
 export async function enviar(metodo, ruta, cuerpo, parametros = {}) {

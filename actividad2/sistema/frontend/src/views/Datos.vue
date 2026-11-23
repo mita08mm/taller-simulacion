@@ -1,28 +1,37 @@
 <script setup>
 import { inject, ref } from 'vue'
-import { useMessage } from 'naive-ui'
-import { importarCsv, urlExportar } from '../api'
+import { importarCsv, urlExportar, enviar, API } from '../api'
 import { useApi } from '../useApi'
+import { useAccion, textoError } from '../useAccion'
 
-const alImportar = inject('alImportar')
 const filtro = inject('filtro')
-const mensaje = useMessage()
+const { accion, mensaje } = useAccion()
 const subiendo = ref('')
 
 async function subir(tipo, { file }) {
   subiendo.value = tipo
-  try {
-    const r = await importarCsv(tipo, file.file)
-    mensaje.success(`Se guardaron ${r.importadas} respuestas de ${tipo} en la base de datos`)
-    alImportar()
-  } catch (e) {
-    mensaje.error(e.message)
-  } finally {
-    subiendo.value = ''
-  }
+  await accion(() => importarCsv(tipo, file.file), { exito: (r) => `Se guardaron ${r.importadas} respuestas de ${tipo} en la base de datos` })
+  subiendo.value = ''
   return false
 }
 const { datos: cruces } = useApi('/api/cruces')
+
+// Informe: el sistema regenera todos sus fragmentos con las respuestas actuales y lo compila con latexmk
+const actualizando = ref(false)
+const resultadoInforme = ref(null)
+async function actualizarInforme() {
+  actualizando.value = true
+  resultadoInforme.value = null
+  try {
+    resultadoInforme.value = await enviar('POST', '/api/admin/informe')
+    if (resultadoInforme.value.ok) mensaje.success(resultadoInforme.value.mensaje)
+    else mensaje.error('La compilación del informe falló')
+  } catch (e) {
+    mensaje.error(textoError(e))
+  } finally {
+    actualizando.value = false
+  }
+}
 </script>
 
 <template>
@@ -50,6 +59,18 @@ const { datos: cruces } = useApi('/api/cruces')
       </n-gi>
     </n-grid>
 
+    <n-card title="Informe" size="small" style="margin-top: 14px">
+      <p class="nota" style="margin: 0 0 10px">
+        Recalcula todo el informe (tablas, desarrollos paso a paso, cruces, resumen, conclusiones y propuestas) con las respuestas que hay ahora en la base, y lo compila en PDF.
+        Úsalo después de importar respuestas nuevas o de limpiar datos.
+      </p>
+      <n-space>
+        <n-button type="primary" :loading="actualizando" @click="actualizarInforme">Actualizar informe</n-button>
+        <n-button tag="a" :href="API + '/api/admin/informe/pdf'" secondary>Descargar PDF</n-button>
+      </n-space>
+      <n-alert v-if="resultadoInforme && !resultadoInforme.ok" type="error" :bordered="false" style="margin-top: 10px">{{ resultadoInforme.mensaje }}</n-alert>
+    </n-card>
+
     <n-card title="Relaciones entre preguntas (tablas cruzadas)" size="small" style="margin-top: 14px">
       <div v-for="c in cruces ?? []" :key="c.id" class="fila-cruce">
         <span>{{ c.titulo.replace(' (opcional)', '') }}</span>
@@ -65,5 +86,5 @@ const { datos: cruces } = useApi('/api/cruces')
 </template>
 
 <style scoped>
-.fila-cruce { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #f1f1f3; font-size: 14px; }
+.fila-cruce { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--borde-suave); font-size: 14px; }
 </style>

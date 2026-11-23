@@ -2,29 +2,61 @@
 % Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C4. Interés en posgrado $\times$ oferta de posgrado FCyT}
 
-\textit{Propósito.} Determinar si la percepción de que la oferta de posgrado de la FCyT es afín a la carrera depende del interés en realizar un posgrado. Respalda el criterio ARCU-SUR 2.4.1 / 1.1.5. Se aplica sobre: todos los titulados, con nivel de significancia $\alpha = 0.05$.
+\textit{Paso 1. Describir el problema.} Determinar si la percepción de que la oferta de posgrado de la FCyT es afín a la carrera depende del interés en realizar un posgrado.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 148$).
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Interés en posgrado.
+  \item Variable dependiente $Y$: Oferta FCyT afín.
+  \item Población: todos los titulados ($N = 148$). Criterio ARCU-SUR: 2.4.1. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Interés en posgrado» (X) y «Oferta FCyT afín» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Interés en posgrado» (X) y «Oferta FCyT afín» (Y).
+\end{itemize}
 
-\begin{mitabla}{C4: frecuencia observada $FO_{ij}$}
-\begin{tabular}{lcc|c}
+\textit{Datos.} Primeros 10 de los 148 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C4: datos de los primeros titulados}
+\begin{tabular}{lll}
 \toprule
-Interés en posgrado & En desacuerdo & De acuerdo & Total fila \\
+Titulado & $X$: Interés en posgrado & $Y$: Oferta FCyT afín \\
 \midrule
-Sí & 33 & 90 & 123 \\
-No & 10 & 15 & 25 \\
-\midrule
-Total columna & 43 & 105 & $N=148$ \\
+T1 & Sí & De acuerdo \\
+T2 & Sí & De acuerdo \\
+T3 & Sí & En desacuerdo \\
+T4 & Sí & De acuerdo \\
+T5 & Sí & De acuerdo \\
+T6 & Sí & De acuerdo \\
+T7 & Sí & De acuerdo \\
+T8 & Sí & De acuerdo \\
+T9 & Sí & De acuerdo \\
+T10 & Sí & De acuerdo \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Sí -- En desacuerdo'': $FE_{11} = 123 \times 43 / 148 = 35.7365$.
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 148$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C4: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Interés en posgrado \textbackslash{} $Y$: Oferta FCyT afín & En desacuerdo & De acuerdo & Total \\
+\midrule
+Sí & 33 & 90 & 123 \\
+No & 10 & 15 & 25 \\
+\midrule
+Total & 43 & 105 & $N = 148$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Sí y En desacuerdo:
+\[
+FE_{11} = \frac{(123)(43)}{148} = 35.74
+\]
 
 \begin{mitabla}{C4: frecuencia esperada $FE_{ij}$}
-\begin{tabular}{lcc}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
 \toprule
-Interés en posgrado & En desacuerdo & De acuerdo \\
+$X$: Interés en posgrado \textbackslash{} $Y$: Oferta FCyT afín & En desacuerdo & De acuerdo \\
 \midrule
 Sí & $123\cdot43/148 = 35.74$ & $123\cdot105/148 = 87.26$ \\
 No & $25\cdot43/148 = 7.26$ & $25\cdot105/148 = 17.74$ \\
@@ -32,38 +64,39 @@ No & $25\cdot43/148 = 7.26$ & $25\cdot105/148 = 17.74$ \\
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
 
 \begin{mitabla}{C4: cálculo de $X_0^2$ celda por celda}
-\begin{tabular}{L{5.4cm}cccc}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
 \toprule
-Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
+$X$: Interés en posgrado \textbackslash{} $Y$: Oferta FCyT afín & En desacuerdo & De acuerdo & Suma fila \\
 \midrule
-Sí -- En desacuerdo & 33 & 35.7365 & 7.4884 & 0.2095 \\
-Sí -- De acuerdo & 90 & 87.2635 & 7.4884 & 0.0858 \\
-No -- En desacuerdo & 10 & 7.2635 & 7.4884 & 1.0310 \\
-No -- De acuerdo & 15 & 17.7365 & 7.4884 & 0.4222 \\
-\midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 1.7485 \\
+Sí & $\dfrac{(33-35.74)^2}{35.74}$\newline $= 0.2095$ & $\dfrac{(90-87.26)^2}{87.26}$\newline $= 0.0858$ & $0.2954$ \\[6pt]
+No & $\dfrac{(10-7.26)^2}{7.26}$\newline $= 1.0310$ & $\dfrac{(15-17.74)^2}{17.74}$\newline $= 0.4222$ & $1.4532$ \\[6pt]
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $k = 2$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (2-1)(2-1) = 1$. De la tabla de chi-cuadrada: $X_{0.05,\,1}^2 = 3.841$.
+\[
+X_0^2 = 0.2954 + 1.4532 = 1.7485
+\]
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 1.7485 < 3.841$.
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
 
-\textit{Paso 6. Conclusión.}
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
 
 \begin{center}
 \begin{tabular}{l}
-Si ($X_0^2 < X_{0.05,\,1}^2$)\\
-\quad \fbox{Independencia}\\
+$1.7485 < 3.841 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
 Sino\\
-\quad Relación entre las variables\\
+\quad NO ``Independencia''\\
 FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que interés en posgrado y oferta fcyt afín sean independientes.
+No se rechaza $H_0$: con estos datos, «Oferta FCyT afín» no depende de «Interés en posgrado».
+
+\textit{Recomendación.} La percepción de la oferta de la FCyT no depende del interés en un posgrado: la difusión puede dirigirse a todos los titulados.
 

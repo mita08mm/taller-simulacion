@@ -182,26 +182,26 @@ const maximoAlcanzado = (p, codigo) => p.maxSelecciones && valores[p.codigo].len
 </template>
 
 <style scoped>
-.fondo { min-height: 100vh; background: #f4f4f5; padding: 24px 16px 60px; }
+.fondo { min-height: 100vh; background: var(--fondo); padding: 24px 16px 60px; }
 .contenedor { max-width: 720px; margin: 0 auto; }
 .cabecera { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.logo { width: 40px; height: 40px; border-radius: 10px; background: #4f46e5; color: #fff; display: grid; place-items: center; font-weight: 700; }
+.logo { width: 40px; height: 40px; border-radius: 10px; background: var(--acento); color: var(--sobre-acento); display: grid; place-items: center; font-weight: 700; }
 .institucion { font-weight: 600; }
-.sub { color: #71717a; font-size: 13px; }
+.sub { color: var(--suave); font-size: 13px; }
 .tarjeta { margin-bottom: 14px; border-radius: 14px; }
 .titulo { font-size: 22px; margin: 0 0 8px; letter-spacing: -0.01em; }
-.intro { color: #52525b; line-height: 1.6; margin: 0; font-size: 14.5px; }
+.intro { color: var(--texto-secundario); line-height: 1.6; margin: 0; font-size: 14.5px; }
 .progreso-fila { display: flex; justify-content: space-between; }
-.paso { color: #71717a; font-size: 12.5px; font-weight: 500; }
+.paso { color: var(--suave); font-size: 12.5px; font-weight: 500; }
 .seccion { font-size: 18px; margin: 0 0 10px; }
-.pregunta { padding: 16px 0; border-top: 1px solid #f4f4f5; }
-.pregunta.conerror .enunciado { color: #b91c1c; }
+.pregunta { padding: 16px 0; border-top: 1px solid var(--borde-suave); }
+.pregunta.conerror .enunciado { color: var(--mal); }
 .enunciado { font-weight: 500; margin-bottom: 10px; line-height: 1.5; }
-.obligatoria { color: #b91c1c; }
-.ayuda { color: #71717a; font-size: 13px; margin: -4px 0 10px; }
-.error { color: #b91c1c; font-size: 13px; margin-top: 8px; }
+.obligatoria { color: var(--mal); }
+.ayuda { color: var(--suave); font-size: 13px; margin: -4px 0 10px; }
+.error { color: var(--mal); font-size: 13px; margin-top: 8px; }
 .escala { display: flex; flex-wrap: wrap; }
 .botones { display: flex; justify-content: space-between; margin-top: 20px; }
 .centro { padding: 60px; display: grid; place-items: center; }
-.nota { color: #71717a; font-size: 13px; }
+.nota { color: var(--suave); font-size: 13px; }
 </style>

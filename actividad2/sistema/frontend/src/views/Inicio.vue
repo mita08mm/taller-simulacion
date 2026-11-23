@@ -40,14 +40,14 @@ const total = (c) => c.favorables.length + c.desfavorables.length
 
 <style scoped>
 .criterio { text-align: left; font: inherit; color: inherit; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; padding: 18px 20px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
-.criterio:hover { border-color: #c7d2fe; box-shadow: 0 1px 8px rgba(79, 70, 229, 0.08); }
+.criterio:hover { border-color: var(--acento-borde); box-shadow: 0 1px 8px rgba(79, 70, 229, 0.08); }
 .criterio-cabecera { display: flex; justify-content: space-between; align-items: center; }
 .criterio-nombre { font-weight: 600; font-size: 16px; margin-top: 4px; }
 .conteo { font-size: 12.5px; color: var(--suave); }
 .conteo.completo { color: var(--bien); }
-.barra { height: 6px; background: #f1f1f3; border-radius: 3px; margin: 12px 0 14px; overflow: hidden; }
+.barra { height: 6px; background: var(--borde-suave); border-radius: 3px; margin: 12px 0 14px; overflow: hidden; }
 .barra-llena { height: 100%; background: var(--acento); border-radius: 3px; }
-.barra.vacia { background: repeating-linear-gradient(90deg, #f1f1f3 0 6px, transparent 6px 10px); }
+.barra.vacia { background: repeating-linear-gradient(90deg, var(--borde-suave) 0 6px, transparent 6px 10px); }
 .indicador { display: flex; align-items: baseline; gap: 8px; }
 .indicador-valor { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
 </style>

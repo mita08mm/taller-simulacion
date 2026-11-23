@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, inject } from 'vue'
 import { obtener, urlExportar } from '../api'
+import { textoError } from '../useAccion'
 
 // Constructor de reportes: el usuario elige encuesta, período y variables; el reporte se calcula al abrirlo
 const encuesta = ref('titulados')
@@ -17,6 +18,16 @@ const conArcusur = ref(false)
 const titulo = ref('')
 const anios = ref([])
 const error = ref(null)
+// Solo se pueden elegir fechas y meses en los que hay respuestas
+const fueraDeRango = inject('fueraDeRango', () => false)
+const rangoDatos = inject('rangoDatos', ref(null))
+const mesFuera = (ts) => {
+  if (!rangoDatos.value) return false
+  const d = new Date(ts)
+  const finMes = new Date(d.getFullYear(), d.getMonth() + 1, 0).getTime(), inicioMes = new Date(d.getFullYear(), d.getMonth(), 1).getTime()
+  const [y1, m1, d1] = rangoDatos.value.desde.split('-').map(Number), [y2, m2, d2] = rangoDatos.value.hasta.split('-').map(Number)
+  return finMes < new Date(y1, m1 - 1, d1).getTime() || inicioMes > new Date(y2, m2 - 1, d2).getTime()
+}
 
 const modos = [
   { value: 'todo', label: 'Todo' },
@@ -55,7 +66,7 @@ async function cargarVariables() {
     secciones.value = await obtener('/api/reporte/variables', { encuesta: encuesta.value })
     elegidas.value = []
   } catch (e) {
-    error.value = e.message.includes('fetch') ? 'No se pudo conectar con el backend.' : e.message
+    error.value = textoError(e)
   }
 }
 watch(encuesta, cargarVariables)
@@ -131,8 +142,8 @@ function verReporte() {
             <n-radio-button value="I" label="I (ene–jun)" />
             <n-radio-button value="II" label="II (jul–dic)" />
           </n-radio-group>
-          <n-date-picker v-if="modo === 'mes'" v-model:value="mes" type="month" placeholder="Elige el mes" clearable />
-          <n-date-picker v-if="modo === 'fechas'" v-model:value="rango" type="daterange" start-placeholder="Desde" end-placeholder="Hasta" clearable />
+          <n-date-picker v-if="modo === 'mes'" v-model:value="mes" type="month" placeholder="Elige el mes" clearable :is-date-disabled="mesFuera" />
+          <n-date-picker v-if="modo === 'fechas'" v-model:value="rango" type="daterange" start-placeholder="Desde" end-placeholder="Hasta" clearable :is-date-disabled="fueraDeRango" />
         </div>
         <div class="nota" style="margin-top: 8px">{{ periodo ? periodo.texto + (periodo.desde ? ` · ${periodo.desde} a ${periodo.hasta}` : '') : 'Completa el período' }}</div>
       </div>
@@ -190,7 +201,7 @@ function verReporte() {
 .periodo-opciones { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
 .periodo-opciones:empty { display: none; }
 .herramientas-variables { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
-.seccion { border-top: 1px solid #f1f1f3; padding: 10px 0; }
+.seccion { border-top: 1px solid var(--borde-suave); padding: 10px 0; }
 .seccion-cabecera { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: var(--suave); margin-bottom: 8px; }
 .preguntas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; }
 .acciones { position: sticky; bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; padding: 12px 18px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04); }

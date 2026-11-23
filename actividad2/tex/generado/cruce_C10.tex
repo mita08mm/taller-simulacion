@@ -1,0 +1,103 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\subsubsection*{C10. Experiencia profesional $\times$ cargo}
+
+\textit{Paso 1. Describir el problema.} Establecer si ocupar un cargo ejecutivo depende de la experiencia (junior o consolidado), para distinguir a los profesionales junior de los mandos consolidados.
+
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Experiencia.
+  \item Variable dependiente $Y$: Cargo.
+  \item Población: trabajan en una organización ($N = 106$). Criterio ARCU-SUR: 3.2.3. Nivel de significancia $\alpha = 0.05$.
+  \item Junior: hasta 6 años de vida profesional (la mediana); consolidado: más de 6 años.
+  \item $H_0$: Las variables «Experiencia» (X) y «Cargo» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Experiencia» (X) y «Cargo» (Y).
+\end{itemize}
+
+\textit{Datos.} Primeros 10 de los 106 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C10: datos de los primeros titulados}
+\begin{tabular}{lll}
+\toprule
+Titulado & $X$: Experiencia & $Y$: Cargo \\
+\midrule
+T1 & Junior & Cargo ejecutivo \\
+T2 & Consolidado & Otro cargo \\
+T3 & Junior & Otro cargo \\
+T4 & Consolidado & Otro cargo \\
+T5 & Junior & Otro cargo \\
+T6 & Consolidado & Otro cargo \\
+T7 & Junior & Otro cargo \\
+T8 & Consolidado & Cargo ejecutivo \\
+T9 & Consolidado & Otro cargo \\
+T10 & Consolidado & Otro cargo \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 106$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C10: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Experiencia \textbackslash{} $Y$: Cargo & Cargo ejecutivo & Otro cargo & Total \\
+\midrule
+Junior & 4 & 49 & 53 \\
+Consolidado & 12 & 41 & 53 \\
+\midrule
+Total & 16 & 90 & $N = 106$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Junior y Cargo ejecutivo:
+\[
+FE_{11} = \frac{(53)(16)}{106} = 8.00
+\]
+
+\begin{mitabla}{C10: frecuencia esperada $FE_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Experiencia \textbackslash{} $Y$: Cargo & Cargo ejecutivo & Otro cargo \\
+\midrule
+Junior & $53\cdot16/106 = 8.00$ & $53\cdot90/106 = 45.00$ \\
+Consolidado & $53\cdot16/106 = 8.00$ & $53\cdot90/106 = 45.00$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
+
+\begin{mitabla}{C10: cálculo de $X_0^2$ celda por celda}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
+\toprule
+$X$: Experiencia \textbackslash{} $Y$: Cargo & Cargo ejecutivo & Otro cargo & Suma fila \\
+\midrule
+Junior & $\dfrac{(4-8.00)^2}{8.00}$\newline $= 2.0000$ & $\dfrac{(49-45.00)^2}{45.00}$\newline $= 0.3556$ & $2.3556$ \\[6pt]
+Consolidado & $\dfrac{(12-8.00)^2}{8.00}$\newline $= 2.0000$ & $\dfrac{(41-45.00)^2}{45.00}$\newline $= 0.3556$ & $2.3556$ \\[6pt]
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+X_0^2 = 2.3556 + 2.3556 = 4.7111
+\]
+
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
+
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+$4.7111 \ge 3.841 \rightarrow$ falso\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad ``Independencia''\\
+Sino\\
+\quad \fbox{NO ``Independencia''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$ y se acepta $H_1$: «Cargo» depende de «Experiencia». Porcentaje de cada fila en la columna ``Cargo ejecutivo'': Junior $4/53 = 7.5\%$; Consolidado $12/53 = 22.6\%$.
+
+\textit{Recomendación.} Los cargos ejecutivos se concentran en los titulados consolidados: ofrecerles formación en gestión y dirección, y a los junior especializaciones técnicas.
+

@@ -3,6 +3,7 @@ import { ref, reactive, computed, inject, watch } from 'vue'
 import CruceDetalle from '../components/CruceDetalle.vue'
 import { useApi, parametrosFiltro } from '../useApi'
 import { obtener, urlExportar } from '../api'
+import { textoError } from '../useAccion'
 
 // Comparación libre: se eligen dos preguntas y el sistema aplica la prueba chi-cuadrada al momento
 const filtro = inject('filtro')
@@ -21,7 +22,7 @@ async function calcular() {
   try {
     resultado.value = await obtener('/api/cruce-libre', { ...parametrosFiltro(filtro), ...params() })
   } catch (e) {
-    error.value = e.message
+    error.value = textoError(e)
     resultado.value = null
   } finally {
     cargando.value = false
@@ -39,11 +40,11 @@ function intercambiar() {
     <p class="pagina-sub">Elige dos preguntas de la encuesta a titulados para ver cómo se reparten las respuestas entre sí y si están relacionadas.</p>
 
     <div class="selector">
-      <n-form-item label="Pregunta en filas" :show-feedback="false" style="flex: 1">
+      <n-form-item label="Variable X (independiente)" :show-feedback="false" style="flex: 1">
         <n-select v-model:value="libre.filas" :options="opciones" filterable />
       </n-form-item>
       <n-button quaternary @click="intercambiar" title="Intercambiar" style="margin-top: 26px">⇄</n-button>
-      <n-form-item label="Pregunta en columnas" :show-feedback="false" style="flex: 1">
+      <n-form-item label="Variable Y (dependiente)" :show-feedback="false" style="flex: 1">
         <n-select v-model:value="libre.columnas" :options="opciones" filterable />
       </n-form-item>
     </div>

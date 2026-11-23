@@ -1,0 +1,61 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\subsubsection*{F6. Nivel de formación que piden los empleadores}
+
+Verificar si los empleadores piden por igual todos los niveles de formación o si hay un nivel que predomina.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Población: organizaciones encuestadas; tamaño $n = 53$; opciones de la pregunta $k = 6$; $\alpha = 0.05$.
+
+\begin{itemize}[nosep]
+  \item $H_0$: Las respuestas de «Nivel demandado» se reparten por igual entre las 6 opciones (uniformidad).
+  \item $H_1$: Las respuestas de «Nivel demandado» no se reparten por igual: hay opciones preferidas.
+\end{itemize}
+
+\textit{Paso 2. Calcular la frecuencia esperada.} Si las respuestas se repartieran por igual, cada opción tendría:
+\[
+FE = \frac{n}{k} = \frac{53}{6} = 8.83
+\]
+
+\textit{Paso 3. Calcular el estadístico chi-cuadrado.} Se cuenta la frecuencia observada $FO_i$ de cada opción y se calcula $\frac{(FO_i - FE)^2}{FE}$.
+
+\begin{mitabla}{F6: prueba de las frecuencias, Nivel demandado}
+\begin{tabular}{L{6cm}ccc}
+\toprule
+Opción & $FO_i$ & $FE$ & $\frac{(FO_i-FE)^2}{FE}$ \\
+\midrule
+Licenciatura & 38 & 8.83 & $\frac{(38-8.83)^2}{8.83} = 96.3050$ \\[3pt]
+Diplomado & 4 & 8.83 & $\frac{(4-8.83)^2}{8.83} = 2.6447$ \\[3pt]
+Especialidad & 8 & 8.83 & $\frac{(8-8.83)^2}{8.83} = 0.0786$ \\[3pt]
+Maestría & 3 & 8.83 & $\frac{(3-8.83)^2}{8.83} = 3.8522$ \\[3pt]
+Doctorado & 0 & 8.83 & $\frac{(0-8.83)^2}{8.83} = 8.8333$ \\[3pt]
+Post-doctorado & 0 & 8.83 & $\frac{(0-8.83)^2}{8.83} = 8.8333$ \\[3pt]
+\midrule
+Total & 53 & 53 & $x_0^2 = 120.5472$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+x_0^2 = \sum_{i=1}^{6} \frac{(FO_i - FE)^2}{FE} = 120.5472
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} $x^2_{\alpha,\,k-1} = x^2_{0.05,\,6-1} = x^2_{0.05,\,5} = 11.070$ (tabla chi-cuadrada).
+
+\textit{Paso 5. Establecer la relación entre estadísticos.} $x_0^2 < x^2_{\alpha,\,k-1}$ $\rightarrow$ $120.5472 \ge 11.070$ $\rightarrow$ no.
+
+\textit{Paso 6. Conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
+\quad ``Uniformidad''\\
+Sino\\
+\quad \fbox{No ``Uniformidad''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$: las respuestas no se reparten por igual, hay opciones preferidas. La más elegida es «Licenciatura» (38 de 53, 71.7\%).
+
+\textit{Recomendación.} Hay un nivel que predomina: el perfil de egreso y la oferta de posgrado deben responder a ese nivel de formación.
+

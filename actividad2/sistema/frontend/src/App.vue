@@ -1,7 +1,9 @@
 <script setup>
-import { ref, reactive, provide, computed, h, watch } from 'vue'
+import { ref, reactive, provide, computed, watch } from 'vue'
+import { esAR, dateEsAR } from 'naive-ui'
 import { obtener } from './api'
 import { parametrosFiltro } from './useApi'
+import { temaNaive as tema } from './tema'
 import Inicio from './views/Inicio.vue'
 import Empleo from './views/criterios/Empleo.vue'
 import Resultados from './views/criterios/Resultados.vue'
@@ -11,6 +13,7 @@ import Curricular from './views/criterios/Curricular.vue'
 import Posgrado from './views/criterios/Posgrado.vue'
 import Relaciones from './views/criterios/Relaciones.vue'
 import Comparar from './views/Comparar.vue'
+import ExplorarVariable from './views/ExplorarVariable.vue'
 import Datos from './views/Datos.vue'
 import Editor from './views/Editor.vue'
 import RespuestasAdmin from './views/RespuestasAdmin.vue'
@@ -39,34 +42,78 @@ if (esReporte.value) {
 const aIso = (ms) => (ms == null ? null : new Date(ms).toISOString().slice(0, 10))
 const rango = ref(null)
 watch(rango, (r) => { filtro.desde = aIso(r?.[0]); filtro.hasta = aIso(r?.[1]) })
-const atajos = {
-  'Últimos 6 meses': () => [Date.now() - 182 * 864e5, Date.now()],
-  'Este año': () => [new Date(new Date().getFullYear(), 0, 1).getTime(), Date.now()],
+// Fechas con respuestas (de las dos encuestas): fuera de ese rango no se puede elegir nada en los calendarios
+const rangoDatos = ref(null)
+provide('rangoDatos', rangoDatos)
+const aFecha = (iso) => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d) }
+async function cargarRangoDatos() {
+  try {
+    const e = await obtener('/api/estado')
+    const fechas = [e.titulados.periodo, e.empleadores.periodo].flatMap((p) => [p.desde, p.hasta]).filter(Boolean).sort()
+    rangoDatos.value = fechas.length ? { desde: fechas[0], hasta: fechas.at(-1) } : null
+  } catch { rangoDatos.value = null }
 }
+const fueraDeRango = (ts) => {
+  if (!rangoDatos.value) return false
+  const ini = aFecha(rangoDatos.value.desde).getTime()
+  const fin = aFecha(rangoDatos.value.hasta).getTime() + 864e5 - 1
+  return ts < ini || ts > fin
+}
+provide('fueraDeRango', fueraDeRango)
+const atajos = computed(() => {
+  if (!rangoDatos.value) return {}
+  const ini = aFecha(rangoDatos.value.desde).getTime(), fin = aFecha(rangoDatos.value.hasta).getTime()
+  const anio = aFecha(rangoDatos.value.hasta).getFullYear()
+  return {
+    'Todo el período': () => [ini, fin],
+    [`Gestión ${anio}`]: () => [Math.max(ini, new Date(anio, 0, 1).getTime()), fin],
+    'Último mes con respuestas': () => [Math.max(ini, new Date(aFecha(rangoDatos.value.hasta).getFullYear(), aFecha(rangoDatos.value.hasta).getMonth(), 1).getTime()), fin],
+  }
+})
 async function actualizarEstado() {
   try { estado.value = await obtener('/api/estado', parametrosFiltro(filtro)) } catch { estado.value = null }
 }
 watch(() => [filtro.desde, filtro.hasta], actualizarEstado)
-provide('alImportar', () => { version.value++; actualizarEstado() })
+// Cualquier pantalla que cambie datos (importar, editar preguntas o respuestas) llama a esto vía useAccion:
+// sube la versión y todas las vistas que la observan vuelven a pedir sus datos
+provide('alCambiarDatos', () => { version.value++; actualizarEstado(); cargarRangoDatos() })
 actualizarEstado()
+cargarRangoDatos()
 
-// Criterios ordenados por su número ARCU-SUR; el número va en gris delante del nombre
-const criterio = (codigo, nombre, key) => ({
-  key,
-  label: () => h('span', { class: 'menu-criterio' }, [h('span', { class: 'menu-codigo' }, codigo), nombre]),
+// Barra superior: de qué encuesta son los datos de la pantalla y de qué meses (ej. «Encuesta a 53 empleadores · sep–oct 2026»)
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+function meses(periodo) {
+  if (!periodo?.desde || !periodo?.hasta) return ''
+  const a = aFecha(periodo.desde), b = aFecha(periodo.hasta)
+  if (a.getFullYear() === b.getFullYear()) {
+    return a.getMonth() === b.getMonth() ? `${MESES[a.getMonth()]} ${a.getFullYear()}` : `${MESES[a.getMonth()]}–${MESES[b.getMonth()]} ${b.getFullYear()}`
+  }
+  return `${MESES[a.getMonth()]} ${a.getFullYear()} – ${MESES[b.getMonth()]} ${b.getFullYear()}`
+}
+const FUENTE = { perfil: 'empleadores', relaciones: 'empleadores', empleo: 'titulados', resultados: 'titulados', posgrado: 'titulados', comparar: 'titulados' }
+const textoFuente = computed(() => {
+  if (!estado.value) return null
+  const t = estado.value.titulados, e = estado.value.empleadores
+  const tit = `${t.n} titulados · ${meses(t.periodo)}`, emp = `${e.n} empleadores · ${meses(e.periodo)}`
+  const f = FUENTE[actual.value]
+  return f === 'empleadores' ? `Encuesta a ${emp}` : f === 'titulados' ? `Encuesta a ${tit}` : `Encuestas: ${tit} | ${emp}`
 })
+
+// Los códigos ARCU-SUR (2.1.2, 3.2.1...) le sirven al comité de acreditación,
+// no a quien navega el panel -- no van en el menú, solo como tooltip en cada página.
 const opciones = [
   { label: 'Inicio', key: 'inicio' },
-  { type: 'group', label: 'Criterios ARCU-SUR', key: 'g-criterios', children: [
-    criterio('2.1.2', 'Perfil de egreso', 'perfil'),
-    criterio('2.1.7', 'Actualización curricular', 'curricular'),
-    criterio('2.4.1', 'Actualización y posgrado', 'posgrado'),
-    criterio('2.4.2', 'Relación con organizaciones', 'relaciones'),
-    criterio('3.2.1', 'Resultados de la formación', 'resultados'),
-    criterio('3.2.2', 'Seguimiento a graduados', 'seguimiento'),
-    criterio('3.2.3', 'Condiciones de empleo', 'empleo'),
+  { type: 'group', label: 'Resultados por tema', key: 'g-criterios', children: [
+    { label: 'Perfil de egreso', key: 'perfil' },
+    { label: 'Actualización curricular', key: 'curricular' },
+    { label: 'Actualización y posgrado', key: 'posgrado' },
+    { label: 'Relación con organizaciones', key: 'relaciones' },
+    { label: 'Resultados de la formación', key: 'resultados' },
+    { label: 'Seguimiento a graduados', key: 'seguimiento' },
+    { label: 'Condiciones de empleo', key: 'empleo' },
   ] },
   { type: 'group', label: 'Herramientas', key: 'g-herramientas', children: [
+    { label: 'Explorar una variable', key: 'explorar' },
     { label: 'Comparar dos preguntas', key: 'comparar' },
     { label: 'Generar reporte', key: 'reporte' },
   ] },
@@ -78,7 +125,7 @@ const opciones = [
 ]
 const vistas = {
   inicio: Inicio, empleo: Empleo, resultados: Resultados, seguimiento: Seguimiento, perfil: PerfilEgreso,
-  curricular: Curricular, posgrado: Posgrado, relaciones: Relaciones, comparar: Comparar,
+  curricular: Curricular, posgrado: Posgrado, relaciones: Relaciones, explorar: ExplorarVariable, comparar: Comparar,
   reporte: ReporteConfig, datos: Datos, editor: Editor, respuestas: RespuestasAdmin,
 }
 // Cada pantalla tiene su dirección (#/empleo, #/perfil, ...): funciona el botón atrás y se puede compartir el enlace
@@ -90,15 +137,11 @@ const vista = computed(() => vistas[actual.value])
 const contenido = ref(null)
 watch(actual, () => contenido.value?.scrollTo({ top: 0 }))
 
-const tema = {
-  common: { primaryColor: '#4f46e5', primaryColorHover: '#6366f1', primaryColorPressed: '#4338ca', fontFamily: 'Inter, system-ui, sans-serif', borderRadius: '8px' },
-  Card: { borderRadius: '12px' },
-  Menu: { itemHeight: '38px', groupTextColor: '#9a9aa5', itemTextColorActive: '#4f46e5', itemColorActive: '#eef2ff', itemColorActiveHover: '#eef2ff' },
-}
 </script>
 
 <template>
-  <n-config-provider :theme-overrides="tema">
+  <!-- Textos internos de los componentes (placeholders, calendario, «Confirmar»...) en español -->
+  <n-config-provider :theme-overrides="tema" :locale="esAR" :date-locale="dateEsAR">
     <n-message-provider>
     <n-dialog-provider>
       <EncuestaPublica v-if="encuestaPublica" :codigo="encuestaPublica" :key="encuestaPublica" />
@@ -117,13 +160,11 @@ const tema = {
         <n-layout>
           <div class="barra">
             <div class="barra-datos" v-if="estado">
-              <span><b>{{ estado.titulados.n }}</b> titulados</span>
-              <span class="separador">·</span>
-              <span><b>{{ estado.empleadores.n }}</b> empleadores</span>
+              <span>{{ textoFuente }}</span>
               <span v-if="filtro.desde || filtro.hasta" class="filtrado">filtrado por fecha</span>
             </div>
             <span v-else class="barra-datos">Sin conexión con el backend</span>
-            <n-date-picker v-model:value="rango" type="daterange" clearable size="small" :shortcuts="atajos"
+            <n-date-picker v-model:value="rango" type="daterange" clearable size="small" :shortcuts="atajos" :is-date-disabled="fueraDeRango"
               start-placeholder="Desde" end-placeholder="Hasta" style="width: 260px" />
           </div>
           <div ref="contenido" class="contenido">
@@ -138,15 +179,12 @@ const tema = {
 
 <style scoped>
 .marca { display: flex; align-items: center; gap: 10px; padding: 0 12px 22px; }
-.marca-logo { width: 34px; height: 34px; border-radius: 9px; background: #4f46e5; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+.marca-logo { width: 34px; height: 34px; border-radius: 9px; background: var(--acento); color: var(--sobre-acento); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
 .marca-titulo { font-weight: 600; font-size: 14px; }
-.marca-sub { color: #71717a; font-size: 12px; }
+.marca-sub { color: var(--suave); font-size: 12px; }
 .barra { height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 32px; border-bottom: 1px solid var(--borde); background: var(--superficie); }
 .barra-datos { font-size: 13.5px; color: var(--suave); display: flex; align-items: center; gap: 6px; }
 .barra-datos b { color: var(--texto); }
-.separador { color: #d4d4d8; }
 .filtrado { margin-left: 8px; font-size: 12px; color: var(--acento); background: var(--acento-suave); padding: 2px 8px; border-radius: 10px; }
 .contenido { height: calc(100vh - 56px); overflow-y: auto; background: var(--fondo); }
-:deep(.menu-criterio) { display: inline-flex; gap: 10px; align-items: baseline; }
-:deep(.menu-codigo) { font-size: 11.5px; color: #a1a1aa; font-variant-numeric: tabular-nums; width: 30px; }
 </style>

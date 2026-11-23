@@ -2,29 +2,61 @@
 % Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C6. Concordancia formación–mercado $\times$ tiempo al primer empleo}
 
-\textit{Propósito.} Determinar si percibir la formación alineada con los requerimientos del mercado se asocia con un menor tiempo para obtener el primer empleo. Respalda el criterio ARCU-SUR 3.2.3. Se aplica sobre: trabajan en una organización, con nivel de significancia $\alpha = 0.05$.
+\textit{Paso 1. Describir el problema.} Determinar si percibir la formación alineada con los requerimientos del mercado se asocia con un menor tiempo para obtener el primer empleo.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 74$).
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Concordancia.
+  \item Variable dependiente $Y$: Tiempo al primer empleo.
+  \item Población: trabajan en una organización ($N = 74$). Criterio ARCU-SUR: 3.2.3. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Concordancia» (X) y «Tiempo al primer empleo» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Concordancia» (X) y «Tiempo al primer empleo» (Y).
+\end{itemize}
 
-\begin{mitabla}{C6: frecuencia observada $FO_{ij}$}
-\begin{tabular}{lcc|c}
+\textit{Datos.} Primeros 10 de los 74 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C6: datos de los primeros titulados}
+\begin{tabular}{lll}
 \toprule
-Concordancia & Hasta 4 meses & Más de 4 meses & Total fila \\
+Titulado & $X$: Concordancia & $Y$: Tiempo al primer empleo \\
 \midrule
-En desacuerdo & 17 & 7 & 24 \\
-De acuerdo & 38 & 12 & 50 \\
-\midrule
-Total columna & 55 & 19 & $N=74$ \\
+T1 & De acuerdo & Más de 4 meses \\
+T2 & De acuerdo & Hasta 4 meses \\
+T3 & De acuerdo & Hasta 4 meses \\
+T4 & De acuerdo & Hasta 4 meses \\
+T5 & De acuerdo & Hasta 4 meses \\
+T6 & De acuerdo & Hasta 4 meses \\
+T7 & En desacuerdo & Más de 4 meses \\
+T8 & De acuerdo & Hasta 4 meses \\
+T9 & De acuerdo & Hasta 4 meses \\
+T10 & En desacuerdo & Hasta 4 meses \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``En desacuerdo -- Hasta 4 meses'': $FE_{11} = 24 \times 55 / 74 = 17.8378$.
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 74$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C6: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses & Total \\
+\midrule
+En desacuerdo & 17 & 7 & 24 \\
+De acuerdo & 38 & 12 & 50 \\
+\midrule
+Total & 55 & 19 & $N = 74$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda En desacuerdo y Hasta 4 meses:
+\[
+FE_{11} = \frac{(24)(55)}{74} = 17.84
+\]
 
 \begin{mitabla}{C6: frecuencia esperada $FE_{ij}$}
-\begin{tabular}{lcc}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
 \toprule
-Concordancia & Hasta 4 meses & Más de 4 meses \\
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses \\
 \midrule
 En desacuerdo & $24\cdot55/74 = 17.84$ & $24\cdot19/74 = 6.16$ \\
 De acuerdo & $50\cdot55/74 = 37.16$ & $50\cdot19/74 = 12.84$ \\
@@ -32,38 +64,39 @@ De acuerdo & $50\cdot55/74 = 37.16$ & $50\cdot19/74 = 12.84$ \\
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
 
 \begin{mitabla}{C6: cálculo de $X_0^2$ celda por celda}
-\begin{tabular}{L{5.4cm}cccc}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
 \toprule
-Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses & Suma fila \\
 \midrule
-En desacuerdo -- Hasta 4 meses & 17 & 17.8378 & 0.7020 & 0.0394 \\
-En desacuerdo -- Más de 4 meses & 7 & 6.1622 & 0.7020 & 0.1139 \\
-De acuerdo -- Hasta 4 meses & 38 & 37.1622 & 0.7020 & 0.0189 \\
-De acuerdo -- Más de 4 meses & 12 & 12.8378 & 0.7020 & 0.0547 \\
-\midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 0.2268 \\
+En desacuerdo & $\dfrac{(17-17.84)^2}{17.84}$\newline $= 0.0394$ & $\dfrac{(7-6.16)^2}{6.16}$\newline $= 0.1139$ & $0.1533$ \\[6pt]
+De acuerdo & $\dfrac{(38-37.16)^2}{37.16}$\newline $= 0.0189$ & $\dfrac{(12-12.84)^2}{12.84}$\newline $= 0.0547$ & $0.0736$ \\[6pt]
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $k = 2$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (2-1)(2-1) = 1$. De la tabla de chi-cuadrada: $X_{0.05,\,1}^2 = 3.841$.
+\[
+X_0^2 = 0.1533 + 0.0736 = 0.2268
+\]
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 0.2268 < 3.841$.
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
 
-\textit{Paso 6. Conclusión.}
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
 
 \begin{center}
 \begin{tabular}{l}
-Si ($X_0^2 < X_{0.05,\,1}^2$)\\
-\quad \fbox{Independencia}\\
+$0.2268 < 3.841 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
 Sino\\
-\quad Relación entre las variables\\
+\quad NO ``Independencia''\\
 FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que concordancia y tiempo al primer empleo sean independientes.
+No se rechaza $H_0$: con estos datos, «Tiempo al primer empleo» no depende de «Concordancia».
+
+\textit{Recomendación.} El tiempo al primer empleo no depende de la concordancia percibida: la inserción rápida se explica por otros factores, como que muchos titulados ya trabajaban antes de titularse.
 

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Encuestas {
 
     static final Set<String> TIPOS = Set.of("unica", "multiple", "numero", "texto", "escala", "email", "telefono");
+    static final Set<String> CON_OPCIONES = Set.of("unica", "multiple", "escala");
     private static final Map<String, Map<String, Object>> CACHE = new ConcurrentHashMap<>();
 
     // ===================== Lectura =====================
@@ -141,14 +143,46 @@ public class Encuestas {
         return b == null ? null : b.doubleValue();
     }
 
-    /** Cuántas respuestas tiene cada pregunta y cada opción (para saber qué se puede borrar). */
+    /**
+     * Cuántas respuestas tiene cada pregunta y cada opción (para saber qué se puede borrar).
+     * Son dos consultas agrupadas para toda la encuesta: antes se hacía un count(*) por pregunta
+     * y otro por opción (más de 200 consultas, medio segundo en cada recarga del editor).
+     * Cuentan lo mismo que contarUsosPregunta y contarUsosOpcion, que se siguen usando al editar o borrar.
+     */
     @SuppressWarnings("unchecked")
     private static void agregarConteos(Connection c, int encuestaId, Iterable<Map<String, Object>> preguntas) throws SQLException {
+        // Respuestas en que aparece cada pregunta (igual que datos -> pregunta IS NOT NULL)
+        Map<String, Integer> porPregunta = new java.util.HashMap<>();
+        try (PreparedStatement ps = c.prepareStatement("""
+                SELECT e.key, count(*) FROM respuesta r CROSS JOIN LATERAL jsonb_each(r.datos) e
+                WHERE r.encuesta_id = ? AND jsonb_typeof(r.datos) = 'object' GROUP BY e.key""")) {
+            ps.setInt(1, encuestaId);
+            try (ResultSet rs = ps.executeQuery()) { while (rs.next()) porPregunta.put(rs.getString(1), rs.getInt(2)); }
+        }
+        // Respuestas que eligieron cada opción: el valor es esa opción (texto) o una lista que la contiene
+        // (igual que datos -> pregunta @> '"opcion"'); DISTINCT para no contar dos veces una lista repetida
+        Map<String, Integer> porOpcion = new java.util.HashMap<>();
+        try (PreparedStatement ps = c.prepareStatement("""
+                SELECT e.key, x.valor, count(DISTINCT r.id)
+                FROM respuesta r
+                CROSS JOIN LATERAL jsonb_each(r.datos) e
+                CROSS JOIN LATERAL (
+                    SELECT e.value #>> '{}' AS valor WHERE jsonb_typeof(e.value) = 'string'
+                    UNION ALL
+                    SELECT el #>> '{}' FROM jsonb_array_elements(
+                        CASE WHEN jsonb_typeof(e.value) = 'array' THEN e.value ELSE '[]'::jsonb END) el
+                    WHERE jsonb_typeof(el) = 'string'
+                ) x
+                WHERE r.encuesta_id = ? AND jsonb_typeof(r.datos) = 'object'
+                GROUP BY e.key, x.valor""")) {
+            ps.setInt(1, encuestaId);
+            try (ResultSet rs = ps.executeQuery()) { while (rs.next()) porOpcion.put(rs.getString(1) + "\u0000" + rs.getString(2), rs.getInt(3)); }
+        }
         for (Map<String, Object> p : preguntas) {
             String codigo = (String) p.get("codigo");
-            p.put("respuestas", (Boolean) p.get("esContacto") ? 0 : contarUsosPregunta(c, encuestaId, codigo));
+            p.put("respuestas", (Boolean) p.get("esContacto") ? 0 : porPregunta.getOrDefault(codigo, 0));
             for (Map<String, Object> o : (List<Map<String, Object>>) p.get("opciones")) {
-                o.put("respuestas", contarUsosOpcion(c, encuestaId, codigo, (String) o.get("codigo")));
+                o.put("respuestas", porOpcion.getOrDefault(codigo + "\u0000" + o.get("codigo"), 0));
             }
         }
     }
@@ -258,14 +292,17 @@ public class Encuestas {
         String codigo = codigoValido(texto(d, "codigo", true));
         String tipo = tipoValido(texto(d, "tipo", true));
         int seccionId = enteroObligatorio(d, "seccionId");
+        String dependeDe = texto(d, "dependeDe", false);
+        validarRango(decimal(d, "valorMinimo"), decimal(d, "valorMaximo"));
         return cambio(c -> {
             int encuestaId = idEncuesta(c, encuesta);
             if (!encuesta.equals(encuestaDeSeccion(c, seccionId))) throw new IllegalArgumentException("La sección no pertenece a la encuesta");
+            validarDependencia(c, encuestaId, Set.of(codigo), dependeDe);
             try (PreparedStatement ps = c.prepareStatement("""
                     INSERT INTO pregunta (encuesta_id, seccion_id, codigo, texto, ayuda, tipo, obligatoria, orden,
-                                          depende_de, depende_valores, max_selecciones, valor_minimo, valor_maximo, es_contacto)
+                                          depende_de, depende_valores, max_selecciones, valor_minimo, valor_maximo, es_contacto, activa)
                     VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT coalesce(max(orden), 0) + 1 FROM pregunta WHERE seccion_id = ?),
-                            ?, ?, ?, ?, ?, ?) RETURNING id""")) {
+                            ?, ?, ?, ?, ?, ?, ?) RETURNING id""")) {
                 ps.setInt(1, encuestaId);
                 ps.setInt(2, seccionId);
                 ps.setString(3, codigo);
@@ -274,12 +311,13 @@ public class Encuestas {
                 ps.setString(6, tipo);
                 ps.setBoolean(7, Boolean.TRUE.equals(d.get("obligatoria")));
                 ps.setInt(8, seccionId);
-                ps.setString(9, texto(d, "dependeDe", false));
-                ps.setString(10, valoresDependencia(d));
+                ps.setString(9, dependeDe);
+                ps.setString(10, dependeDe == null ? null : valoresDependencia(d));
                 ps.setObject(11, entero(d, "maxSelecciones"));
                 ps.setObject(12, decimal(d, "valorMinimo"));
                 ps.setObject(13, decimal(d, "valorMaximo"));
                 ps.setBoolean(14, Boolean.TRUE.equals(d.get("esContacto")));
+                ps.setBoolean(15, !Boolean.FALSE.equals(d.get("activa")));
                 try (ResultSet rs = ps.executeQuery()) { rs.next(); return Map.of("id", rs.getInt(1)); }
             } catch (SQLException ex) {
                 if ("23505".equals(ex.getSQLState())) throw new IllegalArgumentException("Ya existe una pregunta con el código '" + codigo + "'");
@@ -300,6 +338,22 @@ public class Encuestas {
                 throw new IllegalArgumentException("La pregunta ya tiene respuestas: no se puede cambiar su código ni su tipo. "
                     + "Desactívela y cree una nueva.");
             }
+            int seccionActual = (Integer) actual.get("seccionId");
+            int seccionId = d.containsKey("seccionId") ? enteroObligatorio(d, "seccionId") : seccionActual;
+            if (seccionId != seccionActual && encuestaId != idEncuesta(c, encuestaDeSeccion(c, seccionId))) {
+                throw new IllegalArgumentException("La sección no pertenece a la encuesta");
+            }
+            // Al cambiar de sección va al final de la nueva: conservar el orden viejo podía empatar con otra pregunta
+            int orden = d.containsKey("orden") ? enteroObligatorio(d, "orden")
+                : seccionId != seccionActual ? siguienteOrden(c, seccionId) : (Integer) actual.get("orden");
+            String dependeActual = (String) actual.get("dependeDe");
+            String dependeDe = d.containsKey("dependeDe") ? texto(d, "dependeDe", false) : dependeActual;
+            if (!java.util.Objects.equals(dependeDe, dependeActual) || !codigo.equals(codigoActual)) {
+                validarDependencia(c, encuestaId, Set.of(codigo, codigoActual), dependeDe);
+            }
+            Object min = d.containsKey("valorMinimo") ? decimal(d, "valorMinimo") : actual.get("valorMinimo");
+            Object max = d.containsKey("valorMaximo") ? decimal(d, "valorMaximo") : actual.get("valorMaximo");
+            validarRango(min == null ? null : new BigDecimal(String.valueOf(min)), max == null ? null : new BigDecimal(String.valueOf(max)));
             try (PreparedStatement ps = c.prepareStatement("""
                     UPDATE pregunta SET codigo = ?, tipo = ?, texto = ?, ayuda = ?, obligatoria = ?, orden = ?, seccion_id = ?,
                            depende_de = ?, depende_valores = ?, max_selecciones = ?, valor_minimo = ?, valor_maximo = ?,
@@ -310,13 +364,14 @@ public class Encuestas {
                 ps.setString(3, d.containsKey("texto") ? texto(d, "texto", true) : (String) actual.get("texto"));
                 ps.setString(4, d.containsKey("ayuda") ? texto(d, "ayuda", false) : (String) actual.get("ayuda"));
                 ps.setBoolean(5, d.containsKey("obligatoria") ? Boolean.TRUE.equals(d.get("obligatoria")) : (Boolean) actual.get("obligatoria"));
-                ps.setInt(6, d.containsKey("orden") ? enteroObligatorio(d, "orden") : (Integer) actual.get("orden"));
-                ps.setInt(7, d.containsKey("seccionId") ? enteroObligatorio(d, "seccionId") : (Integer) actual.get("seccionId"));
-                ps.setString(8, d.containsKey("dependeDe") ? texto(d, "dependeDe", false) : (String) actual.get("dependeDe"));
-                ps.setString(9, d.containsKey("dependeValores") ? valoresDependencia(d) : (String) actual.get("dependeValores"));
+                ps.setInt(6, orden);
+                ps.setInt(7, seccionId);
+                ps.setString(8, dependeDe);
+                ps.setString(9, dependeDe == null ? null
+                    : d.containsKey("dependeValores") ? valoresDependencia(d) : (String) actual.get("dependeValores"));
                 ps.setObject(10, d.containsKey("maxSelecciones") ? entero(d, "maxSelecciones") : actual.get("maxSelecciones"));
-                ps.setObject(11, d.containsKey("valorMinimo") ? decimal(d, "valorMinimo") : actual.get("valorMinimo"));
-                ps.setObject(12, d.containsKey("valorMaximo") ? decimal(d, "valorMaximo") : actual.get("valorMaximo"));
+                ps.setObject(11, min);
+                ps.setObject(12, max);
                 ps.setBoolean(13, d.containsKey("esContacto") ? Boolean.TRUE.equals(d.get("esContacto")) : (Boolean) actual.get("esContacto"));
                 ps.setBoolean(14, d.containsKey("activa") ? !Boolean.FALSE.equals(d.get("activa")) : (Boolean) actual.get("activa"));
                 ps.setInt(15, id);
@@ -324,6 +379,22 @@ public class Encuestas {
             } catch (SQLException ex) {
                 if ("23505".equals(ex.getSQLState())) throw new IllegalArgumentException("Ya existe una pregunta con el código '" + codigo + "'");
                 throw ex;
+            }
+            // Las condiciones de otras preguntas se guardan por código: si cambia, se arrastra el código nuevo
+            if (!codigo.equals(codigoActual)) {
+                try (PreparedStatement ps = c.prepareStatement("UPDATE pregunta SET depende_de = ? WHERE encuesta_id = ? AND depende_de = ?")) {
+                    ps.setString(1, codigo);
+                    ps.setInt(2, encuestaId);
+                    ps.setString(3, codigoActual);
+                    ps.executeUpdate();
+                }
+            }
+            // Si dejó de ser de opciones (solo posible sin respuestas), sus opciones ya no tienen sentido
+            if (!tipo.equals(actual.get("tipo")) && !CON_OPCIONES.contains(tipo)) {
+                try (PreparedStatement ps = c.prepareStatement("DELETE FROM opcion WHERE pregunta_id = ?")) {
+                    ps.setInt(1, id);
+                    ps.executeUpdate();
+                }
             }
             subirVersion(c, encuestaId);
             return Map.of("id", id);
@@ -430,7 +501,137 @@ public class Encuestas {
         }, null);
     }
 
+    // ===================== Orden (arrastrar en el editor) =====================
+
+    /**
+     * Guarda de una sola vez el orden que quedó al arrastrar: secciones y, dentro de
+     * cada una, sus preguntas (una pregunta puede haber pasado a otra sección).
+     * Se exige la lista completa para que el orden quede 1, 2, 3... sin empates.
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> reordenar(String encuesta, Map<String, Object> d) {
+        List<Object> secciones = lista(d, "secciones");
+        return cambio(c -> {
+            int encuestaId = idEncuesta(c, encuesta);
+            Set<Integer> seccionesEsperadas = ids(c, "SELECT id FROM seccion WHERE encuesta_id = ?", encuestaId);
+            Set<Integer> preguntasEsperadas = ids(c, "SELECT id FROM pregunta WHERE encuesta_id = ?", encuestaId);
+            Set<Integer> seccionesVistas = new HashSet<>(), preguntasVistas = new HashSet<>();
+            try (PreparedStatement ps = c.prepareStatement("UPDATE seccion SET orden = ? WHERE id = ?");
+                 PreparedStatement pp = c.prepareStatement("UPDATE pregunta SET seccion_id = ?, orden = ? WHERE id = ?")) {
+                int i = 0;
+                for (Object o : secciones) {
+                    if (!(o instanceof Map)) throw new IllegalArgumentException("Cada sección debe ser un objeto {id, preguntas}");
+                    Map<String, Object> s = (Map<String, Object>) o;
+                    int seccionId = enteroObligatorio(s, "id");
+                    seccionesVistas.add(seccionId);
+                    ps.setInt(1, ++i);
+                    ps.setInt(2, seccionId);
+                    ps.addBatch();
+                    int j = 0;
+                    for (Object v : lista(s, "preguntas")) {
+                        int preguntaId = aEntero(v, "preguntas");
+                        if (!preguntasVistas.add(preguntaId)) throw new IllegalArgumentException("La pregunta " + preguntaId + " aparece dos veces");
+                        pp.setInt(1, seccionId);
+                        pp.setInt(2, ++j);
+                        pp.setInt(3, preguntaId);
+                        pp.addBatch();
+                    }
+                }
+                if (i != seccionesVistas.size() || !seccionesVistas.equals(seccionesEsperadas) || !preguntasVistas.equals(preguntasEsperadas)) {
+                    throw new IllegalArgumentException("El orden enviado no coincide con la encuesta guardada: recargue el editor");
+                }
+                ps.executeBatch();
+                pp.executeBatch();
+            }
+            return Map.of("resultado", "reordenada");
+        }, encuesta);
+    }
+
+    /** Orden de las opciones de una pregunta (lista completa de ids en el orden nuevo). */
+    public static Map<String, Object> reordenarOpciones(int preguntaId, Map<String, Object> d) {
+        List<Object> lista = lista(d, "ids");
+        return cambio(c -> {
+            Map<String, Object> p = preguntaPorId(c, preguntaId);
+            Set<Integer> esperadas = ids(c, "SELECT id FROM opcion WHERE pregunta_id = ?", preguntaId);
+            Set<Integer> vistas = new HashSet<>();
+            try (PreparedStatement ps = c.prepareStatement("UPDATE opcion SET orden = ? WHERE id = ?")) {
+                int i = 0;
+                for (Object v : lista) {
+                    int opcionId = aEntero(v, "ids");
+                    vistas.add(opcionId);
+                    ps.setInt(1, ++i);
+                    ps.setInt(2, opcionId);
+                    ps.addBatch();
+                }
+                if (i != vistas.size() || !vistas.equals(esperadas)) {
+                    throw new IllegalArgumentException("El orden enviado no coincide con las opciones guardadas: recargue el editor");
+                }
+                ps.executeBatch();
+            }
+            subirVersion(c, (Integer) p.get("encuestaId"));
+            return Map.of("resultado", "reordenada");
+        }, null);
+    }
+
     // ===================== utilidades =====================
+
+    /**
+     * La condición tiene que apuntar a otra pregunta con opciones, y no puede formar
+     * un ciclo (A depende de B y B de A): en ese caso ninguna de las dos se mostraría.
+     */
+    private static void validarDependencia(Connection c, int encuestaId, Set<String> propios, String dependeDe) throws SQLException {
+        if (dependeDe == null) return;
+        if (propios.contains(dependeDe)) throw new IllegalArgumentException("Una pregunta no puede depender de sí misma");
+        Set<String> recorridos = new HashSet<>();
+        String actual = dependeDe;
+        try (PreparedStatement ps = c.prepareStatement("SELECT tipo, depende_de FROM pregunta WHERE encuesta_id = ? AND codigo = ?")) {
+            while (actual != null && recorridos.add(actual)) {
+                ps.setInt(1, encuestaId);
+                ps.setString(2, actual);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        if (actual.equals(dependeDe)) throw new IllegalArgumentException("No existe la pregunta '" + dependeDe + "' de la que depende");
+                        return;
+                    }
+                    if (actual.equals(dependeDe) && !CON_OPCIONES.contains(rs.getString("tipo"))) {
+                        throw new IllegalArgumentException("Solo se puede depender de una pregunta con opciones");
+                    }
+                    actual = rs.getString("depende_de");
+                }
+                if (actual != null && propios.contains(actual)) {
+                    throw new IllegalArgumentException("Condición circular: '" + dependeDe + "' ya depende (directa o indirectamente) de esta pregunta");
+                }
+            }
+        }
+    }
+
+    private static void validarRango(BigDecimal min, BigDecimal max) {
+        if (min != null && max != null && min.compareTo(max) > 0) {
+            throw new IllegalArgumentException("El valor mínimo no puede ser mayor que el máximo");
+        }
+    }
+
+    private static int siguienteOrden(Connection c, int seccionId) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("SELECT coalesce(max(orden), 0) + 1 FROM pregunta WHERE seccion_id = ?")) {
+            ps.setInt(1, seccionId);
+            try (ResultSet rs = ps.executeQuery()) { rs.next(); return rs.getInt(1); }
+        }
+    }
+
+    private static Set<Integer> ids(Connection c, String sql, int parametro) throws SQLException {
+        Set<Integer> r = new HashSet<>();
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, parametro);
+            try (ResultSet rs = ps.executeQuery()) { while (rs.next()) r.add(rs.getInt(1)); }
+        }
+        return r;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Object> lista(Map<String, Object> d, String clave) {
+        if (!(d.get(clave) instanceof List<?> l)) throw new IllegalArgumentException("El campo '" + clave + "' debe ser una lista");
+        return (List<Object>) l;
+    }
 
     /** Ejecuta un cambio de estructura en una transacción y vacía la caché del formulario. */
     private static Map<String, Object> cambio(Db.Trabajo<Map<String, Object>> trabajo, String encuestaParaVersion) {
@@ -517,6 +718,10 @@ public class Encuestas {
     private static Integer entero(Map<String, Object> d, String clave) {
         Object v = d.get(clave);
         if (v == null || String.valueOf(v).isBlank()) return null;
+        return aEntero(v, clave);
+    }
+
+    private static int aEntero(Object v, String clave) {
         try {
             return (int) Double.parseDouble(String.valueOf(v));
         } catch (NumberFormatException e) {

@@ -2,29 +2,61 @@
 % Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
 \subsubsection*{C3. Formación complementaria $\times$ remuneración}
 
-\textit{Propósito.} Determinar si la formación complementaria se asocia con el nivel de remuneración, como sustento para la oferta de actualización profesional y posgrado. Respalda el criterio ARCU-SUR 2.4.1 / 3.2.3. Se aplica sobre: trabajan en una organización, con nivel de significancia $\alpha = 0.05$.
+\textit{Paso 1. Describir el problema.} Determinar si la formación complementaria se asocia con el nivel de remuneración, como sustento para la oferta de actualización profesional y posgrado.
 
-\textit{Paso 1. Contar con la muestra: tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 108$).
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Formación complementaria.
+  \item Variable dependiente $Y$: Remuneración.
+  \item Población: trabajan en una organización ($N = 108$). Criterio ARCU-SUR: 2.4.1. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Formación complementaria» (X) y «Remuneración» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Formación complementaria» (X) y «Remuneración» (Y).
+\end{itemize}
 
-\begin{mitabla}{C3: frecuencia observada $FO_{ij}$}
-\begin{tabular}{lcc|c}
+\textit{Datos.} Primeros 10 de los 108 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C3: datos de los primeros titulados}
+\begin{tabular}{lll}
 \toprule
-Formación complementaria & Hasta Bs 5.000 & Más de Bs 5.000 & Total fila \\
+Titulado & $X$: Formación complementaria & $Y$: Remuneración \\
 \midrule
-Sí & 21 & 52 & 73 \\
-No & 13 & 22 & 35 \\
-\midrule
-Total columna & 34 & 74 & $N=108$ \\
+T1 & Sí & Más de Bs 5.000 \\
+T2 & Sí & Más de Bs 5.000 \\
+T3 & Sí & Hasta Bs 5.000 \\
+T4 & Sí & Más de Bs 5.000 \\
+T5 & Sí & Hasta Bs 5.000 \\
+T6 & Sí & Más de Bs 5.000 \\
+T7 & Sí & Más de Bs 5.000 \\
+T8 & No & Más de Bs 5.000 \\
+T9 & No & Más de Bs 5.000 \\
+T10 & Sí & Más de Bs 5.000 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 2. Calcular la frecuencia esperada} de cada celda, $FE_{ij} = (\text{total fila } i)(\text{total columna } j)/N$. Por ejemplo, para la celda ``Sí -- Hasta Bs 5.000'': $FE_{11} = 73 \times 34 / 108 = 22.9815$.
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 108$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C3: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Formación complementaria \textbackslash{} $Y$: Remuneración & Hasta Bs 5.000 & Más de Bs 5.000 & Total \\
+\midrule
+Sí & 21 & 52 & 73 \\
+No & 13 & 22 & 35 \\
+\midrule
+Total & 34 & 74 & $N = 108$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Sí y Hasta Bs 5.000:
+\[
+FE_{11} = \frac{(73)(34)}{108} = 22.98
+\]
 
 \begin{mitabla}{C3: frecuencia esperada $FE_{ij}$}
-\begin{tabular}{lcc}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
 \toprule
-Formación complementaria & Hasta Bs 5.000 & Más de Bs 5.000 \\
+$X$: Formación complementaria \textbackslash{} $Y$: Remuneración & Hasta Bs 5.000 & Más de Bs 5.000 \\
 \midrule
 Sí & $73\cdot34/108 = 22.98$ & $73\cdot74/108 = 50.02$ \\
 No & $35\cdot34/108 = 11.02$ & $35\cdot74/108 = 23.98$ \\
@@ -32,38 +64,39 @@ No & $35\cdot34/108 = 11.02$ & $35\cdot74/108 = 23.98$ \\
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 3. Calcular el estadístico chi-cuadrado,} sumando $(FO_{ij}-FE_{ij})^2/FE_{ij}$ de cada celda.
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
 
 \begin{mitabla}{C3: cálculo de $X_0^2$ celda por celda}
-\begin{tabular}{L{5.4cm}cccc}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
 \toprule
-Celda & $FO_{ij}$ & $FE_{ij}$ & $(FO_{ij}-FE_{ij})^2$ & $(FO_{ij}-FE_{ij})^2/FE_{ij}$ \\
+$X$: Formación complementaria \textbackslash{} $Y$: Remuneración & Hasta Bs 5.000 & Más de Bs 5.000 & Suma fila \\
 \midrule
-Sí -- Hasta Bs 5.000 & 21 & 22.9815 & 3.9263 & 0.1708 \\
-Sí -- Más de Bs 5.000 & 52 & 50.0185 & 3.9263 & 0.0785 \\
-No -- Hasta Bs 5.000 & 13 & 11.0185 & 3.9263 & 0.3563 \\
-No -- Más de Bs 5.000 & 22 & 23.9815 & 3.9263 & 0.1637 \\
-\midrule
-\multicolumn{4}{r}{$X_0^2 = \sum$} & 0.7694 \\
+Sí & $\dfrac{(21-22.98)^2}{22.98}$\newline $= 0.1708$ & $\dfrac{(52-50.02)^2}{50.02}$\newline $= 0.0785$ & $0.2493$ \\[6pt]
+No & $\dfrac{(13-11.02)^2}{11.02}$\newline $= 0.3563$ & $\dfrac{(22-23.98)^2}{23.98}$\newline $= 0.1637$ & $0.5201$ \\[6pt]
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\textit{Paso 4. Determinar el estadístico teórico.} Con $k = 2$ filas y $m = 2$ columnas, los grados de libertad son $(k-1)(m-1) = (2-1)(2-1) = 1$. De la tabla de chi-cuadrada: $X_{0.05,\,1}^2 = 3.841$.
+\[
+X_0^2 = 0.2493 + 0.5201 = 0.7694
+\]
 
-\textit{Paso 5. Establecer la relación entre estadísticos:} $X_0^2 < X_{0.05,\,1}^2 \;\Rightarrow\; 0.7694 < 3.841$.
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
 
-\textit{Paso 6. Conclusión.}
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
 
 \begin{center}
 \begin{tabular}{l}
-Si ($X_0^2 < X_{0.05,\,1}^2$)\\
-\quad \fbox{Independencia}\\
+$0.7694 < 3.841 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
 Sino\\
-\quad Relación entre las variables\\
+\quad NO ``Independencia''\\
 FinSi
 \end{tabular}
 \end{center}
 
-No se puede rechazar que formación complementaria y remuneración sean independientes.
+No se rechaza $H_0$: con estos datos, «Remuneración» no depende de «Formación complementaria».
+
+\textit{Recomendación.} La formación complementaria no se asocia con la remuneración en esta muestra: la oferta de posgrado debe justificarse por actualización y pertinencia, no por una promesa salarial.
 

@@ -1,0 +1,59 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+\subsubsection*{F7. Probabilidad de contratar titulados}
+
+Verificar si las organizaciones se reparten por igual entre las opciones de probabilidad de contratación o si alguna predomina.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Población: organizaciones encuestadas; tamaño $n = 53$; opciones de la pregunta $k = 4$; $\alpha = 0.05$.
+
+\begin{itemize}[nosep]
+  \item $H_0$: Las respuestas de «Probabilidad» se reparten por igual entre las 4 opciones (uniformidad).
+  \item $H_1$: Las respuestas de «Probabilidad» no se reparten por igual: hay opciones preferidas.
+\end{itemize}
+
+\textit{Paso 2. Calcular la frecuencia esperada.} Si las respuestas se repartieran por igual, cada opción tendría:
+\[
+FE = \frac{n}{k} = \frac{53}{4} = 13.25
+\]
+
+\textit{Paso 3. Calcular el estadístico chi-cuadrado.} Se cuenta la frecuencia observada $FO_i$ de cada opción y se calcula $\frac{(FO_i - FE)^2}{FE}$.
+
+\begin{mitabla}{F7: prueba de las frecuencias, Probabilidad}
+\begin{tabular}{L{6cm}ccc}
+\toprule
+Opción & $FO_i$ & $FE$ & $\frac{(FO_i-FE)^2}{FE}$ \\
+\midrule
+Alta probabilidad & 16 & 13.25 & $\frac{(16-13.25)^2}{13.25} = 0.5708$ \\[3pt]
+Depende del crecimiento & 27 & 13.25 & $\frac{(27-13.25)^2}{13.25} = 14.2689$ \\[3pt]
+No prevista & 10 & 13.25 & $\frac{(10-13.25)^2}{13.25} = 0.7972$ \\[3pt]
+No requiere & 0 & 13.25 & $\frac{(0-13.25)^2}{13.25} = 13.2500$ \\[3pt]
+\midrule
+Total & 53 & 53 & $x_0^2 = 28.8868$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+x_0^2 = \sum_{i=1}^{4} \frac{(FO_i - FE)^2}{FE} = 28.8868
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} $x^2_{\alpha,\,k-1} = x^2_{0.05,\,4-1} = x^2_{0.05,\,3} = 7.815$ (tabla chi-cuadrada).
+
+\textit{Paso 5. Establecer la relación entre estadísticos.} $x_0^2 < x^2_{\alpha,\,k-1}$ $\rightarrow$ $28.8868 \ge 7.815$ $\rightarrow$ no.
+
+\textit{Paso 6. Conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
+\quad ``Uniformidad''\\
+Sino\\
+\quad \fbox{No ``Uniformidad''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$: las respuestas no se reparten por igual, hay opciones preferidas. La más elegida es «Depende del crecimiento» (27 de 53, 50.9\%).
+
+\textit{Recomendación.} Hay una respuesta que predomina: usarla para estimar la demanda de titulados en los próximos años.
+
