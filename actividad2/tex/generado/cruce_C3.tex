@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C3. Formación complementaria $\times$ remuneración}
 
 \textit{Paso 1. Describir el problema.} Determinar si la formación complementaria se asocia con el nivel de remuneración, como sustento para la oferta de actualización profesional y posgrado.
@@ -44,6 +44,19 @@ Sí & 21 & 52 & 73 \\
 No & 13 & 22 & 35 \\
 \midrule
 Total & 34 & 74 & $N = 108$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C3: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Formación complementaria \textbackslash{} $Y$: Remuneración & Hasta Bs 5.000 & Más de Bs 5.000 \\
+\midrule
+Sí & \cellcolor{gray!30}21 & \cellcolor{gray!75}52 \\
+No & \cellcolor{gray!19}13 & \cellcolor{gray!32}22 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

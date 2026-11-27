@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C2. Sector $\times$ pertinencia del puesto}
 
 \textit{Paso 1. Describir el problema.} Determinar si la concordancia entre la titulación y el empleo depende del sector, público o privado, en que trabaja el titulado.
@@ -44,6 +44,19 @@ Público & 2 & 19 & 21 \\
 Privado & 8 & 79 & 87 \\
 \midrule
 Total & 10 & 98 & $N = 108$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C2: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Sector \textbackslash{} $Y$: Pertinencia del puesto & En desacuerdo & De acuerdo \\
+\midrule
+Público & \cellcolor{gray!2}2 & \cellcolor{gray!18}19 \\
+Privado & \cellcolor{gray!8}8 & \cellcolor{gray!75}79 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

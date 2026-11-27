@@ -1,0 +1,115 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/titulados.csv (titulados) / /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/empleadores.csv (empleadores)
+\subsubsection*{C6. Concordancia formación–mercado $\times$ tiempo al primer empleo}
+
+\textit{Paso 1. Describir el problema.} Determinar si percibir la formación alineada con los requerimientos del mercado se asocia con un menor tiempo para obtener el primer empleo.
+
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Concordancia.
+  \item Variable dependiente $Y$: Tiempo al primer empleo.
+  \item Población: trabajan en una organización ($N = 74$). Criterio ARCU-SUR: 3.2.3. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Concordancia» (X) y «Tiempo al primer empleo» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Concordancia» (X) y «Tiempo al primer empleo» (Y).
+\end{itemize}
+
+\textit{Datos.} Primeros 10 de los 74 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C6: datos de los primeros titulados}
+\begin{tabular}{lll}
+\toprule
+Titulado & $X$: Concordancia & $Y$: Tiempo al primer empleo \\
+\midrule
+T1 & De acuerdo & Más de 4 meses \\
+T2 & De acuerdo & Hasta 4 meses \\
+T3 & De acuerdo & Hasta 4 meses \\
+T4 & De acuerdo & Hasta 4 meses \\
+T5 & De acuerdo & Hasta 4 meses \\
+T6 & De acuerdo & Hasta 4 meses \\
+T7 & En desacuerdo & Más de 4 meses \\
+T8 & De acuerdo & Hasta 4 meses \\
+T9 & De acuerdo & Hasta 4 meses \\
+T10 & En desacuerdo & Hasta 4 meses \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 74$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C6: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses & Total \\
+\midrule
+En desacuerdo & 17 & 7 & 24 \\
+De acuerdo & 38 & 12 & 50 \\
+\midrule
+Total & 55 & 19 & $N = 74$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C6: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses \\
+\midrule
+En desacuerdo & \cellcolor{gray!34}17 & \cellcolor{gray!14}7 \\
+De acuerdo & \cellcolor{gray!75}38 & \cellcolor{gray!24}12 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda En desacuerdo y Hasta 4 meses:
+\[
+FE_{11} = \frac{(24)(55)}{74} = 17.84
+\]
+
+\begin{mitabla}{C6: frecuencia esperada $FE_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses \\
+\midrule
+En desacuerdo & $24\cdot55/74 = 17.84$ & $24\cdot19/74 = 6.16$ \\
+De acuerdo & $50\cdot55/74 = 37.16$ & $50\cdot19/74 = 12.84$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
+
+\begin{mitabla}{C6: cálculo de $X_0^2$ celda por celda}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
+\toprule
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses & Suma fila \\
+\midrule
+En desacuerdo & $\dfrac{(17-17.84)^2}{17.84}$\newline $= 0.0394$ & $\dfrac{(7-6.16)^2}{6.16}$\newline $= 0.1139$ & $0.1533$ \\[6pt]
+De acuerdo & $\dfrac{(38-37.16)^2}{37.16}$\newline $= 0.0189$ & $\dfrac{(12-12.84)^2}{12.84}$\newline $= 0.0547$ & $0.0736$ \\[6pt]
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+X_0^2 = 0.1533 + 0.0736 = 0.2268
+\]
+
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
+
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+$0.2268 < 3.841 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
+Sino\\
+\quad NO ``Independencia''\\
+FinSi
+\end{tabular}
+\end{center}
+
+No se rechaza $H_0$: con estos datos, «Tiempo al primer empleo» no depende de «Concordancia».
+
+\textit{Recomendación.} El tiempo al primer empleo no depende de la concordancia percibida: la inserción rápida se explica por otros factores, como que muchos titulados ya trabajaban antes de titularse.
+

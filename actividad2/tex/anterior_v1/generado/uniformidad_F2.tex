@@ -1,0 +1,62 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/titulados.csv (titulados) / /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/empleadores.csv (empleadores)
+\subsubsection*{F2. Institución preferida para el posgrado}
+
+Verificar si la preferencia por la institución donde estudiar el posgrado se reparte por igual o se concentra en algunas.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Población: interesados en posgrado; tamaño $n = 123$; opciones de la pregunta $k = 7$; $\alpha = 0.05$.
+
+\begin{itemize}[nosep]
+  \item $H_0$: Las respuestas de «Institución» se reparten por igual entre las 7 opciones (uniformidad).
+  \item $H_1$: Las respuestas de «Institución» no se reparten por igual: hay opciones preferidas.
+\end{itemize}
+
+\textit{Paso 2. Calcular la frecuencia esperada.} Si las respuestas se repartieran por igual, cada opción tendría:
+\[
+FE = \frac{n}{k} = \frac{123}{7} = 17.57
+\]
+
+\textit{Paso 3. Calcular el estadístico chi-cuadrado.} Se cuenta la frecuencia observada $FO_i$ de cada opción y se calcula $\frac{(FO_i - FE)^2}{FE}$.
+
+\begin{mitabla}{F2: prueba de las frecuencias, Institución}
+\begin{tabular}{L{6cm}ccc}
+\toprule
+Opción & $FO_i$ & $FE$ & $\frac{(FO_i-FE)^2}{FE}$ \\
+\midrule
+EUPG & 13 & 17.57 & $\frac{(13-17.57)^2}{17.57} = 1.1893$ \\[3pt]
+Dirección de Posgrado FCyT & 38 & 17.57 & $\frac{(38-17.57)^2}{17.57} = 23.7503$ \\[3pt]
+IBNORCA & 3 & 17.57 & $\frac{(3-17.57)^2}{17.57} = 12.0836$ \\[3pt]
+Univ. internacionales & 31 & 17.57 & $\frac{(31-17.57)^2}{17.57} = 10.2625$ \\[3pt]
+Univ. públicas nacionales & 17 & 17.57 & $\frac{(17-17.57)^2}{17.57} = 0.0186$ \\[3pt]
+Univ. privadas nacionales & 10 & 17.57 & $\frac{(10-17.57)^2}{17.57} = 3.2625$ \\[3pt]
+Otro & 11 & 17.57 & $\frac{(11-17.57)^2}{17.57} = 2.4576$ \\[3pt]
+\midrule
+Total & 123 & 123 & $x_0^2 = 53.0244$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+x_0^2 = \sum_{i=1}^{7} \frac{(FO_i - FE)^2}{FE} = 53.0244
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} $x^2_{\alpha,\,k-1} = x^2_{0.05,\,7-1} = x^2_{0.05,\,6} = 12.592$ (tabla chi-cuadrada).
+
+\textit{Paso 5. Establecer la relación entre estadísticos.} $x_0^2 < x^2_{\alpha,\,k-1}$ $\rightarrow$ $53.0244 \ge 12.592$ $\rightarrow$ no.
+
+\textit{Paso 6. Conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
+\quad ``Uniformidad''\\
+Sino\\
+\quad \fbox{No ``Uniformidad''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$: las respuestas no se reparten por igual, hay opciones preferidas. La más elegida es «Dirección de Posgrado FCyT» (38 de 123, 30.9\%).
+
+\textit{Recomendación.} La preferencia se concentra en algunas instituciones: si la UMSS no es la más elegida, revisar costo, horarios y modalidad de su oferta.
+

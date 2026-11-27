@@ -116,7 +116,8 @@ Todos los GET de análisis y las exportaciones aceptan `?desde=aaaa-mm-dd&hasta=
 | Respuestas | `GET /api/admin/respuestas`, `GET/PUT/DELETE /api/admin/respuestas/{id}`, `GET /api/admin/respuestas/revisar?encuesta=…`, `GET /api/admin/respuestas-por-dia` |
 | Criterios ARCU-SUR | `GET /api/criterios` |
 | Indicadores | `GET /api/estado`, `/api/demografia`, `/api/empleabilidad`, `/api/formacion`, `/api/financiamiento`, `/api/competencias`, `/api/empleadores` |
-| Cruces | `GET /api/cruces` (los 7 del estudio), `GET /api/variables`, `GET /api/cruce-libre?filas=…&columnas=…&agrupar=1` |
+| Cruces | `GET /api/cruces` (prueba de independencia de los cruces del estudio), `GET /api/variables`, `GET /api/cruce-libre?filas=…&columnas=…&agrupar=1` |
+| Uniformidad | `GET /api/uniformidad` (prueba de las frecuencias F1–F8: si las respuestas de una pregunta se reparten por igual entre sus opciones) |
 | Reporte a medida | `GET /api/reporte/variables?encuesta=…`, `GET /api/reporte?encuesta=…&variables=a,b,c` |
 | Importar / exportar | `POST /api/importar?tipo=…`, `GET /api/exportar?que=titulados\|empleadores\|libre\|C1…C7\|reporte\|reporte-datos` |
 
@@ -136,7 +137,7 @@ para que Excel en español lo abra en columnas.
 | `Revision.java` | Revisión de calidad: respuestas casi vacías, nombres de organización sin sentido y posibles duplicados |
 | `Dataset.java` | Respuestas de una encuesta en forma de tabla; filtro por fecha |
 | `Catalogo.java` | Etiquetas, agrupaciones de los cruces, punto medio de los rangos de tiempo, homologación de cargos |
-| `Estadistica.java` | Media, mediana, desviación, IC 95% (Coss Bu cap. 6), frecuencias, chi-cuadrada de tabla de contingencia (α = 0.05) |
+| `Estadistica.java` | Media, mediana, desviación, IC 95% (Coss Bu cap. 6), frecuencias, prueba de las frecuencias / uniformidad ($FE = n/k$) y chi-cuadrada de tabla de contingencia / independencia (α = 0.05) |
 | `Analisis.java` | Indicadores y los 7 cruces del estudio |
 | `Criterios.java` | Valoración de cada criterio ARCU-SUR (la usan el panel y el informe) |
 | `Abiertas.java` | Codificación de las preguntas abiertas de empleadores en categorías por palabras clave |

@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C4. Interés en posgrado $\times$ oferta de posgrado FCyT}
 
 \textit{Paso 1. Describir el problema.} Determinar si la percepción de que la oferta de posgrado de la FCyT es afín a la carrera depende del interés en realizar un posgrado.
@@ -44,6 +44,19 @@ Sí & 33 & 90 & 123 \\
 No & 10 & 15 & 25 \\
 \midrule
 Total & 43 & 105 & $N = 148$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C4: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Interés en posgrado \textbackslash{} $Y$: Oferta FCyT afín & En desacuerdo & De acuerdo \\
+\midrule
+Sí & \cellcolor{gray!28}33 & \cellcolor{gray!75}90 \\
+No & \cellcolor{gray!8}10 & \cellcolor{gray!13}15 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

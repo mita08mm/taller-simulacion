@@ -11,6 +11,7 @@
 \usepackage{amsmath, amssymb}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{colortbl}
 
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
@@ -61,12 +62,16 @@
   \end{table}
 }
 
+% Celda de mapa de calor (escala de grises): x, y, intensidad (0-100), texto
+\newcommand{\celda}[4]{\ifnum#3>45 \def\colortexto{white}\else\def\colortexto{black}\fi
+  \fill[black!#3!white] (#1,#2) rectangle ++(2.2,-0.9);
+  \draw[black!30] (#1,#2) rectangle ++(2.2,-0.9);
+  \node[font=\small, text=\colortexto] at (#1+1.1,#2-0.45) {#4};}
+
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{\small Análisis de Mercado y Herramienta de Recolección de Datos}
-\lhead{\small Informe de Actividad}
 \cfoot{\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrulewidth}{0pt}
 
 \lstset{
   basicstyle=\ttfamily\small,
@@ -102,9 +107,7 @@
 {\huge\bfseries ANÁLISIS DE MERCADO Y HERRAMIENTA\\DE RECOLECCIÓN DE DATOS\par}
 \vspace{0.8cm}
 {\Large Enfoque ARCUSUR\par}
-\vspace{0.8cm}
-{\normalsize Informe de Actividad 2\par}
-\vspace*{\fill}
+\vspace*{\fill}w
 
 \begin{flushleft}
 \begin{tabular}{@{}ll}
@@ -121,26 +124,9 @@
 \end{titlepage}
 
 \tableofcontents
-\listoftables
 \newpage
 
 \section*{Resumen}
-
-Este informe presenta el análisis de mercado sobre el perfil, la
-formación continua y la empleabilidad de los titulados de la Carrera de
-Ingeniería de Sistemas de la Universidad Mayor de San Simón, como insumo
-para el proceso de Autoevaluación orientado a la acreditación ARCU-SUR.
-Las variables analizadas se eligieron a partir de los indicadores que el
-documento de Criterios de Calidad ARCU-SUR para Ingeniería pide sobre
-graduados, perfil de egreso, posgrado y vinculación con el sector
-productivo, y se obtienen de dos encuestas: una a titulados y otra a
-empleadores. Los datos se procesan en una herramienta de software
-propia que calcula frecuencias, medias con intervalo de confianza del
-95\% y pruebas de independencia chi-cuadrada sobre tablas de
-contingencia. \input{generado/resumen_resultados}
-
-\textbf{Palabras clave:} análisis de mercado, empleabilidad, ARCU-SUR,
-Ingeniería de Sistemas.
 
 \newpage
 
@@ -152,977 +138,2481 @@ Ingeniería de Sistemas.
 \subsection{Antecedentes}
 
 La Carrera de Ingeniería de Sistemas de la Universidad Mayor de San Simón
-se encuentra en un proceso de Autoevaluación orientado a la elaboración de
-un Plan de Desarrollo Estratégico, en el marco de una futura postulación
-de acreditación ante el sistema ARCU-SUR. Este proceso requiere contar con
-información empírica actualizada sobre el perfil, las expectativas de
-formación continua y la situación de empleabilidad de sus titulados, así
-como sobre los requerimientos que el sector productivo plantea a los
-profesionales egresados de la carrera.
+(UMSS) se encuentra en proceso de acreditación ante el sistema ARCU-SUR,
+coordinado con la Comisión Nacional de Acreditación de Carreras
+Universitarias (CNACU) y la Dirección Universitaria de Evaluación y
+Acreditación (DUEA) de la UMSS. Como parte de ese proceso, la carrera
+realiza su Autoevaluación con el fin de elaborar un Plan de Desarrollo
+Estratégico. ARCU-SUR es el sistema de acreditación de carreras
+universitarias del Sector Educativo del MERCOSUR; para las carreras de
+ingeniería evalúa cuatro dimensiones: Contexto Institucional, Proyecto
+Académico, Comunidad Universitaria e Infraestructura (ARCU-SUR, 2019).
 
-El propio documento de Criterios de Calidad ARCU-SUR, en su apartado de
-documentación y fuentes de información, pide presentar las ``encuestas
+Varios de los criterios de esa evaluación no se pueden responder con la
+información interna de la carrera (planes de estudio, registros
+académicos), porque se refieren a lo que ocurre con los titulados
+después de egresar: si consiguen empleo, en cuánto tiempo, si ese empleo
+corresponde a su formación, si continúan estudiando y cómo valoran la
+formación recibida. Tampoco se pueden responder sin conocer la opinión de
+quienes contratan a esos titulados. Por eso el propio documento de
+Criterios pide, entre la documentación de respaldo, las ``encuestas
 aplicadas para la autoevaluación'' y la ``información sobre mecanismos
-de seguimiento de graduados'' (ARCU-SUR, 2019). El presente estudio
-levanta esa información mediante dos instrumentos propios (encuestas a
-titulados y a empleadores) y la procesa con una herramienta de software
-desarrollada para este fin.
+de seguimiento de graduados'' (ARCU-SUR, 2019).
+
+El presente estudio responde a esa necesidad con un análisis de mercado
+basado en dos encuestas: una dirigida a los titulados de la carrera y
+otra a las organizaciones que los emplean. Las respuestas se procesan en
+una herramienta de software desarrollada para este fin, que importa los
+datos, calcula los indicadores y las pruebas estadísticas, y los presenta
+en un panel de consulta.
 
 \subsection{Objetivos}
 
 \subsubsection{Objetivo General}
 
 Analizar el perfil, la formación continua y la empleabilidad de los
-titulados de la Carrera de Ingeniería de Sistemas de la UMSS, de acuerdo
-con los criterios de calidad ARCU-SUR para graduados y perfil de egreso.
+titulados de la Carrera de Ingeniería de Sistemas de la UMSS, junto con
+la valoración que el sector productivo hace de su formación, para
+aportar evidencia a los criterios de calidad ARCU-SUR referidos a
+graduados, perfil de egreso y vinculación con el medio.
 
 \subsubsection{Objetivos Específicos}
 
 \begin{enumerate}
+  \item Describir el perfil de los titulados: características
+  demográficas, antigüedad profesional, situación laboral, formación
+  continua y fuentes de financiamiento.
   \item Calcular los indicadores de condiciones de empleo que pide el
-  criterio ARCU-SUR 3.2.3 (tasa de empleo, tiempo medio para obtener el
-  primer empleo y concordancia entre titulación y empleo).
-  \item Determinar, mediante pruebas de independencia chi-cuadrada, la
-  relación entre la situación laboral, la formación complementaria y la
-  valoración de la formación recibida.
-  \item Describir la valoración que los empleadores hacen del perfil
-  profesional y de las competencias de los titulados.
-  \item Desarrollar una herramienta de software que importe, procese y
-  visualice los datos recolectados.
+  criterio ARCU-SUR 3.2.3: tasa de empleo, tiempo medio para obtener el
+  primer empleo, destino laboral y concordancia entre la titulación y el
+  empleo.
+  \item Describir la demanda del sector productivo: intención de
+  contratación, nivel de formación requerido, áreas y herramientas
+  tecnológicas demandadas, y valoración del perfil profesional de los
+  titulados.
+  \item Determinar, mediante pruebas estadísticas, qué variables del
+  perfil de los titulados se relacionan entre sí, y explorar los
+  patrones que aparecen al combinar tres variables.
+  \item Formular propuestas para la Dirección de Carrera a partir de los
+  resultados obtenidos.
+  \item Desarrollar una herramienta de software que recolecte, procese y
+  visualice los datos, de modo que el análisis pueda repetirse en cada
+  nueva aplicación de las encuestas.
 \end{enumerate}
 
 \subsection{Justificación}
 
-El sistema ARCU-SUR evalúa a las carreras de ingeniería en cuatro
-dimensiones: Contexto Institucional, Proyecto Académico, Comunidad
-Universitaria e Infraestructura (ARCU-SUR, 2019). Varios de sus
-criterios dependen directamente de información sobre los titulados y
-sobre quienes los emplean:
+La pertinencia de una carrera, en el sentido de ARCU-SUR, es la
+correspondencia entre la formación que ofrece y las demandas de su
+contexto social, económico y laboral (ARCU-SUR, 2019). Esa
+correspondencia no se puede afirmar sin medirla, y para medirla hacen
+falta datos de dos fuentes: los titulados, que conocen cómo les sirvió su
+formación en el trabajo, y los empleadores, que conocen qué esperan de un
+Ingeniero de Sistemas. La Tabla~\ref{tab:justificacion} resume qué
+criterios ARCU-SUR dependen de esa información y qué aporta este estudio
+a cada uno.
 
-\begin{itemize}
-  \item \textbf{3.2.3 Condiciones de empleo}, cuyos indicadores son el
-  ``tiempo medio para obtener el primer empleo'', el ``destino laboral y
-  profesional de los graduados; tasa de empleo'' y la ``concordancia
-  entre las características de la titulación y las del empleo''.
-  \item \textbf{3.2.1 Resultados} y \textbf{3.2.2 Vinculación y
-  seguimiento a los graduados}, que piden evaluar el resultado del
-  proceso formativo y contar con un sistema de seguimiento de
-  graduados.
-  \item \textbf{2.1.2 Perfil de Egreso}, que exige ``coherencia entre el
-  perfil de egreso y la demanda explícita de competencias profesionales
-  \ldots{} expresadas por agentes sociales relevantes''.
-  \item \textbf{2.1.7 Actualización curricular}, \textbf{2.4.1 Cursos de
-  actualización profesional permanente} y \textbf{1.1.5} (programas de
-  posgrado).
-\end{itemize}
+\begin{mitabla}{Criterios ARCU-SUR a los que aporta el estudio}\label{tab:justificacion}
+\begin{tabular}{L{3.6cm}L{6.4cm}L{5.6cm}}
+\toprule
+\textbf{Criterio} & \textbf{Qué pide (ARCU-SUR, 2019)} & \textbf{Qué aporta el estudio} \\
+\midrule
+3.2.3 Condiciones de empleo & ``Tiempo medio para obtener el primer
+empleo''; ``destino laboral y profesional de los graduados; tasa de
+empleo''; ``concordancia entre las características de la titulación y
+las del empleo''. & Los tres indicadores, calculados con las respuestas
+de los titulados. \\
+3.2.1 Resultados & Evaluar el resultado del proceso formativo y usar esa
+evaluación para realizar ajustes. & Satisfacción con la formación,
+aspectos útiles y aspectos a mejorar de la carrera. \\
+3.2.2 Vinculación y seguimiento a los graduados & ``Mecanismos de
+seguimiento a los graduados''. & La encuesta y la herramienta, que
+quedan como mecanismo de seguimiento; interés de los titulados en una
+red de contactos de la carrera. \\
+2.1.2 Perfil de Egreso & ``Coherencia entre el perfil de egreso y la
+demanda explícita de competencias profesionales \ldots{} expresadas por
+agentes sociales relevantes''. & Valoración de los empleadores sobre el
+perfil y las competencias de los titulados. \\
+2.1.7 Actualización curricular & Mecanismos de actualización del
+currículo en consonancia con los desarrollos disciplinares y
+profesionales. & Asignaturas que dieron ventaja o resultaron poco útiles;
+tecnologías y tendencias que piden los empleadores. \\
+2.4.1 Cursos de actualización profesional permanente & ``Programas de
+formación de posgrado en disciplinas afines a la carrera''. & Formación
+complementaria cursada, interés en posgrado, áreas e instituciones
+preferidas. \\
+2.4.2 Relaciones con el sector público y privado & Relaciones de la
+carrera con organizaciones públicas y privadas. & Contratación de
+titulados en los últimos cinco años e intención de contratación de las
+organizaciones encuestadas. \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-Este estudio produce, con datos propios, la evidencia que esos criterios
-piden. Además, la herramienta de software queda como un mecanismo
-permanente de seguimiento: cada nueva aplicación de las encuestas se
-importa y los indicadores se recalculan sin rehacer el análisis.
+Además del aporte a la acreditación, el estudio tiene un valor práctico
+para la Dirección de Carrera: identifica en qué áreas existe demanda de
+posgrado, qué financiamiento usan los titulados y qué competencias pide
+el mercado, lo que sirve de base para decidir la oferta de formación
+continua y las alianzas con el sector productivo. Por último, como la
+herramienta de software recalcula todos los indicadores al importar
+nuevas respuestas, el análisis no se agota en esta aplicación: puede
+repetirse periódicamente y convertirse en un observatorio permanente de
+los titulados.
 
 \section{Marco Metodológico}
 
-\subsection{Diseño}
+\subsection{Diseño del Estudio}
 
-El estudio es de tipo cuantitativo y exploratorio. Es cuantitativo
-porque se basa en respuestas estructuradas (categóricas y numéricas)
-resumidas mediante frecuencias, medias e intervalos de confianza. Es
-exploratorio porque busca identificar relaciones entre variables. Cada
-relación se plantea como una prueba de hipótesis: una variable
-independiente $X$, una variable dependiente $Y$, la hipótesis nula
-$H_0$ (``$X$ e $Y$ son independientes'') y la alternativa $H_1$
-(``existe dependencia significativa entre $X$ e $Y$''), que se contrastan
-con la prueba chi-cuadrada.
+El estudio tiene un \textbf{enfoque cuantitativo}: las respuestas de las
+encuestas se cuentan, se resumen en medidas y se someten a pruebas
+estadísticas. Que el enfoque sea cuantitativo no significa que todas las
+variables lo sean. La mayoría de las preguntas de las encuestas son
+cualitativas (género, rubro, área de interés, grado de acuerdo), pero
+también se analizan contando cuántas veces aparece cada respuesta. Las
+preguntas abiertas de la encuesta a empleadores se tratan del mismo modo:
+sus respuestas se agrupan en categorías y luego se cuentan.
 
-El enunciado director menciona la experimentación por simulación y el
-análisis de diferentes escenarios. El modelo de simulación (generador
-congruencial y Transformada Inversa discreta para proyectar escenarios)
-se retiró del estudio por indicación del docente, porque proyectar
-resultados exige otras variables y datos que esta actividad no trabaja.
-El análisis de escenarios se resuelve con los datos observados: la
-herramienta permite recalcular todos los indicadores para cualquier
-período (gestión, semestre, mes o fechas exactas), comparar cualquier
-par de preguntas y armar reportes a medida con las variables que se
-quieran estudiar (Sección~\ref{sec:herramienta}).
+Por su alcance, el estudio es \textbf{descriptivo} y
+\textbf{exploratorio}. Es descriptivo porque primero caracteriza cada
+variable por separado: cómo se distribuyen las respuestas, cuál es la más
+frecuente y, en las variables numéricas, cuál es su valor central y su
+dispersión. Es exploratorio porque después busca relaciones entre
+variables sin suponerlas de antemano: primero entre dos variables, con
+tablas de contingencia y pruebas de independencia, y luego entre tres,
+con una tabulación cruzada que agrega una tercera variable.
 
-\subsection{Población Objetivo}
+\subsection{Variables y Escalas de Medición}
+
+Antes de calcular cualquier medida hay que saber qué tipo de variable es
+cada pregunta, porque la escala de medición decide qué cálculos tienen
+sentido. Por ejemplo, el promedio del rubro de una organización no
+significa nada, mientras que el promedio de los años de vida profesional
+sí. La Tabla~\ref{tab:escalas} resume las escalas presentes en las
+encuestas y lo que se puede calcular con cada una.
+
+\begin{mitabla}{Escalas de medición de las variables y cálculos permitidos}\label{tab:escalas}
+\begin{tabular}{L{2.6cm}L{5.4cm}L{7.6cm}}
+\toprule
+\textbf{Escala} & \textbf{Ejemplos en las encuestas} & \textbf{Qué se puede calcular} \\
+\midrule
+Nominal & Género, rubro, sector público/privado, área de interés de
+posgrado, fuente de financiamiento & Frecuencias, porcentajes, moda,
+prueba de uniformidad y prueba de independencia. No se promedia. \\
+Ordinal & Grado de acuerdo, rangos de edad, de remuneración y de tiempo
+al primer empleo & Lo anterior, más la mediana. Con pesos asignados a
+cada nivel, un puntaje promedio. \\
+Numérica & Años de vida profesional, años de desempleo & Lo anterior,
+más media, desviación estándar, cuartiles e intervalo de confianza. \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Las preguntas de grado de acuerdo, satisfacción o importancia miden
+\textbf{percepciones}, no hechos: dos titulados en la misma situación
+pueden responder distinto. Esa subjetividad es propia de lo que se quiere
+medir (la opinión de titulados y empleadores sobre la formación) y no se
+elimina, pero se declara, y los resultados de esas preguntas se leen como
+opinión de los encuestados. Lo mismo ocurre con la agrupación de las
+preguntas abiertas en categorías: la regla de agrupación la define el
+equipo, por lo que se publica junto con los resultados.
+
+Para resumir una escala ordinal en un solo valor se usan
+\textbf{factores de ponderación}: a cada nivel se le asigna un peso, desde
+1 para el nivel más bajo hasta $k$ para el más alto, donde $k$ es la
+cantidad de niveles de la escala. En la escala de acuerdo de la encuesta
+a titulados, por ejemplo, Totalmente en desacuerdo vale 1, En desacuerdo
+2, De acuerdo 3 y Totalmente de acuerdo 4. El puntaje promedio es la
+media de esos pesos, ponderada por la frecuencia de cada nivel:
+\[
+\bar{x} = \frac{\sum_{i=1}^{k} f_i \, w_i}{n}
+\]
+donde $w_i$ es el peso del nivel $i$, $f_i$ la cantidad de respuestas en
+ese nivel y $n$ el total de respuestas. Un puntaje cercano a $k$ indica
+acuerdo y uno cercano a 1, desacuerdo. La escala de la encuesta a
+empleadores no admite este tratamiento: tiene dos niveles de acuerdo
+(Totalmente y Parcialmente de acuerdo) y uno solo de desacuerdo, además
+de la opción No sabe, de modo que sus niveles no están igualmente
+espaciados. En esa escala solo se reportan frecuencias y porcentajes.
+
+\subsection{Población y Muestra}
+
+El estudio tiene dos poblaciones:
 
 \begin{enumerate}
   \item \textbf{Titulados} de la Carrera de Ingeniería de Sistemas de la
-  UMSS. La encuesta se distribuye únicamente a titulados de la Carrera,
-  por lo que el formulario no incluye una pregunta filtro.
-  \item \textbf{Empleadores} de titulados de la Carrera: el enunciado
-  exigía al menos cinco organizaciones, con una del ámbito público y una
-  del privado. La encuesta recibió respuestas de \nEmpleadores{} organizaciones.
+  UMSS.
+  \item \textbf{Organizaciones empleadoras}, públicas y privadas, que
+  contratan o pueden contratar a titulados de la carrera.
 \end{enumerate}
+
+La muestra está formada por quienes respondieron las encuestas:
+\nTitulados{} titulados y \nEmpleadores{} organizaciones. El muestreo es
+\textbf{no probabilístico}: las encuestas se difundieron y respondió quien
+quiso hacerlo, sin sortear a los participantes. Por eso los resultados
+describen a quienes respondieron y no se pueden extender con certeza a
+todos los titulados; los intervalos de confianza que se calculan deben
+leerse bajo esa condición. La encuesta a titulados se distribuyó solo
+entre titulados de la carrera, razón por la cual no incluye una pregunta
+filtro.
 
 \subsection{Técnicas de Recolección de Datos}
 
-Se aplican dos encuestas estructuradas mediante formularios web: la de
+Se aplicaron dos encuestas estructuradas mediante formularios web: la de
 titulados en Microsoft Forms y la de empleadores en Google Forms. Ambos
-instrumentos se transcriben completos en los Anexos del enunciado. La
-encuesta a titulados tiene lógica condicional: según la situación
-laboral declarada, se muestra una rama distinta de preguntas
-(trabaja en una organización, tiene un emprendimiento propio o no
-trabaja).
+instrumentos se transcriben completos en los anexos del enunciado de la
+actividad.
 
-Ambos formularios registran automáticamente la fecha de cada respuesta.
-La herramienta usa esa fecha para delimitar el período analizado, de
-modo que el formulario puede seguir abierto y cada informe se cierra con
-una fecha de corte, o se comparan respuestas antiguas y nuevas.
+\begin{itemize}
+  \item La \textbf{encuesta a titulados} tiene cinco bloques: datos
+  generales, formación complementaria y posgrado, trayectoria
+  profesional, primer empleo y satisfacción con la formación, además de
+  una pregunta sobre la red de contactos de la carrera. Tiene lógica
+  condicional: según la situación laboral declarada se muestra una rama
+  distinta de preguntas (trabaja en una organización, tiene un
+  emprendimiento propio o no trabaja).
+  \item La \textbf{encuesta a empleadores} tiene tres bloques: datos de la
+  organización, empleabilidad (contratación, formación requerida,
+  cargos y tres preguntas abiertas sobre áreas, herramientas y
+  habilidades) y formación y perfil profesional (escala de acuerdo).
+\end{itemize}
 
 \input{generado/periodo}
 
+El enunciado pide individualizar al menos tres organizaciones del ámbito
+tecnológico, una pública y una privada. La lista de organizaciones
+encuestadas está en el Anexo~\ref{anexo:organizaciones}.
+
 Las Historias de Usuario del enunciado orientaron el diseño de la
-herramienta. La Tabla~\ref{tab:hu} muestra qué preguntas reales del
-formulario responden a cada una; el análisis se hace siempre sobre las
+herramienta. La Tabla~\ref{tab:hu} muestra qué preguntas de las
+encuestas responden a cada una. El análisis se hace siempre sobre las
 preguntas tal como fueron aplicadas.
 
-\begin{mitabla}{Historias de Usuario y preguntas del formulario que las responden\label{tab:hu}}
-\begin{tabular}{cL{4.2cm}L{8.8cm}}
+\begin{mitabla}{Historias de Usuario y preguntas que las responden}\label{tab:hu}
+\begin{tabular}{cL{4.2cm}L{10cm}}
 \toprule
-HU & Tema & Preguntas del formulario utilizadas \\
+\textbf{HU} & \textbf{Tema} & \textbf{Preguntas utilizadas} \\
 \midrule
-1 & Antigüedad y empleabilidad & Años de vida profesional, tiempo desempleado, situación laboral, sector, rubro, cargo, remuneración, tiempo hasta el primer empleo \\
-2 & Formación continua y áreas de interés & Formación complementaria y su nivel, interés en posgrado, área de interés, institución elegida, opinión sobre la oferta de posgrado de la FCyT \\
-3 & Mecanismos de financiamiento & Fuente de financiamiento del programa cursado; financiamiento del emprendimiento \\
-4 & Brechas en competencias & Satisfacción con la formación, concordancia formación--mercado, aspectos útiles y a mejorar, asignaturas; escala de perfil profesional de empleadores \\
-5 & Reportes y matrices cruzadas & Exportación CSV y para Excel, tablas de contingencia (cruces del estudio y cruce libre), mapas de calor y diagrama de radar en la herramienta \\
+1 & Antigüedad y empleabilidad & Años de vida profesional, tiempo
+desempleado, situación laboral, sector, rubro, cargo, remuneración,
+tiempo hasta el primer empleo \\
+2 & Formación continua y áreas de interés & Formación complementaria y
+su nivel, interés en posgrado, área de interés, institución elegida,
+opinión sobre la oferta de posgrado de la FCyT \\
+3 & Mecanismos de financiamiento & Fuente de financiamiento del
+programa cursado; financiamiento del emprendimiento \\
+4 & Brechas en competencias & Satisfacción con la formación,
+concordancia formación--mercado, aspectos útiles y a mejorar,
+asignaturas; escala de perfil profesional de empleadores \\
+5 & Reportes y matrices cruzadas & Tablas de contingencia, mapas de
+calor y exportación de datos en la herramienta \\
 \bottomrule
 \end{tabular}
 \end{mitabla}
 
-\subsection{Variables e Indicadores según ARCU-SUR}
+\subsection{Preparación y Validación de los Datos}
 
-Una variable o un cruce se incluye en el análisis solo si responde a un
-indicador concreto del documento de Criterios ARCU-SUR y sale de una
-pregunta real del formulario. La Tabla~\ref{tab:indicadores} resume los
-indicadores calculados y la Tabla~\ref{tab:cruces} los cruces de
-variables.
+Antes de calcular cualquier resultado, los datos pasan por una etapa de
+preparación (\textit{data wrangling}) cuyo propósito es que cada número
+del informe salga de respuestas válidas y comparables. La herramienta
+aplica estas reglas de forma automática:
 
-\begin{mitabla}{Indicadores calculados y criterio ARCU-SUR al que responden\label{tab:indicadores}}
-\begin{tabular}{cL{4.6cm}L{6.6cm}c}
-\toprule
-Id & Indicador & Cálculo & Criterio \\
-\midrule
-U1 & Tasa de empleo & Proporción que trabaja en una organización o en un emprendimiento propio & 3.2.3 \\
-U2 & Tiempo medio al primer empleo & Media e IC 95\% usando el punto medio de cada rango (meses) & 3.2.3 \\
-U3 & Años de vida profesional y desempleo & Media, desviación estándar e IC 95\% & 3.2.3 \\
-U4 & Destino laboral & Frecuencias de rubro, sector, departamento, cargo y remuneración & 3.2.3 \\
-U5 & Concordancia titulación--empleo & Frecuencias y media de las escalas de pertinencia y concordancia (1--4) & 3.2.3 \\
-U6 & Satisfacción con la formación & Frecuencias y media; aspectos útiles y a mejorar & 3.2.1 \\
-U7 & Ranking de asignaturas & Menciones de asignaturas con ventaja y poco útiles & 2.1.7 \\
-U8 & Demanda de posgrado & \% con formación complementaria, \% con interés, área e institución & 2.4.1 / 1.1.5 \\
-U9 & Oferta de posgrado FCyT & Frecuencias y media de la escala (1--4) & 2.4.1 \\
-U10 & Seguimiento de graduados & \% interesado en la red de contactos de la Carrera & 3.2.2 \\
-U11 & Perfil según empleadores & Porcentaje de cada opción en los 18 ítems de perfil profesional y vinculación & 2.1.2 / 2.4.2 \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-\begin{mitabla}{Cruces de variables (pruebas de independencia)\label{tab:cruces}}
-\begin{tabular}{cL{5.4cm}L{5.8cm}c}
-\toprule
-Id & Cruce & Propósito & Criterio \\
-\midrule
-C1 & Situación laboral $\times$ satisfacción con la formación & Determinar si la valoración de la formación cambia según la situación laboral & 3.2.1 \\
-C2 & Sector $\times$ pertinencia del puesto & Determinar si la concordancia titulación--empleo depende del sector & 3.2.3 \\
-C3 & Formación complementaria $\times$ remuneración & Determinar si la formación complementaria se asocia con la remuneración & 2.4.1 / 3.2.3 \\
-C4 & Interés en posgrado $\times$ oferta FCyT afín & Determinar si la afinidad percibida de la oferta FCyT depende del interés en un posgrado & 2.4.1 / 1.1.5 \\
-C5 & Área de interés $\times$ institución elegida & Identificar áreas en que la oferta de la UMSS no capta la demanda de posgrado & 2.4.1 / 1.1.5 \\
-C6 & Concordancia $\times$ tiempo al primer empleo & Determinar si una formación alineada al mercado se asocia con un ingreso más rápido al empleo & 3.2.3 \\
-C7 & Nivel cursado $\times$ fuente de financiamiento & Determinar si la forma de financiar el programa (recursos propios o beca) depende de su nivel & 2.4.1 \\
-C8 & Edad $\times$ área de interés del posgrado & Patrón demográfico: orientar la oferta de posgrado a cada grupo de edad & 2.4.1 \\
-C9 & Experiencia $\times$ remuneración & Grado de madurez profesional: si la remuneración depende de ser junior o consolidado & 3.2.3 \\
-C10 & Experiencia $\times$ cargo & Distinguir a los profesionales junior de los mandos consolidados & 3.2.3 \\
-C11 & Formación complementaria $\times$ interés en posgrado & Determinar si quien ya cursó un programa quiere seguir estudiando & 2.4.1 \\
-C12 & Edad $\times$ situación laboral & Patrón demográfico: si la situación laboral depende de la edad & 3.2.3 \\
-C13 & Género $\times$ interés en posgrado & Patrón demográfico: si el interés en un posgrado depende del género & 2.4.1 \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-Para los empleadores el análisis es solo descriptivo (frecuencias de
-cada respuesta). \textit{[Confirmar: la encuesta reunió \nEmpleadores{} respuestas
-de empleadores, no las 5 que exigía el enunciado -- con esa cantidad
-podría ser posible aplicar chi-cuadrada también a empleadores; falta
-decidir si se mantiene el análisis solo descriptivo o se agregan
-cruces para esta encuesta.]}
-
-\subsection{Decisiones de Procesamiento}
-
-El formulario se aplica tal como fue diseñado. Las situaciones que
-afectan el cálculo se resuelven con las siguientes decisiones, que la
-herramienta aplica de forma automática:
-
-\begin{itemize}
-  \item \textbf{Tiempo hasta el primer empleo.} Solo lo responde la rama
-  ``trabaja en una organización''. Para calcular su media se reemplaza
-  cada rango por su punto medio en meses: ya trabajaba $=0$, menos de un
-  mes $=0.5$, 1--4 meses $=2.5$, 4--8 meses $=6$, 8--12 meses $=10$. La
-  opción ``más de 12 meses'' no tiene límite superior y se toma como 12,
-  por lo que la media obtenida es una cota inferior.
-  \item \textbf{Escalas de acuerdo de titulados} (4 niveles). Se
-  codifican de 1 (totalmente en desacuerdo) a 4 (totalmente de
-  acuerdo). La pregunta de satisfacción usa esta misma escala, por lo
-  que se interpreta como grado de acuerdo con estar satisfecho. Para las
-  tablas de contingencia los cuatro niveles se agrupan en ``en
-  desacuerdo'' y ``de acuerdo'', de modo que las celdas tengan
-  suficientes datos.
-  \item \textbf{Escala de empleadores.} Tiene dos niveles de acuerdo, uno
-  de desacuerdo y la opción ``no sabe''; al no ser simétrica, no se
-  calcula media: se reporta el porcentaje de cada opción.
-  \item \textbf{Otras agrupaciones para los cruces:} remuneración (hasta
-  Bs 5.000 / más de Bs 5.000), tiempo al primer empleo (hasta 4 meses /
-  más de 4 meses), institución de posgrado (UMSS: EUPG o FCyT / otra) y
-  nivel cursado (diplomado o especialidad / maestría o superior).
-  \item \textbf{Datos personales.} Correo, teléfono y LinkedIn se eliminan
-  al importar los datos, antes de cualquier cálculo. Las organizaciones
-  se listan, pero ningún resultado se atribuye a una organización con
+\begin{enumerate}
+  \item \textbf{Datos personales.} Correo, teléfono y LinkedIn se
+  eliminan al importar, antes de cualquier cálculo. Las organizaciones se
+  listan, pero ningún resultado se atribuye a una organización con
   nombre.
-\end{itemize}
-
-\subsection{Pipeline de Procesamiento}
-
-\begin{enumerate}
-  \item \textbf{Recolección e importación:} las respuestas llegan por
-  el formulario propio de la herramienta o se importan del CSV exportado
-  de Microsoft Forms (titulados) y Google Forms (empleadores). Al
-  importar, el texto de cada pregunta y opción se traduce al código de la
-  encuesta y se informa lo que no se pudo reconocer; los datos
-  personales se guardan aparte y no entran al análisis, y se toma la
-  fecha de cada respuesta.
-  \item \textbf{Selección del período:} se eligen las respuestas
-  recibidas entre dos fechas (o todas).
-  \item \textbf{Estadística univariada:} frecuencias absolutas y
-  relativas de cada pregunta; media, desviación estándar e intervalo de
-  confianza del 95\% para las variables numéricas y las escalas.
-  \item \textbf{Estadística bivariada:} tablas de contingencia y prueba
-  chi-cuadrada para los cruces C1--C13.
-  \item \textbf{Visualización y exportación:} panel de control con
-  gráficos de barras, mapas de calor y diagrama de radar; exportación de
-  los datos limpios y de cada matriz cruzada en CSV.
+  \item \textbf{Codificación.} El texto de cada pregunta y de cada opción
+  se traduce a un código; las respuestas que no se reconocen se informan
+  para revisarlas, en lugar de descartarlas en silencio.
+  \item \textbf{Respuestas faltantes.} Una pregunta sin respuesta se
+  trata como dato faltante y no como un cero. Como la encuesta tiene
+  ramas, cada resultado informa su propio $n$: la cantidad de personas que
+  efectivamente respondieron esa pregunta.
+  \item \textbf{Consistencia.} Se descartan las respuestas en que los años
+  de desempleo superan los años de vida profesional, porque son
+  imposibles; la cantidad descartada se informa junto al resultado.
+  \item \textbf{Rangos.} El tiempo hasta el primer empleo se pregunta por
+  rangos. Para calcular su media, cada rango se reemplaza por su punto
+  medio en meses: ya trabajaba $=0$, menos de un mes $=0.5$, 1--4 meses
+  $=2.5$, 4--8 meses $=6$, 8--12 meses $=10$. La opción ``más de 12
+  meses'' no tiene límite superior y se toma como 12, por lo que la media
+  obtenida es una cota inferior.
+  \item \textbf{Agrupación para los cruces.} Cuando una tabla de
+  contingencia tiene celdas con frecuencia esperada menor que 5, las
+  categorías se agrupan (por ejemplo, ``en desacuerdo'' y ``de acuerdo''
+  en lugar de cuatro niveles) para que la prueba chi-cuadrada sea
+  aplicable.
 \end{enumerate}
 
-\subsection{Formulación del Modelo Estadístico}
+\subsection{Procedimiento de Análisis}\label{sec:procedimiento}
 
-Esta sección presenta, para cada procedimiento que usa el estudio, la
-idea, la fórmula, el algoritmo y un ejemplo resuelto con pocos datos, en
-el mismo formato de los apuntes de la asignatura (Ali Rodriguez, 2021).
-En las Secciones~\ref{sec:titulados} a~\ref{sec:cruces} se aplica el mismo
-algoritmo a los datos reales de la encuesta.
+El análisis sigue siempre el mismo orden. Cada paso responde una
+pregunta, y su resultado decide si corresponde el siguiente. Todas las
+pruebas usan un nivel de significancia $\alpha = 0.05$. Esta sección
+describe cómo se realiza cada paso; su aplicación se presenta en la
+Sección~\ref{sec:titulados}.
 
-\subsubsection{Distribución de Frecuencias y Mediana}\label{sec:frecuencias}
+\subsubsection{Variables y escala de medición}
 
-Una pregunta de opción única se resume contando cuántas personas eligieron
-cada respuesta.
+\textit{Propósito: saber qué se puede calcular con cada variable antes
+de calcular.} Cada variable se clasifica según su escala (nominal,
+ordinal o numérica) y se indica si es subjetiva, conforme a la
+Tabla~\ref{tab:escalas}. Una variable numérica puede agruparse en
+categorías para cruzarla con otras; por ejemplo, los años de vida
+profesional se dividen en la mediana en \textbf{junior} (hasta la
+mediana) y \textbf{consolidado} (más de la mediana).
 
+\subsubsection{Paso 1. Análisis descriptivo}
+
+\textit{Propósito: conocer cómo es cada variable por separado.}
+
+Para toda variable se calcula la frecuencia absoluta $f_i$ (cuántas
+respuestas tiene la opción $i$), la frecuencia relativa $h_i = f_i/n$ y la
+moda (la opción más frecuente). En las variables numéricas se agregan:
 \[
-\boxed{\;h_i = \frac{f_i}{n}\;}
-\qquad\qquad
-\boxed{\;Me = x_{\left(\frac{n+1}{2}\right)}\;}
+\bar{x} = \frac{\sum x_i}{n} \qquad
+s^2 = \frac{\sum (x_i - \bar{x})^2}{n-1} \qquad
+s = \sqrt{s^2} \qquad
+CV = \frac{s}{\bar{x}} \times 100
 \]
-
-donde $f_i$ es la frecuencia absoluta (cantidad de personas que eligieron
-la respuesta $i$), $n$ el número de respuestas, $h_i$ la frecuencia
-relativa y $Me$ la mediana: el valor que queda al centro cuando los datos
-se ordenan de menor a mayor (si $n$ es par, el promedio de los dos
-centrales).
-
-\textbf{Algoritmo}
-
-Paso 1. Contar con la muestra y determinar su tamaño $n$.
-
-Paso 2. Contar la frecuencia absoluta $f_i$ de cada respuesta.
-
-Paso 3. Calcular la frecuencia relativa $h_i = f_i/n$.
-
-Paso 4. Para una variable numérica, ordenar los datos y ubicar la mediana
-en la posición $(n+1)/2$.
-
-\textbf{Ejemplo.} Años de vida profesional de 5 titulados: 6, 2, 9, 4, 4.
-
-\textit{Paso 1. Contar con la muestra y determinar su tamaño.} $n = 5$.
-
-\textit{Paso 2 y 3. Frecuencias.}
-
-\begin{mitabla}{Ejemplo: distribución de frecuencias}
-\begin{tabular}{ccc}
-\toprule
-Años ($x_i$) & $f_i$ & $h_i = f_i/n$ \\
-\midrule
-2 & 1 & $1/5 = 0.20$ \\
-4 & 2 & $2/5 = 0.40$ \\
-6 & 1 & $1/5 = 0.20$ \\
-9 & 1 & $1/5 = 0.20$ \\
-\midrule
-Total & 5 & 1.00 \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-\textit{Paso 4. Mediana.} Datos ordenados: 2, 4, \textbf{4}, 6, 9. La
-posición central es $(5+1)/2 = 3$, entonces $Me = 4$ años: la mitad de
-los titulados tiene 4 años o menos de experiencia.
-
-\subsubsection{Intervalo de Confianza para una Media}\label{sec:ic}
-
-La encuesta llega a una parte de los titulados (una muestra), no a todos.
-La media de la muestra no es exactamente la media de todos los titulados;
-el intervalo de confianza indica entre qué valores está esa media con un
-95\% de confianza (Coss Bu, 1998, cap.~6, para varianza desconocida).
-
+además de la mediana (el valor central de los datos ordenados) y el
+intervalo de confianza del 95\% para la media, para varianza desconocida:
 \[
-\boxed{\;\bar{x} = \frac{\sum x_i}{n}\;}
+\bar{x} - \frac{s}{\sqrt{n}}\,t_{n-1,\alpha/2} \;\le\; \mu \;\le\; \bar{x} + \frac{s}{\sqrt{n}}\,t_{n-1,\alpha/2}
+\]
+En las escalas ordinales se usa el puntaje promedio con factores de
+ponderación, $\bar{x} = \sum f_i w_i / n$.
+
+\subsubsection{Paso 2. Prueba de uniformidad}
+
+\textit{Propósito: saber si las respuestas de una variable se reparten
+parejo o si hay opciones preferidas.}
+
+Es la prueba de las frecuencias. Si las $k$ opciones fueran igual de
+elegidas, cada una tendría la frecuencia esperada $FE = n/k$. Se compara
+con la frecuencia observada $FO_i$:
+\[
+x_0^2 = \sum_{i=1}^{k} \frac{(FE_i - FO_i)^2}{FE_i}
+\]
+Si $x_0^2 < x^2_{\alpha,\,k-1}$ se concluye \textbf{uniformidad} (ninguna
+opción se prefiere); si no, \textbf{no uniformidad}.
+
+\subsubsection{Paso 3. Tabla de contingencia y mapa de calor}
+
+\textit{Propósito: ver cómo se combinan dos variables.}
+
+Se cruza una variable independiente $X$ (filas) con una dependiente $Y$
+(columnas) y se cuenta la frecuencia observada $FO_{ij}$ de cada
+combinación. El \textbf{mapa de calor} es la misma tabla con cada celda
+sombreada según su porcentaje por fila: cuanto más oscura, más casos. Si
+las filas tienen tonos semejantes, no hay relación; si los tonos se
+invierten de una fila a otra, hay indicios de dependencia.
+
+\subsubsection{Paso 4. Prueba de independencia}
+
+\textit{Propósito: decidir si la variable $Y$ depende de $X$ o si la
+diferencia observada puede deberse al azar.}
+
+Se plantean $H_0$: $X$ e $Y$ son independientes, y $H_1$: $Y$ depende de
+$X$. La frecuencia esperada de cada celda, si fueran independientes, es
+\[
+FE_{ij} = \frac{(\text{total de la fila } i) \times (\text{total de la columna } j)}{N}
 \qquad
-\boxed{\;S = \sqrt{\frac{\sum (x_i - \bar{x})^2}{n-1}}\;}
+x_0^2 = \sum_{i}\sum_{j} \frac{(FO_{ij} - FE_{ij})^2}{FE_{ij}}
 \]
+Si $x_0^2 < x^2_{(f-1)(c-1),\,\alpha}$ se acepta $H_0$ (independencia); si
+no, se concluye dependencia.
+
+\subsubsection{Paso 5. Incidencia}
+
+\textit{Propósito: medir cuánto influye $X$ sobre $Y$.} Solo se calcula
+cuando el paso 4 concluye dependencia; si las variables son
+independientes, la diferencia entre grupos no se interpreta.
+
+Se calcula el porcentaje por fila de la categoría de interés y se
+comparan los grupos, por diferencia (en puntos porcentuales) y por
+razón (cuántas veces más):
 \[
-\boxed{\;\bar{x} - \frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2} \;\le\; \mu \;\le\; \bar{x} + \frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2}\;}
-\]
-
-\textbf{Algoritmo}
-
-Paso 1. Contar con la muestra y determinar su tamaño $n$.
-
-Paso 2. Calcular la media muestral $\bar{x}$.
-
-Paso 3. Calcular la desviación estándar muestral $S$.
-
-Paso 4. Determinar el estadístico teórico $t_{n-1,\alpha/2}$ de la tabla
-$t$ de Student (con más de 30 grados de libertad se usa $z_{0.025}=1.96$,
-igual que en la prueba de los promedios).
-
-Paso 5. Calcular el margen de error $\dfrac{S}{\sqrt{n}}\,t_{n-1,\alpha/2}$.
-
-Paso 6. Construir el intervalo y concluir.
-
-\textbf{Ejemplo.} Con los mismos 5 titulados (6, 2, 9, 4, 4 años),
-construir el intervalo de confianza del 95\% para la media de años de
-vida profesional.
-
-\textit{Paso 1. Contar con la muestra y determinar su tamaño.} $n = 5$.
-
-\textit{Paso 2. Calcular la media muestral.}
-\[
-\bar{x} = \frac{6 + 2 + 9 + 4 + 4}{5} = \frac{25}{5} = 5 \text{ años}
-\]
-
-\textit{Paso 3. Calcular la desviación estándar muestral.}
-
-\begin{mitabla}{Ejemplo: cálculo de la desviación estándar}
-\begin{tabular}{ccc}
-\toprule
-$x_i$ & $x_i - \bar{x}$ & $(x_i - \bar{x})^2$ \\
-\midrule
-6 & $6-5 = 1$ & 1 \\
-2 & $2-5 = -3$ & 9 \\
-9 & $9-5 = 4$ & 16 \\
-4 & $4-5 = -1$ & 1 \\
-4 & $4-5 = -1$ & 1 \\
-\midrule
- & $\sum$ & 28 \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-\[
-S = \sqrt{\frac{28}{5-1}} = \sqrt{7} = 2.6458
-\]
-
-\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y
-$n - 1 = 4$ grados de libertad, de la tabla $t$ de Student:
-$t_{4,\,0.025} = 2.776$.
-
-\textit{Paso 5. Calcular el margen de error.}
-\[
-\frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2} = \frac{2.6458}{\sqrt{5}} \times 2.776 = 1.1832 \times 2.776 = 3.2846
-\]
-
-\textit{Paso 6. Construir el intervalo y concluir.}
-\[
-5 - 3.2846 \;\le\; \mu \;\le\; 5 + 3.2846 \quad\Longrightarrow\quad 1.72 \;\le\; \mu \;\le\; 8.28
-\]
-
-Con un 95\% de confianza, la media de años de vida profesional de todos
-los titulados está entre 1.72 y 8.28 años. El intervalo es ancho porque
-la muestra del ejemplo es muy pequeña; con las respuestas reales es
-mucho más estrecho (Sección~\ref{sec:titulados}).
-
-\subsubsection{Prueba de las Frecuencias (Principio de Uniformidad)}\label{sec:uniformidad}
-
-Las pruebas estadísticas de la asignatura verifican dos principios:
-\textbf{uniformidad} e \textbf{independencia} (Ali Rodriguez, 2021, cap.~3;
-Coss Bu, 1998, cap.~3). La uniformidad se verifica con la prueba de las
-frecuencias (Chi-Cuadrado): si se reparten $n$ respuestas entre las $k$
-opciones de una pregunta y nadie tuviera preferencia, cada opción
-recibiría la misma cantidad, $FE = n/k$ (como repartir 10 manzanas entre
-2 personas: 5 cada una). Se compara lo que \textbf{ocurre} ($FO_i$) con
-lo que se \textbf{espera} ($FE$). En la encuesta, ``Uniformidad'' quiere
-decir que las respuestas se reparten parejo y ninguna opción se destaca;
-``No uniformidad'' quiere decir que hay opciones preferidas de verdad, no
-por azar.
-
-\[
-\boxed{\;FE = \frac{n}{k} \qquad x_0^2 = \sum_{i=1}^{k} \frac{(FO_i - FE)^2}{FE} \;<\; x^2_{\alpha,\,k-1}\;}
-\]
-
-\textbf{Algoritmo}
-
-Paso 1. Contar con la muestra y determinar su tamaño.
-
-Paso 2. Calcular la frecuencia esperada.
-
-Paso 3. Calcular el estadístico Chi cuadrado.
-
-Paso 4. Determinar el estadístico teórico $x^2_{\alpha,\,k-1}$.
-
-Paso 5. Establecer relación entre estadísticos.
-
-Paso 6. Conclusión.
-
-\begin{center}
-\begin{tabular}{l}
-Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
-\quad ``Uniformidad''\\
-Sino\\
-\quad No ``Uniformidad''\\
-FinSi
-\end{tabular}
-\end{center}
-
-\textbf{Ejemplo.} Área de interés de los 10 titulados del ejemplo de
-análisis exploratorio de la asignatura: Ciencia de Datos (T1, T4, T8),
-Ciberseguridad (T2, T6), Ing.\ de Software (T3, T7, T9) y Redes (T5,
-T10). Aplicar la prueba de las frecuencias con $\alpha = 5\%$ y $k = 4$.
-
-\textit{Paso 1. Contar con la muestra y determinar su tamaño.} $n = 10$,
-$k = 4$ opciones.
-
-\textit{Paso 2. Calcular la frecuencia esperada.}
-\[
-FE = \frac{n}{k} = \frac{10}{4} = 2.5
-\]
-
-\textit{Paso 3. Calcular el estadístico Chi cuadrado.}
-
-\begin{mitabla}{Ejemplo: prueba de las frecuencias}
-\begin{tabular}{lccc}
-\toprule
-Área & $FO_i$ & $FE$ & $\frac{(FO_i-FE)^2}{FE}$ \\
-\midrule
-Ciencia de Datos  & 3 & 2.5 & $\frac{(3-2.5)^2}{2.5} = 0.1$ \\[3pt]
-Ciberseguridad    & 2 & 2.5 & $\frac{(2-2.5)^2}{2.5} = 0.1$ \\[3pt]
-Ing.\ de Software & 3 & 2.5 & $\frac{(3-2.5)^2}{2.5} = 0.1$ \\[3pt]
-Redes             & 2 & 2.5 & $\frac{(2-2.5)^2}{2.5} = 0.1$ \\[3pt]
-\midrule
-Total & 10 & 10 & $x_0^2 = 0.4$ \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-\textit{Paso 4. Determinar el estadístico teórico.}
-$x^2_{0.05,\,4-1} = x^2_{0.05,\,3} = 7.815$.
-
-\textit{Paso 5. Establecer relación entre estadísticos.}
-$x_0^2 < x^2_{\alpha,\,k-1} \rightarrow 0.4 < 7.815 \rightarrow$ sí.
-
-\textit{Paso 6. Conclusión.}
-
-\begin{center}
-\begin{tabular}{l}
-$0.4 < 7.815$\\
-Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
-\quad \fbox{``Uniformidad''}\\
-Sino\\
-\quad No ``Uniformidad''\\
-FinSi
-\end{tabular}
-\end{center}
-
-Los 10 titulados se reparten de forma pareja entre las cuatro áreas:
-ninguna es preferida. Como $FE = 2.5 < 5$, con tan pocos datos la
-conclusión es solo ilustrativa; con las respuestas reales la $FE$ es
-mucho mayor (Sección~\ref{sec:resultado-uniformidad}).
-
-\subsubsection{Prueba de Independencia Chi-Cuadrada (Tabla de Contingencia)}\label{sec:chi}
-
-Sirve para saber si dos preguntas de la encuesta están relacionadas: si
-una variable $X$ (independiente) influye en otra variable $Y$
-(dependiente), o si las diferencias que se ven en la tabla se deben al
-azar. Verifica el segundo principio, el de \textbf{independencia}, y es
-la misma idea de la prueba de las frecuencias de la
-Sección~\ref{sec:uniformidad}: comparar lo que \textbf{ocurre} ($FO$) con lo que se
-\textbf{espera} ($FE$). La diferencia es que aquí los datos se ordenan en
-una tabla de doble entrada ($f$ filas para $X$, $c$ columnas para $Y$),
-y lo esperado en cada celda es lo que habría \textbf{si $X$ e $Y$ fueran
-independientes}, calculado con los totales de la tabla.
-
-\textbf{Hipótesis}
-
-$H_0$: Las variables $X$ e $Y$ son independientes.
-
-$H_1$: Existe dependencia significativa entre las variables $X$ e $Y$.
-
-\[
-\boxed{\;FE_{ij} = \frac{(\text{total fila } i)(\text{total columna } j)}{N}\;}
+p_i = \frac{FO_{ij}}{\text{total de la fila } i} \times 100
 \qquad
-\boxed{\;gl = (f-1)(c-1)\;}
-\]
-\[
-\boxed{\;X_0^2 = \sum_{i=1}^{f}\sum_{j=1}^{c} \frac{(FO_{ij} - FE_{ij})^2}{FE_{ij}}\;}
-\]
-
-\begin{center}
-\begin{tabular}{l}
-Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
-\quad ``Independencia'' (no se rechaza $H_0$)\\
-Sino\\
-\quad NO ``Independencia'' (se rechaza $H_0$ y se acepta $H_1$)\\
-FinSi
-\end{tabular}
-\end{center}
-
-\textbf{Algoritmo}
-
-Paso 1. Describir el problema: definir $X$ (independiente) e $Y$
-(dependiente) y plantear las hipótesis.
-
-Paso 2. Contar con la muestra: construir la tabla de contingencia con la
-frecuencia observada $FO_{ij}$ (cuántos titulados respondieron a la vez la
-categoría $i$ de $X$ y la categoría $j$ de $Y$) y sus totales.
-
-Paso 3. Calcular la frecuencia esperada $FE_{ij}$ de cada celda.
-
-Paso 4. Calcular el estadístico chi-cuadrado $X_0^2$.
-
-Paso 5. Determinar el estadístico teórico $X^2_{(f-1)(c-1),\,\alpha}$ de
-la tabla chi-cuadrada.
-
-Paso 6. Establecer la relación entre estadísticos y concluir.
-
-\textbf{Ejemplo resuelto en clase.} Se tiene el posgrado deseado y la
-fuente de financiamiento de 10 titulados (datos ilustrativos):
-
-\begin{mitabla}{Ejemplo: datos de 10 titulados}
-\begin{tabular}{lll}
-\toprule
-Titulado & $X$: Posgrado deseado & $Y$: Fuente de financiamiento \\
-\midrule
-T1 & Maestría & Fondos propios \\
-T2 & Especialidad & Beca educativa \\
-T3 & Maestría & Beca educativa \\
-T4 & Doctorado & Beca educativa \\
-T5 & Maestría & Fondos propios \\
-T6 & Ninguno & Fondos propios \\
-T7 & Maestría & Beca empresarial \\
-T8 & Especialidad & Beca empresarial \\
-T9 & Maestría & Fondos propios \\
-T10 & Maestría & Beca educativa \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-\textit{Paso 1. Describir el problema.} Establecer el grado de relación
-o dependencia entre el posgrado deseado (variable independiente $X$) y la
-fuente de financiamiento (variable dependiente $Y$).
-$H_0$: el posgrado deseado y la fuente de financiamiento son
-independientes. $H_1$: existe dependencia significativa entre ellos.
-
-\textit{Paso 2. Tabla de contingencia} ($FO_{ij}$, $N = 10$).
-
-\begin{mitabla}{Ejemplo: frecuencia observada $FO_{ij}$}
-\begin{tabular}{lccc|c}
-\toprule
-Posgrado deseado & Fondos propios & Beca educativa & Beca empresarial & Total \\
-\midrule
-Especialidad & 0 & 1 & 1 & 2 \\
-Maestría & 3 & 2 & 1 & 6 \\
-Doctorado & 0 & 1 & 0 & 1 \\
-Ninguno & 1 & 0 & 0 & 1 \\
-\midrule
-Total & 4 & 4 & 2 & $N = 10$ \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-\textit{Paso 3. Frecuencia esperada.} Por ejemplo, para la celda
-Especialidad y Fondos propios:
-\[
-FE_{11} = \frac{(2)(4)}{10} = 0.8
+\text{diferencia} = p_1 - p_2
+\qquad
+\text{razón} = \frac{p_1}{p_2}
 \]
 
-\begin{mitabla}{Ejemplo: frecuencia esperada $FE_{ij}$}
-\begin{tabular}{lccc}
-\toprule
-Posgrado deseado & F. propios & B. educativa & B. empresarial \\
-\midrule
-Especialidad & $2\cdot4/10 = 0.8$ & $2\cdot4/10 = 0.8$ & $2\cdot2/10 = 0.4$ \\
-Maestría & $6\cdot4/10 = 2.4$ & $6\cdot4/10 = 2.4$ & $6\cdot2/10 = 1.2$ \\
-Doctorado & $1\cdot4/10 = 0.4$ & $1\cdot4/10 = 0.4$ & $1\cdot2/10 = 0.2$ \\
-Ninguno & $1\cdot4/10 = 0.4$ & $1\cdot4/10 = 0.4$ & $1\cdot2/10 = 0.2$ \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
+\subsubsection{Paso 6. Factor de riesgo}
 
-\textit{Paso 4. Estadístico chi-cuadrado.}
+\textit{Propósito: identificar qué grupo está en peor situación.} Se
+define primero la situación desfavorable y, entre los cruces con
+dependencia confirmada, se identifica el grupo con la mayor proporción de
+esa situación. Pertenecer a ese grupo es un factor de riesgo.
 
-\begin{mitabla}{Ejemplo: cálculo de $X_0^2$ celda por celda}
-\begin{tabular}{lccc}
-\toprule
-Posgrado deseado & F. propios & B. educativa & B. empresarial \\
-\midrule
-Especialidad & $\frac{(0-0.8)^2}{0.8} = 0.80$ & $\frac{(1-0.8)^2}{0.8} = 0.05$ & $\frac{(1-0.4)^2}{0.4} = 0.90$ \\[3pt]
-Maestría & $\frac{(3-2.4)^2}{2.4} = 0.15$ & $\frac{(2-2.4)^2}{2.4} = 0.07$ & $\frac{(1-1.2)^2}{1.2} = 0.03$ \\[3pt]
-Doctorado & $\frac{(0-0.4)^2}{0.4} = 0.40$ & $\frac{(1-0.4)^2}{0.4} = 0.90$ & $\frac{(0-0.2)^2}{0.2} = 0.20$ \\[3pt]
-Ninguno & $\frac{(1-0.4)^2}{0.4} = 0.90$ & $\frac{(0-0.4)^2}{0.4} = 0.40$ & $\frac{(0-0.2)^2}{0.2} = 0.20$ \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-\[
-X_0^2 = (0.80 + 0.05 + 0.90) + (0.15 + 0.07 + 0.03) + (0.40 + 0.90 + 0.20) + (0.90 + 0.40 + 0.20) = 5
-\]
+\subsubsection{Paso 7. Análisis exploratorio multivariable}
 
-\textit{Paso 5. Estadístico teórico.} Con $f = 4$ filas y $c = 3$
-columnas: $gl = (4-1)(3-1) = 6$. De la tabla chi-cuadrada, con
-$\alpha = 0.05$: $X^2_{6,\,0.05} = 12.592$.\footnote{Se usa el valor de
-la cola derecha de la tabla, que es el que corresponde a esta prueba
-(Coss Bu, 1998, cap.~3).}
+\textit{Propósito: encontrar patrones que no aparecen con dos
+variables.}
 
-\textit{Paso 6. Relación entre estadísticos y conclusión.}
+Se cruzan dos variables nominales y en cada combinación se calcula la
+frecuencia y el promedio de las variables numéricas u ordinales. Luego,
+por cada categoría de la primera variable, se describe el patrón
+encontrado y su interpretación. El resultado se representa con barras
+apiladas y con un gráfico de dispersión por categorías.
 
-\begin{center}
-\begin{tabular}{l}
-$5 < 12.592 \rightarrow$ verdad\\
-Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
-\quad \fbox{``Independencia''}\\
-Sino\\
-\quad NO ``Independencia''\\
-FinSi
-\end{tabular}
-\end{center}
+Las variables nominales definen las celdas de la tabla y las numéricas u
+ordinales entran como promedios dentro de cada celda. La razón es que
+cada variable nominal que se agrega multiplica las combinaciones: con
+pocas respuestas, la mayoría de las celdas quedaría con uno o ningún caso
+y no se podría leer ningún patrón. En cambio, una variable numérica más
+solo agrega una columna de promedios. Por eso se pueden incluir varias
+variables numéricas u ordinales, mientras que una nueva variable nominal
+solo es viable si la muestra es grande o si sus categorías se agrupan.
 
-No se rechaza $H_0$: con estos datos, la fuente de financiamiento no
-depende del posgrado deseado. \textit{Recomendación:} buscar
-financiamiento a través de organismos internacionales para contar con
-becas educativas o que fomenten la formación de posgrado de los
-titulados. En este ejemplo todas las celdas tienen $FE < 5$ porque la
-muestra es de solo 10 titulados; con pocas respuestas por celda la prueba
-pierde confiabilidad, por eso en los cruces reales se agrupan categorías
-cuando hace falta.
+\subsection{Herramienta de Software}
 
-\textbf{Valores teóricos usados en el estudio} ($\alpha = 0.05$):
-
-\begin{mitabla}{Valores de la tabla chi-cuadrada usados}
-\begin{tabular}{cccccc}
-\toprule
-$gl$ & 1 & 2 & 4 & 6 & 8 \\
-\midrule
-$X^2_{gl,\,0.05}$ & 3.841 & 5.991 & 9.488 & 12.592 & 15.507 \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
-
-\subsubsection{Análisis Exploratorio Multivariable}\label{sec:multivariable}
-
-La prueba de independencia cruza dos variables a la vez. Para explorar tres
-variables juntas se sigue el ejemplo de la asignatura (apunte del docente):
-dos variables cualitativas $X$ y $Y$ se tabulan de forma cruzada, y en cada
-combinación $X$--$Y$ que aparece se calcula la frecuencia $n$ y el promedio
-de una tercera variable cuantitativa $Z$:
-
-\begin{enumerate}
-  \item Elegir las tres variables: $X$ y $Y$ cualitativas, $Z$ cuantitativa.
-  \item Para cada combinación $X_i$--$Y_j$ que aparece en los datos,
-  contar cuántos casos hay ($n_{ij}$) y promediar $Z$ entre ellos
-  ($\bar{Z}_{ij}$).
-  \item Calcular el total general $N$ y el promedio general $\bar{Z}$
-  (promedio de $Z$ ponderado por $n_{ij}$ de todas las combinaciones).
-  \item Para cada categoría de $X$, identificar la categoría de $Y$ más
-  frecuente y si su $\bar{Z}$ queda por encima o por debajo del promedio
-  general $\bar{Z}$ -- esto es lo que el apunte llama ``patrón'' y
-  ``hallazgo'' por categoría.
-\end{enumerate}
-
-A diferencia de la prueba de independencia, esto no es una prueba
-estadística (no hay un valor teórico contra el cual comparar): es
-exploración descriptiva, para ver patrones entre tres variables a la vez
-antes de decidir si amerita una prueba de independencia aparte.
-
-\subsection{Herramienta de Software}\label{sec:herramienta}
-
-La herramienta tiene dos partes:
+Los pasos anteriores se implementan en una herramienta propia, para que
+el análisis no dependa de cálculos manuales y pueda repetirse con cada
+nueva aplicación de las encuestas. Tiene un backend en Java, un
+frontend web en Vue y una base de datos PostgreSQL.
 
 \begin{itemize}
-  \item \textbf{Backend en Java} (servidor HTTP del propio JDK) con
-  una base de datos PostgreSQL. La estructura de las encuestas
-  (secciones, preguntas y opciones) se guarda en tablas relacionadas, y
-  cada respuesta como un documento JSON, porque cada titulado responde
-  solo las preguntas de su rama. El backend recibe las respuestas del
-  formulario, importa los CSV de Forms, aplica las decisiones de
-  procesamiento, calcula indicadores y cruces, y expone los resultados
-  como servicios REST en formato JSON.
-  \item \textbf{Frontend web} en Vue, con la librería de componentes
-  Naive UI y la librería de gráficos ECharts. El panel se organiza por
-  criterio ARCU-SUR: cada pantalla muestra qué pide el criterio, su
-  valoración (aspectos favorables y desfavorables), los indicadores que
-  lo responden, los gráficos de evidencia y los cruces relacionados.
-  Además tiene una pantalla para comparar dos preguntas cualesquiera
-  (la herramienta aplica la prueba chi-cuadrada al momento), el
-  formulario público de cada encuesta, un editor de preguntas y la
-  administración, importación y exportación de respuestas. Todas las
-  pantallas pueden filtrarse por el período en que se recibieron las
-  respuestas. Las Historias de Usuario del enunciado se cubren con
-  estas funcionalidades (Tabla~\ref{tab:hu}).
+  \item \textbf{Recolección:} formularios propios para titulados y
+  empleadores, e importación de los CSV exportados de Microsoft Forms y
+  Google Forms.
+  \item \textbf{Preparación:} aplica las reglas de la sección de
+  preparación y validación de los datos.
+  \item \textbf{Análisis:} calcula los pasos 1 a 7 y permite elegir el
+  período de respuestas a analizar.
+  \item \textbf{Visualización:} panel organizado por criterio ARCU-SUR,
+  con gráficos de barras, mapas de calor y la opción de comparar dos
+  preguntas cualesquiera.
+  \item \textbf{Exportación:} datos limpios y tablas cruzadas en CSV, y
+  regeneración de las tablas de este informe con los datos vigentes.
 \end{itemize}
-
-\begin{mitabla}{Pantallas de la herramienta y servicios que las alimentan}
-\begin{tabular}{L{4.4cm}L{4.4cm}L{5.8cm}}
-\toprule
-Pantalla & Servicio REST & Contenido \\
-\midrule
-Inicio & \texttt{/api/criterios} & Resumen de la valoración de cada criterio \\
-Una pantalla por criterio (2.1.2, 2.1.7, 2.4.1, 2.4.2, 3.2.1, 3.2.2, 3.2.3) & \texttt{/api/criterios} y los servicios de indicadores (\texttt{/api/empleabilidad}, \texttt{/api/formacion}, \texttt{/api/competencias}, \texttt{/api/empleadores}, \texttt{/api/cruces}) & Qué pide el criterio, valoración, indicadores, gráficos y cruces relacionados \\
-Comparar dos preguntas & \texttt{/api/cruce-libre} & Tabla de contingencia, mapa de calor, $FO$, $FE$, $X_0^2$ y decisión \\
-Generar reporte & \nolinkurl{/api/reporte/variables}, \texttt{/api/reporte}, \texttt{/api/exportar} & Reporte a medida: el usuario elige la encuesta, el período (gestión, semestre, mes o fechas exactas) y las preguntas; se obtiene la tabla y el gráfico de cada pregunta (imprimible o en PDF), opcionalmente con la valoración ARCU-SUR, y su exportación a Excel (tablas o respuestas individuales) \\
-Formulario público & \texttt{/api/encuestas}, \texttt{/api/respuestas} & Encuesta a titulados y a empleadores \\
-Preguntas y respuestas & \texttt{/api/admin/...} & Editor de preguntas y administración de respuestas \\
-Importar y exportar & \texttt{/api/importar}, \texttt{/api/exportar} & Carga de CSV de Forms y descarga de datos limpios y matrices \\
-\bottomrule
-\end{tabular}
-\end{mitabla}
 
 \section{Análisis de la Demanda Educativa y Perfil de los Titulados}\label{sec:titulados}
 
-Todas las tablas de esta sección y de las dos siguientes se generan con
-la herramienta a partir de las respuestas importadas, de modo que cada
-número puede rastrearse hasta su cálculo. En las preguntas de opción
-única se cuenta cuántos titulados eligieron cada opción ($f_i$) y se
-divide entre el número de respuestas ($f_i/n$).
+Esta sección aplica el procedimiento de la Sección~\ref{sec:procedimiento}
+a cuatro preguntas sobre los titulados. Cada análisis tiene su propio
+propósito, sus cuatro variables principales y el criterio ARCU-SUR al que
+responde (Tabla~\ref{tab:analisis}).
 
-\subsection{Caracterización Demográfica}
+\begin{mitabla}{Análisis realizados con las respuestas de los titulados}\label{tab:analisis}
+\begin{tabular}{L{3.2cm}L{5.6cm}L{3.8cm}L{2.0cm}}
+\toprule
+\textbf{Análisis} & \textbf{Pregunta que responde} & \textbf{Variables principales} & \textbf{Criterio} \\
+\midrule
+1. Inserción laboral y experiencia & ¿De qué depende que un titulado tenga
+trabajo? & Formación complementaria, situación laboral, años de vida
+profesional, satisfacción & 3.2.3, 3.2.1, 2.4.1 \\
+2. Demanda de posgrado & ¿Qué posgrado quieren los titulados y dónde lo
+harían? & Interés, área, edad, afinidad de la oferta FCyT & 2.4.1 \\
+3. Calidad del empleo & ¿El trabajo es pertinente, cuánto tardaron en
+conseguirlo y cuánto ganan? & Sector, remuneración, tiempo al primer
+trabajo, pertinencia & 3.2.3 \\
+4. Antes y después de la IA & ¿Cambió la inserción o lo que se quiere
+estudiar desde la llegada de la IA? & Cohorte, tiempo al primer trabajo,
+área de interés, concordancia & 2.1.7, 3.2.3 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-La edad y el género no responden por sí mismos a un indicador ARCU-SUR.
-Se presentan para describir a quienes respondieron la encuesta, de modo
-que los resultados de las secciones siguientes se lean sabiendo a qué
-grupo de titulados representan.
+\subsection{Análisis 1. Inserción laboral y experiencia profesional}\label{sec:a1}
 
-\input{generado/demografia}
+Este análisis busca saber de qué depende que un titulado tenga trabajo:
+si de haber hecho formación complementaria, de sus años de vida
+profesional o de su satisfacción con la formación recibida.
 
-\subsection{Tasa de Empleo}
+\subsubsection{Variables y escala de medición}
 
-La tasa de empleo es uno de los indicadores con que ARCU-SUR evalúa si
-la formación se refleja en las posibilidades de empleo de los graduados
-(criterio 3.2.3). Se calcula como la proporción de titulados que
-trabajan, ya sea en una organización o en un emprendimiento propio.
+\begin{mitabla}{Variables analizadas y escala de medición}\label{tab:real-variables}
+\begin{tabular}{cL{4.6cm}L{2.4cm}cL{5.4cm}}
+\toprule
+\textbf{Var.} & \textbf{Pregunta} & \textbf{Escala} & \textbf{$n$} & \textbf{Criterio ARCU-SUR} \\
+\midrule
+$X$ & ¿Ha realizado formación complementaria? (Sí, No) & Nominal & 148 &
+2.4.1 Cursos de actualización profesional \\
+$Y$ & Situación laboral actual (trabaja en una organización,
+emprendimiento propio, no trabaja) & Nominal & 148 & 3.2.3 Condiciones
+de empleo \\
+$Z$ & Años de vida profesional & Numérica & 143 & 3.2.3 Condiciones de
+empleo \\
+$W$ & Satisfacción global con la formación (1 a 4) & Ordinal, subjetiva
+& 147 & 3.2.1 Resultados \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\input{generado/tasa_empleo}
+De las 148 respuestas, 145 declararon sus años de vida profesional; se
+descartaron 2 en las que los años de desempleo superaban a los de vida
+profesional, por lo que $Z$ se calcula con 143. Una persona no respondió
+la satisfacción. $W$ es la única variable subjetiva: mide la opinión del
+titulado, por lo que su resultado se lee como percepción.
 
-\subsection{Tiempo Medio para Obtener el Primer Empleo}
+\subsubsection{Paso 1. Análisis descriptivo}
 
-El criterio 3.2.3 pide expresamente el tiempo medio para obtener el
-primer empleo. Como la encuesta obtiene ese dato de una muestra y no de
-todos los titulados, además de la media se calcula su intervalo de
-confianza del 95\%, con el procedimiento de la Sección~\ref{sec:ic}, para
-indicar entre qué valores se encuentra la media de toda la población.
+\begin{mitabla}{Distribución de frecuencias de las variables nominales}\label{tab:real-nominales}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Variable} & \textbf{Categoría} & \textbf{$f_i$} & \textbf{$h_i = f_i/n$} \\
+\midrule
+$X$ Formación complementaria & Sí & 98 & $98/148 = 0.662$ \\
+                             & No & 50 & $50/148 = 0.338$ \\
+\midrule
+$Y$ Situación laboral & Trabaja en una organización & 108 & $108/148 = 0.730$ \\
+                      & Emprendimiento propio       & 15  & $15/148 = 0.101$ \\
+                      & No trabaja                  & 25  & $25/148 = 0.169$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\input{generado/ic_tiempo_primer_empleo}
+La moda de $X$ es Sí y la de $Y$ es trabajar en una organización.
+Sumando el emprendimiento propio, la tasa de empleo es $(108+15)/148 =
+123/148 = 83.1\%$, y el $25/148 = 16.9\%$ no trabaja.
 
-\subsection{Años de Vida Profesional y de Desempleo}
+Con esto se busca saber cuántos titulados siguieron formándose y
+cuántos tienen trabajo. Que $h_i$ sea 0.662 quiere decir que 66 de cada
+100 titulados hicieron algún curso, diplomado o posgrado después de
+titularse, y la tasa de empleo indica que de cada 100 titulados 83 tienen
+trabajo (73 en una organización y 10 con emprendimiento propio) y 17 no.
+La mayoría consigue trabajo, casi siempre como dependiente de una
+organización, y la mayoría siente la necesidad de seguir capacitándose;
+el 16.9\% sin trabajo es el grupo que los pasos siguientes buscan
+explicar. Como dos de cada tres titulados buscan formación complementaria
+por su cuenta, la carrera puede ofrecer cursos de actualización y
+posgrado propios, en respuesta al criterio 2.4.1.
 
-Los años de vida profesional describen la experiencia acumulada de los
-titulados que respondieron, y los años de desempleo complementan la
-tasa de empleo: una tasa alta puede ocultar períodos largos sin trabajo.
-Ambos se estiman con su intervalo de confianza.
+\textit{Variable numérica ($Z$, $n = 143$).} La
+Tabla~\ref{tab:real-z} agrupa las 143 respuestas por valor declarado
+$x_i$. La columna $F_i$ es la frecuencia acumulada, $f_i x_i$ sirve para la
+media y $f_i (x_i - \bar{x})^2$ para la varianza. El valor 1.5 corresponde
+a una persona que respondió año y medio.
 
-\paragraph{Años de vida profesional.}
+\begin{mitabla}{Cálculo de la media y la varianza de los años de vida profesional}\label{tab:real-z}
+\small
+\begin{tabular}{cccccc}
+\toprule
+\textbf{$x_i$} & \textbf{$f_i$} & \textbf{$F_i$} & \textbf{$f_i\,x_i$} & \textbf{$(x_i - \bar{x})^2$} & \textbf{$f_i\,(x_i - \bar{x})^2$} \\
+\midrule
+1   & 23 & 23  & 23.0  & 63.27  & 1455.32 \\
+1.5 & 1  & 24  & 1.5   & 55.57  & 55.57 \\
+2   & 20 & 44  & 40.0  & 48.37  & 967.31 \\
+3   & 9  & 53  & 27.0  & 35.46  & 319.11 \\
+4   & 7  & 60  & 28.0  & 24.55  & 171.83 \\
+5   & 10 & 70  & 50.0  & 15.64  & 156.38 \\
+6   & 7  & 77  & 42.0  & 8.73   & 61.11 \\
+7   & 2  & 79  & 14.0  & 3.82   & 7.64 \\
+8   & 5  & 84  & 40.0  & 0.91   & 4.56 \\
+9   & 1  & 85  & 9.0   & 0.00   & 0.00 \\
+10  & 2  & 87  & 20.0  & 1.09   & 2.19 \\
+11  & 2  & 89  & 22.0  & 4.18   & 8.37 \\
+12  & 5  & 94  & 60.0  & 9.27   & 46.37 \\
+13  & 5  & 99  & 65.0  & 16.37  & 81.83 \\
+14  & 9  & 108 & 126.0 & 25.46  & 229.11 \\
+15  & 7  & 115 & 105.0 & 36.55  & 255.83 \\
+16  & 2  & 117 & 32.0  & 49.64  & 99.28 \\
+17  & 3  & 120 & 51.0  & 64.73  & 194.19 \\
+18  & 1  & 121 & 18.0  & 81.82  & 81.82 \\
+19  & 1  & 122 & 19.0  & 100.91 & 100.91 \\
+20  & 8  & 130 & 160.0 & 122.00 & 976.02 \\
+21  & 1  & 131 & 21.0  & 145.09 & 145.09 \\
+22  & 2  & 133 & 44.0  & 170.18 & 340.37 \\
+23  & 2  & 135 & 46.0  & 197.27 & 394.55 \\
+25  & 4  & 139 & 100.0 & 257.46 & 1029.83 \\
+26  & 1  & 140 & 26.0  & 290.55 & 290.55 \\
+28  & 2  & 142 & 56.0  & 362.73 & 725.46 \\
+35  & 1  & 143 & 35.0  & 678.37 & 678.37 \\
+\midrule
+Total & 143 & & 1280.5 & & 8878.95 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\input{generado/ic_vida_profesional}
+\begin{enumerate}
+  \item \textbf{Media.} Se suma la columna $f_i x_i$ y se divide entre
+  $n$:
+  \[
+  \bar{x} = \frac{\sum f_i x_i}{n} = \frac{1280.5}{143} = 8.95 \text{ años}
+  \]
+  \item \textbf{Varianza.} A cada valor se le resta la media, la
+  diferencia se eleva al cuadrado y se multiplica por su frecuencia; por
+  ejemplo, para $x_i = 1$: $(1 - 8.95)^2 = 63.27$ y $23 \times 63.27 =
+  1455.32$. La suma de esa última columna se divide entre $n - 1$:
+  \[
+  s^2 = \frac{\sum f_i (x_i - \bar{x})^2}{n-1} = \frac{8878.95}{143 - 1}
+  = \frac{8878.95}{142} = 62.53 \text{ años}^2
+  \]
+  \item \textbf{Desviación estándar.} Es la raíz de la varianza, y vuelve
+  a estar en años:
+  \[
+  s = \sqrt{62.53} = 7.91 \text{ años}
+  \]
+  \item \textbf{Coeficiente de variación.} Compara la desviación con la
+  media:
+  \[
+  CV = \frac{s}{\bar{x}} \times 100 = \frac{7.91}{8.95} \times 100 =
+  88.3\%
+  \]
+  \item \textbf{Mediana.} Con 143 datos ordenados, el central ocupa la
+  posición $(143+1)/2 = 72$. En la columna $F_i$, hasta $x_i = 5$ se
+  acumulan 70 datos y hasta $x_i = 6$ se acumulan 77, así que el dato 72
+  vale $Me = 6$ años.
+  \item \textbf{Moda y rango.} El valor con mayor $f_i$ es 1 año (23
+  titulados). El menor valor es 1 y el mayor 35, así que el rango es
+  $35 - 1 = 34$ años.
+  \item \textbf{Intervalo de confianza del 95\%.} Con $n - 1 = 142$
+  grados de libertad, la tabla t de Student da $t_{142,\,0.025} = 1.977$.
+  \[
+  \text{margen} = \frac{s}{\sqrt{n}} \times t_{142,\,0.025} =
+  \frac{7.91}{\sqrt{143}} \times 1.977 = \frac{7.91}{11.96} \times 1.977
+  = 0.661 \times 1.977 = 1.31
+  \]
+  \[
+  8.95 - 1.31 \le \mu \le 8.95 + 1.31 \quad\Rightarrow\quad 7.65 \le \mu
+  \le 10.26 \text{ años}
+  \]
+  Con 95\% de confianza, la media de años de vida profesional de los
+  titulados está entre 7.65 y 10.26 años.
+\end{enumerate}
 
-\paragraph{Mediana y segmentación por experiencia.} La Historia de
-Usuario~1 pide también la mediana de los años transcurridos desde la
-titulación y separar a los profesionales junior de los consolidados. Como
-el formulario de Forms no preguntaba el año de titulación, se usan los
-años de vida profesional.
+Estos valores responden cuánta trayectoria tienen los titulados y si un
+solo promedio los representa. En promedio, cada titulado lleva casi 9
+años de vida profesional, pero la mitad lleva 6 años o menos y la
+respuesta más repetida es 1 año, es decir, hay muchos titulados
+recientes. La desviación de 7.91 años indica cuánto se alejan, en
+promedio, de la media, y el coeficiente de variación de 88.3\% muestra que
+esa dispersión es casi tan grande como la propia media, por lo que la
+media no describe bien a un titulado cualquiera. El intervalo indica que,
+si se encuestara a todos los titulados, con 95\% de confianza su media
+estaría entre 7.65 y 10.26 años.
 
-\input{generado/experiencia}
+La media es mayor que la mediana porque los 21 titulados con 20 años o
+más elevan el promedio: la distribución es asimétrica a la derecha y el
+titulado típico lleva 6 años, no 9. La muestra mezcla dos perfiles,
+recién titulados y profesionales con trayectoria, que no conviene
+analizar como un solo grupo. Por eso la trayectoria se describe con la
+mediana, y para los cruces la mediana divide a los titulados en
+\textbf{junior} ($Z \le 6$ años, 77 titulados) y \textbf{consolidado}
+($Z > 6$ años, 66 titulados); esta nueva variable, experiencia, se usa en
+los pasos siguientes.
 
-\paragraph{Años desempleado.}
+\textit{Variable ordinal ($W$, $n = 147$).}
 
-\input{generado/ic_desempleo}
+\begin{mitabla}{Puntaje promedio de satisfacción con factores de ponderación}\label{tab:real-ponderacion}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Nivel} & \textbf{Peso $w_i$} & \textbf{$f_i$} & \textbf{$f_i \, w_i$} \\
+\midrule
+Totalmente en desacuerdo & 1 & 5   & 5 \\
+En desacuerdo            & 2 & 33  & 66 \\
+De acuerdo               & 3 & 98  & 294 \\
+Totalmente de acuerdo    & 4 & 11  & 44 \\
+\midrule
+Total & & 147 & 409 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\subsection{Destino Laboral}
+Cada nivel se multiplica por su peso: por ejemplo, ``De acuerdo'' tiene
+98 respuestas de peso 3, que aportan $98 \times 3 = 294$. Se suman los
+aportes y se divide entre el total de respuestas:
+\[
+\bar{x} = \frac{\sum f_i w_i}{n} = \frac{5 + 66 + 294 + 44}{147} =
+\frac{409}{147} = 2.78
+\]
+El puntaje 2.78 queda más cerca de ``De acuerdo'' (3) que de ``En
+desacuerdo'' (2); la moda es 3 (98 respuestas) y la mediana también, porque el
+dato central (posición 74) cae en ``De acuerdo'' ($5 + 33 = 38$
+acumulados en los niveles 1 y 2, y $38 + 98 = 136$ hasta el nivel 3). El
+$(98+11)/147 = 109/147 = 74.1\%$ está de acuerdo o totalmente de acuerdo
+con estar satisfecho con la formación recibida, y el $(5+33)/147 =
+38/147 = 25.9\%$ en desacuerdo.
 
-El criterio 3.2.3 incluye el destino laboral y profesional de los
-graduados. Conocer en qué sector, rubro y cargo trabajan, y cuánto
-perciben, permite a la Carrera contrastar el perfil de egreso con los
-puestos que efectivamente ocupan. Solo responden quienes trabajan en una
-organización.
+El puntaje resume en un solo número la satisfacción con la formación
+recibida. En la escala de 1 a 4 queda entre ``En desacuerdo'' y ``De
+acuerdo'', más cerca de este último: tres de cada cuatro titulados están
+satisfechos, uno de cada cuatro no, y solo 11 (7.5\%) están totalmente de
+acuerdo. La valoración es positiva pero moderada: los titulados aprueban
+la formación, pero casi nadie la valora en el nivel más alto y el
+promedio no llega a 3. Conviene identificar, con las preguntas abiertas
+de la encuesta, qué aspectos critica el 25.9\% insatisfecho, para
+orientar las mejoras del criterio 3.2.1; al ser una variable subjetiva,
+también conviene contrastarla con la opinión de los empleadores
+(Sección~\ref{sec:empleadores}).
 
-\input{generado/destino_laboral}
+\subsubsection{Paso 2. Prueba de uniformidad}
 
-\subsection{Formación Continua y Fuentes de Financiamiento}
+\begin{mitabla}{Pruebas de uniformidad}\label{tab:real-uniformidad}
+\begin{tabular}{lcccl}
+\toprule
+\textbf{Variable} & \textbf{$FE = n/k$} & \textbf{$x_0^2$} & \textbf{$x^2_{0.05,\,k-1}$} & \textbf{Conclusión} \\
+\midrule
+$X$ Formación complementaria ($k=2$) & $148/2 = 74$    & 15.568  & 3.841 & No uniformidad \\
+$Y$ Situación laboral ($k=3$)        & $148/3 = 49.33$ & 105.662 & 5.991 & No uniformidad \\
+$W$ Satisfacción ($k=4$)             & $147/4 = 36.75$ & 147.939 & 7.815 & No uniformidad \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-Los criterios 2.4.1 y 1.1.5 piden que la institución ofrezca y promueva
-programas de actualización y posgrado afines a la carrera. Para que esa
-oferta responda a una demanda real se necesita saber qué formación ya
-tienen los titulados, qué les interesa estudiar, dónde lo harían y cómo
-financiaron lo que ya cursaron.
+La Tabla~\ref{tab:real-unif-detalle} muestra el cálculo de cada
+$x_0^2$. La frecuencia esperada es la misma para todas las opciones de una
+variable ($FE = n/k$), y cada opción aporta $(FE - FO)^2/FE$. El valor
+crítico se lee en la tabla chi-cuadrado con $k - 1$ grados de libertad y
+$\alpha = 0.05$.
 
-\input{generado/formacion}
+\begin{mitabla}{Detalle del cálculo de las pruebas de uniformidad}\label{tab:real-unif-detalle}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Variable} & \textbf{Opción} & \textbf{$FO$} & \textbf{$FE$} & \textbf{$(FE-FO)^2$} & \textbf{$\frac{(FE-FO)^2}{FE}$} \\
+\midrule
+$X$ & Sí & 98 & 74 & $(74-98)^2 = 576$ & 7.784 \\
+    & No & 50 & 74 & $(74-50)^2 = 576$ & 7.784 \\
+    & \multicolumn{4}{r}{$x_0^2 =$} & 15.568 \\
+\midrule
+$Y$ & Trabaja en una organización & 108 & 49.33 & 3441.78 & 69.766 \\
+    & Emprendimiento propio       & 15  & 49.33 & 1178.78 & 23.894 \\
+    & No trabaja                  & 25  & 49.33 & 592.11  & 12.002 \\
+    & \multicolumn{4}{r}{$x_0^2 =$} & 105.662 \\
+\midrule
+$W$ & Totalmente en desacuerdo & 5  & 36.75 & 1008.06 & 27.430 \\
+    & En desacuerdo            & 33 & 36.75 & 14.06   & 0.383 \\
+    & De acuerdo               & 98 & 36.75 & 3751.56 & 102.083 \\
+    & Totalmente de acuerdo    & 11 & 36.75 & 663.06  & 18.043 \\
+    & \multicolumn{4}{r}{$x_0^2 =$} & 147.939 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\subsection{Valoración de la Formación Recibida}
+Por ejemplo, para $X$: $x_0^2 = 7.784 + 7.784 = 15.568$, mayor que el
+valor crítico $x^2_{0.05,\,1} = 3.841$, por lo que se rechaza la
+uniformidad. Lo mismo ocurre en $Y$ ($105.662 > 5.991$) y en $W$
+($147.939 > 7.815$).
 
-El criterio 3.2.1 pide evaluar el resultado del proceso formativo, y el
-2.1.7 actualizar el currículo según los desarrollos profesionales. La
-opinión de los titulados sobre su formación, sobre los aspectos útiles y
-a mejorar y sobre las asignaturas es la evidencia directa para ambos.
-Las escalas de acuerdo se codifican de 1 a 4 y se les aplica el mismo
-procedimiento del intervalo de confianza.
+La prueba comprueba si las preferencias del paso 1 son reales o podrían
+deberse al azar. $x_0^2$ mide cuánto se alejan las respuestas de un
+reparto parejo: valdría 0 si todas las opciones tuvieran la misma
+frecuencia y crece cuanto más se concentran en alguna, mientras que el
+valor crítico es lo máximo que puede alejarse por azar con 95\% de
+confianza. En $X$ el resultado es cuatro veces ese límite, y en $Y$ y $W$
+más de dieciocho veces; en $W$, casi todo el valor (102.083 de 147.939)
+lo aporta ``De acuerdo'', con 98 respuestas donde se esperaban 36.75. Por
+lo tanto, la preferencia por haber hecho formación complementaria, por
+trabajar en una organización y por estar de acuerdo con la formación es
+real y no una casualidad de la muestra, y las conclusiones del paso 1
+pueden usarse como base del diagnóstico.
 
-\input{generado/valoracion}
+\subsubsection{Paso 3. Tablas de contingencia y mapas de calor}
+
+Se plantean tres cruces, todos con la situación laboral como variable
+dependiente, agrupada en trabaja (organización o emprendimiento) y no
+trabaja:
+
+\begin{enumerate}
+  \item Formación complementaria $\times$ situación laboral: ¿haber hecho
+  formación complementaria se asocia con tener trabajo?
+  \item Experiencia $\times$ situación laboral: ¿la situación laboral
+  depende de la antigüedad profesional?
+  \item Satisfacción $\times$ situación laboral: ¿quienes no trabajan
+  valoran peor la formación? La satisfacción se agrupa en desacuerdo
+  (niveles 1 y 2) y acuerdo (niveles 3 y 4).
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.2,0.9) {Formación complementaria};
+\node[font=\small] at (1.1,0.35) {Trabaja}; \node[font=\small] at (3.3,0.35) {No trabaja};
+\celda{0}{0}{85}{83 (84.7\%)} \celda{2.2}{0}{15}{15 (15.3\%)}
+\celda{0}{-0.9}{80}{40 (80.0\%)} \celda{2.2}{-0.9}{20}{10 (20.0\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Sí};
+\node[font=\small, anchor=east] at (-0.1,-1.35) {No};
+\begin{scope}[xshift=7.6cm]
+\node[font=\small\bfseries] at (2.2,0.9) {Experiencia};
+\node[font=\small] at (1.1,0.35) {Trabaja}; \node[font=\small] at (3.3,0.35) {No trabaja};
+\celda{0}{0}{78}{60 (77.9\%)} \celda{2.2}{0}{22}{17 (22.1\%)}
+\celda{0}{-0.9}{91}{60 (90.9\%)} \celda{2.2}{-0.9}{9}{6 (9.1\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Junior};
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Consolidado};
+\end{scope}
+\begin{scope}[yshift=-3.4cm, xshift=3.8cm]
+\node[font=\small\bfseries] at (2.2,0.9) {Satisfacción};
+\node[font=\small] at (1.1,0.35) {Trabaja}; \node[font=\small] at (3.3,0.35) {No trabaja};
+\celda{0}{0}{84}{32 (84.2\%)} \celda{2.2}{0}{16}{6 (15.8\%)}
+\celda{0}{-0.9}{83}{90 (82.6\%)} \celda{2.2}{-0.9}{17}{19 (17.4\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Desacuerdo};
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Acuerdo};
+\end{scope}
+\end{tikzpicture}
+\caption{Mapas de calor de los tres cruces (frecuencia y porcentaje por fila). Solo en experiencia los tonos cambian de forma visible entre filas.}\label{fig:real-calor}
+\end{figure}
+
+Los mapas permiten ver, antes de la prueba, si la situación laboral
+cambia según la otra variable. En formación complementaria trabaja el
+84.7\% de quienes la hicieron y el 80.0\% de quienes no, y en
+satisfacción el 84.2\% de los insatisfechos y el 82.6\% de los
+satisfechos: en ambos los tonos de las filas son casi iguales. En
+experiencia, en cambio, trabaja el 77.9\% de los junior y el 90.9\% de los
+consolidados, y la celda ``no trabaja'' de los junior (22.1\%) es más del
+doble que la de los consolidados (9.1\%). A simple vista solo la
+experiencia parece relacionarse con tener trabajo, pero es una lectura
+visual; el paso 4 comprueba si la diferencia es real.
+
+\subsubsection{Paso 4. Prueba de independencia}
+
+Para cada cruce se plantea $H_0$: la situación laboral es independiente
+de la otra variable. Primero se arma la tabla de contingencia con sus
+totales (Tabla~\ref{tab:real-contingencia}). El total $N$ cambia de un
+cruce a otro porque solo entran quienes respondieron las dos preguntas:
+148 en formación complementaria, 143 en experiencia (los que tienen
+$Z$ válido) y 147 en satisfacción.
+
+\begin{mitabla}{Tablas de contingencia con totales de fila y columna}\label{tab:real-contingencia}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Fila} & \textbf{Trabaja} & \textbf{No trabaja} & \textbf{Total fila} \\
+\midrule
+\multicolumn{4}{l}{\textit{Formación complementaria $\times$ situación}} \\
+Sí           & 83  & 15 & 98 \\
+No           & 40  & 10 & 50 \\
+Total columna & 123 & 25 & $N = 148$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Experiencia $\times$ situación}} \\
+Junior       & 60  & 17 & 77 \\
+Consolidado  & 60  & 6  & 66 \\
+Total columna & 120 & 23 & $N = 143$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Satisfacción $\times$ situación}} \\
+Desacuerdo   & 32  & 6  & 38 \\
+Acuerdo      & 90  & 19 & 109 \\
+Total columna & 122 & 25 & $N = 147$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Luego se calcula la frecuencia esperada de cada celda multiplicando su
+total de fila por su total de columna y dividiendo entre $N$. Por
+ejemplo, en la celda junior--trabaja: $FE = 77 \times 120 / 143 = 64.62$.
+Si la experiencia no influyera, se esperarían 64.62 junior trabajando,
+pero se observaron 60. Cada celda aporta $(FO - FE)^2/FE$; en este caso,
+$(60 - 64.62)^2/64.62 = 21.30/64.62 = 0.3297$.
+
+\begin{mitabla}{Cálculo de $x_0^2$ para experiencia $\times$ situación laboral}\label{tab:real-chi}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Celda} & \textbf{$FO$} & \textbf{$FE$} & \textbf{$\frac{(FO-FE)^2}{FE}$} \\
+\midrule
+Junior, Trabaja         & 60 & $77 \cdot 120/143 = 64.62$ & 0.3297 \\
+Junior, No trabaja      & 17 & $77 \cdot 23/143 = 12.38$  & 1.7200 \\
+Consolidado, Trabaja    & 60 & $66 \cdot 120/143 = 55.38$ & 0.3846 \\
+Consolidado, No trabaja & 6  & $66 \cdot 23/143 = 10.62$  & 2.0067 \\
+\midrule
+ & & & $x_0^2 = 4.4410$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Los otros dos cruces se calculan de la misma forma
+(Tabla~\ref{tab:real-chi-otros}).
+
+\begin{mitabla}{Cálculo de $x_0^2$ para formación complementaria y satisfacción $\times$ situación laboral}\label{tab:real-chi-otros}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Celda} & \textbf{$FO$} & \textbf{$FE$} & \textbf{$\frac{(FO-FE)^2}{FE}$} \\
+\midrule
+\multicolumn{4}{l}{\textit{Formación complementaria $\times$ situación}} \\
+Sí, Trabaja    & 83 & $98 \cdot 123/148 = 81.45$ & 0.0297 \\
+Sí, No trabaja & 15 & $98 \cdot 25/148 = 16.55$  & 0.1459 \\
+No, Trabaja    & 40 & $50 \cdot 123/148 = 41.55$ & 0.0581 \\
+No, No trabaja & 10 & $50 \cdot 25/148 = 8.45$   & 0.2859 \\
+ & & & $x_0^2 = 0.5196$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Satisfacción $\times$ situación}} \\
+Desacuerdo, Trabaja    & 32 & $38 \cdot 122/147 = 31.54$  & 0.0068 \\
+Desacuerdo, No trabaja & 6  & $38 \cdot 25/147 = 6.46$    & 0.0331 \\
+Acuerdo, Trabaja       & 90 & $109 \cdot 122/147 = 90.46$ & 0.0024 \\
+Acuerdo, No trabaja    & 19 & $109 \cdot 25/147 = 18.54$  & 0.0115 \\
+ & & & $x_0^2 = 0.0538$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Cada tabla tiene 2 filas y 2 columnas, así que los grados de libertad
+son $gl = (f-1)(c-1) = (2-1)(2-1) = 1$, y el valor crítico de la tabla
+chi-cuadrado es $x^2_{1,\,0.05} = 3.841$. Se compara cada $x_0^2$ con ese
+valor (Tabla~\ref{tab:real-independencia}).
+
+\begin{mitabla}{Resultado de las pruebas de independencia}\label{tab:real-independencia}
+\begin{tabular}{lccccl}
+\toprule
+\textbf{Cruce} & \textbf{$N$} & \textbf{$gl$} & \textbf{$x_0^2$} & \textbf{$x^2_{gl,\,0.05}$} & \textbf{Conclusión} \\
+\midrule
+Formación complementaria $\times$ situación & 148 & 1 & 0.5196 & 3.841 & Independencia \\
+Experiencia $\times$ situación              & 143 & 1 & 4.4410 & 3.841 & Dependencia \\
+Satisfacción $\times$ situación             & 147 & 1 & 0.0538 & 3.841 & Independencia \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+En los tres cruces todas las frecuencias esperadas son mayores que 5 (la
+menor es 6.46), por lo que la prueba es aplicable. Solo experiencia supera
+el valor crítico ($4.4410 > 3.841$), así que se rechaza $H_0$; en los otros
+dos, $0.5196 < 3.841$ y $0.0538 < 3.841$, y se acepta $H_0$.
+
+La prueba decide si las diferencias de los mapas de calor son reales o
+pueden deberse al azar: $x_0^2$ mide cuánto se aleja la tabla observada
+de la que habría si las variables no tuvieran relación. En formación
+complementaria y satisfacción la tabla observada es casi igual a la
+esperada; por ejemplo, trabajan 83 titulados con formación complementaria
+donde se esperaban 81.45. En experiencia, la diferencia supera lo que el
+azar explica: hay 17 junior sin trabajo donde se esperaban 12.38, y 6
+consolidados sin trabajo donde se esperaban 10.62.
+
+Se concluye que tener trabajo no depende de haber hecho formación
+complementaria, que quienes no trabajan no valoran peor la formación que
+quienes sí trabajan, y que tener trabajo sí depende de los años de vida
+profesional; solo este cruce pasa al paso 5. En consecuencia, las
+acciones para mejorar la empleabilidad deben dirigirse a la etapa inicial
+de la vida profesional, ya que los cursos complementarios, por sí solos,
+no aseguran conseguir trabajo.
+
+\subsubsection{Paso 5. Incidencia}
+
+Solo el cruce experiencia $\times$ situación laboral resultó dependiente.
+La categoría de interés es ``no trabaja''. Con los datos de la
+Tabla~\ref{tab:real-contingencia}, se divide cada celda de esa columna
+entre el total de su fila:
+\[
+p_{\text{junior}} = \frac{17}{77} \times 100 = 22.1\% \qquad
+p_{\text{consolidado}} = \frac{6}{66} \times 100 = 9.1\%
+\]
+\[
+\text{diferencia} = 22.1 - 9.1 = 13.0 \text{ puntos} \qquad
+\text{razón} = \frac{22.1}{9.1} = 2.4
+\]
+Una vez confirmado que la relación es real, estos valores miden cuánto
+influye la experiencia en no tener trabajo. La diferencia de 13.0 puntos
+indica que, de cada 100 junior, 13 más están sin trabajo que de cada 100
+consolidados, y la razón indica que los junior están sin trabajo 2.4
+veces más. La influencia es fuerte: ser junior más que duplica la
+proporción de titulados sin trabajo, por lo que quienes están en sus
+primeros seis años de vida profesional deben ser la prioridad de
+cualquier acción de inserción laboral.
+
+\subsubsection{Paso 6. Factor de riesgo}
+
+Situación desfavorable: no tener trabajo. El grupo con mayor proporción
+es el de los junior (22.1\% frente a 9.1\%), así que \textbf{tener seis
+años o menos de vida profesional es un factor de riesgo de desempleo}. La
+formación complementaria y la satisfacción con la formación no son
+factores de riesgo, porque resultaron independientes de la situación
+laboral.
+
+Este resultado identifica hacia quién deben dirigirse las acciones. De
+los 23 titulados sin trabajo que declararon sus años de vida
+profesional, 17 son junior ($17/23 = 73.9\%$): tres de cada cuatro
+desempleados llevan seis años o menos. El desempleo se concentra,
+entonces, en la transición de la universidad al trabajo y no en los
+profesionales con trayectoria. Se recomienda fortalecer la inserción
+laboral temprana mediante prácticas o pasantías antes de titularse, una
+bolsa de trabajo con los empleadores de la Sección~\ref{sec:empleadores}
+y el seguimiento a los titulados en sus primeros años, en línea con el
+criterio 3.2.3.
+
+\subsubsection{Paso 7. Análisis exploratorio multivariable}
+
+Se cruzan las dos variables nominales, situación laboral ($Y$, en sus
+tres categorías) y formación complementaria ($X$), y en cada combinación
+se calcula la frecuencia y el promedio de las otras dos: los años de vida
+profesional ($\bar{Z}$) y el puntaje de satisfacción ($\bar{W}$). Así
+entran las cuatro variables en una sola tabla.
+
+\begin{mitabla}{Tabulación cruzada de cuatro variables}\label{tab:real-multi}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Situación laboral ($Y$)} & \textbf{Formación compl.\ ($X$)} & \textbf{$n$} & \textbf{$\bar{Z}$ (años)} & \textbf{$\bar{W}$ (1--4)} \\
+\midrule
+Trabaja en una organización & Sí & 73 & 8.97  & 2.79 \\
+                            & No & 35 & 10.63 & 2.69 \\
+Emprendimiento propio       & Sí & 10 & 12.22 & 2.90 \\
+                            & No & 5  & 6.20  & 2.75 \\
+No trabaja                  & Sí & 15 & 6.73  & 3.00 \\
+                            & No & 10 & 3.88  & 2.60 \\
+\midrule
+\multicolumn{2}{l}{Total / promedio general} & 148 & 8.95 & 2.78 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+En cada celda, $\bar{Z}$ es la suma de los años de vida profesional
+dividida entre quienes tienen $Z$ válido, y $\bar{W}$ es la suma de los
+puntajes de satisfacción (1 a 4) dividida entre quienes la respondieron.
+Por eso el divisor puede ser menor que $n$ (Tabla~\ref{tab:real-multi-calculo}).
+
+\begin{mitabla}{Cálculo de los promedios de cada celda}\label{tab:real-multi-calculo}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Situación laboral} & \textbf{F. compl.} & \textbf{$\bar{Z} = \sum Z / n_Z$} & \textbf{$\bar{W} = \sum W / n_W$} \\
+\midrule
+Trabaja en una organización & Sí & $646.0/72 = 8.97$  & $204/73 = 2.79$ \\
+                            & No & $361.5/34 = 10.63$ & $94/35 = 2.69$ \\
+Emprendimiento propio       & Sí & $110.0/9 = 12.22$  & $29/10 = 2.90$ \\
+                            & No & $31.0/5 = 6.20$    & $11/4 = 2.75$ \\
+No trabaja                  & Sí & $101.0/15 = 6.73$  & $45/15 = 3.00$ \\
+                            & No & $31.0/8 = 3.88$    & $26/10 = 2.60$ \\
+\midrule
+\multicolumn{2}{l}{Total} & $1280.5/143 = 8.95$ & $409/147 = 2.78$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+El promedio por situación laboral se obtiene sumando las dos filas de
+cada grupo: quienes trabajan en una organización tienen $(646.0 +
+361.5)/(72 + 34) = 1007.5/106 = 9.50$ años, los emprendedores $(110.0 +
+31.0)/(9 + 5) = 141.0/14 = 10.07$ y quienes no trabajan $(101.0 +
+31.0)/(15 + 8) = 132.0/23 = 5.74$.
+
+Cada fila de la Tabla~\ref{tab:real-multi} es un grupo de titulados, y
+sus promedios se comparan con el general (8.95 años y 2.78 puntos) para
+encontrar patrones que no aparecen al cruzar solo dos variables.
+
+Quienes trabajan en una organización son el grupo más numeroso (108).
+Entre ellos, los que no hicieron formación complementaria tienen más
+antigüedad (10.63 años) que los que sí la hicieron (8.97), es decir, la
+formación complementaria es más común en los titulados más recientes; la
+satisfacción es semejante (2.79 y 2.69). Los emprendedores con formación
+complementaria son el grupo con mayor antigüedad de toda la tabla (12.22
+años) y una de las satisfacciones más altas (2.90), aunque con 15
+emprendedores el hallazgo es indicativo.
+
+Quienes no trabajan son el grupo con menor antigüedad (5.74 años en
+promedio, frente a 9.50 de quienes trabajan en una organización), lo que
+coincide con el factor de riesgo del paso 6. Dentro de ese grupo, los que
+no hicieron formación complementaria son los más recientes de toda la
+tabla (3.88 años) y los menos satisfechos (2.60), mientras que los que sí
+la hicieron son los más satisfechos (3.00).
+
+El desempleo se concentra, entonces, en los titulados recientes, y en
+ellos la satisfacción con la formación se separa según hayan continuado o
+no su formación. La cuarta variable ($W$) muestra algo que la prueba de
+independencia no mostraba: el grupo más reciente, sin trabajo y sin
+formación complementaria, es también el que peor valora la formación
+recibida. Aunque son solo 10 casos y el hallazgo es indicativo, conviene
+tratarlo como grupo prioritario: acercarle la oferta de actualización de
+la carrera junto con el acompañamiento laboral del paso 6, y consultarle
+qué esperaba de la formación.
+
+Con 3 situaciones laborales y 2 respuestas de formación complementaria
+hay 6 celdas para 148 titulados. Si la experiencia entrara como tercera
+variable nominal serían 12 celdas, y algunas quedarían con menos de cinco
+casos; por eso entra como promedio ($\bar{Z}$), igual que la satisfacción
+($\bar{W}$).
+
+\subsection{Análisis 2. Demanda de posgrado}\label{sec:a2}
+
+Este análisis busca saber si los titulados quieren realizar un posgrado,
+en qué área y en qué institución, y si consideran que la Dirección de
+Posgrado de la FCyT ofrece programas afines a su especialidad. Responde
+al criterio 2.4.1, que pide programas de formación de posgrado en
+disciplinas afines a la carrera.
+
+\subsubsection{Variables y escala de medición}
+
+\begin{mitabla}{Variables del análisis de demanda de posgrado}\label{tab:a2-variables}
+\begin{tabular}{cL{6.2cm}L{2.4cm}cL{3.6cm}}
+\toprule
+\textbf{Var.} & \textbf{Pregunta} & \textbf{Escala} & \textbf{$n$} & \textbf{Criterio ARCU-SUR} \\
+\midrule
+$X$ & ¿Estaría interesado en realizar estudios en algún programa de
+posgrado dentro de las áreas de la Ingeniería en Sistemas? (Sí, No) &
+Nominal & 148 & 2.4.1 \\
+$Y$ & ¿En cuál de las siguientes áreas le interesaría realizar el
+programa? & Nominal & 123 & 2.4.1 \\
+$V$ & ¿En qué organización educativa optaría por realizar sus estudios?
+& Nominal & 123 & 2.4.1 \\
+$Z$ & Edad que tiene actualmente (rangos) & Ordinal & 148 & --- \\
+$W$ & ¿Existen programas de posgrado de la FCyT afines a las áreas de
+especialidad de un Ingeniero en Sistemas? (1 a 4) & Ordinal, subjetiva
+& 148 & 2.4.1 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+El área y la institución solo se preguntan a los 123 titulados
+interesados, por lo que su $n$ es menor. Para los cruces, Base de Datos
+(10) y Robótica (5) se agrupan en ``Otras áreas'', y la edad se agrupa en
+hasta 30 años (69) y 31 años o más (79); la institución se agrupa en UMSS
+(Dirección de Posgrado FCyT y EUPG) y fuera de la UMSS. $W$ es subjetiva:
+mide lo que el titulado cree sobre la oferta, no la oferta real.
+
+\subsubsection{Paso 1. Análisis descriptivo}
+
+\begin{mitabla}{Distribución de frecuencias de la demanda de posgrado}\label{tab:a2-frec}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Variable} & \textbf{Categoría} & \textbf{$f_i$} & \textbf{$F_i$} & \textbf{$h_i = f_i/n$} \\
+\midrule
+$X$ Interés en posgrado & Sí & 123 & & $123/148 = 0.831$ \\
+ & No & 25 & & $25/148 = 0.169$ \\
+\midrule
+$Y$ Área de interés & Inteligencia Artificial & 54 & & $54/123 = 0.439$ \\
+ & Ingeniería de Software & 29 & & $29/123 = 0.236$ \\
+ & Redes de Datos y Seguridad & 25 & & $25/123 = 0.203$ \\
+ & Base de Datos & 10 & & $10/123 = 0.081$ \\
+ & Robótica & 5 & & $5/123 = 0.041$ \\
+\midrule
+$V$ Institución elegida & Dirección de Posgrado FCyT & 38 & & $38/123 = 0.309$ \\
+ & Universidades internacionales & 31 & & $31/123 = 0.252$ \\
+ & Universidades públicas nacionales & 17 & & $17/123 = 0.138$ \\
+ & EUPG (UMSS) & 13 & & $13/123 = 0.106$ \\
+ & Otro & 11 & & $11/123 = 0.089$ \\
+ & Universidades privadas nacionales & 10 & & $10/123 = 0.081$ \\
+ & IBNORCA & 3 & & $3/123 = 0.024$ \\
+\midrule
+$Z$ Edad & 19--22 años & 5 & 5 & $5/148 = 0.034$ \\
+ & 23--26 años & 34 & 39 & $34/148 = 0.230$ \\
+ & 27--30 años & 30 & 69 & $30/148 = 0.203$ \\
+ & 31--34 años & 15 & 84 & $15/148 = 0.101$ \\
+ & 35 años o más & 64 & 148 & $64/148 = 0.432$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+La moda de $X$ es Sí, la de $Y$ es Inteligencia Artificial y la de $V$ es
+la Dirección de Posgrado de la FCyT. Sumando la EUPG, la UMSS reúne
+$(38+13)/123 = 51/123 = 41.5\%$ de los interesados, y el $72/123 =
+58.5\%$ elegiría otra institución. La edad es ordinal, así que no se
+promedia: su mediana es el dato de la posición $(148+1)/2 = 74.5$, que
+según $F_i$ cae en 31--34 años (hasta 27--30 se acumulan 69 y hasta
+31--34, 84). La moda es 35 años o más.
+
+\begin{mitabla}{Puntaje de afinidad de la oferta de posgrado de la FCyT}\label{tab:a2-pond}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Nivel} & \textbf{Peso $w_i$} & \textbf{$f_i$} & \textbf{$f_i \, w_i$} \\
+\midrule
+Totalmente en desacuerdo & 1 & 17 & 17 \\
+En desacuerdo & 2 & 26 & 52 \\
+De acuerdo & 3 & 94 & 282 \\
+Totalmente de acuerdo & 4 & 11 & 44 \\
+\midrule
+Total & & 148 & 395 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+\bar{x} = \frac{\sum f_i w_i}{n} = \frac{17 + 52 + 282 + 44}{148} = \frac{395}{148} = 2.67
+\qquad
+\frac{94 + 11}{148} = \frac{105}{148} = 70.9\% \text{ de acuerdo}
+\]
+
+Estos valores miden cuánta demanda de posgrado hay y hacia dónde se
+dirige. De cada 100 titulados, 83 harían un posgrado en áreas de la
+Ingeniería de Sistemas, y entre ellos la Inteligencia Artificial es
+claramente la primera opción: la elige el 43.9\%, casi el doble que
+Ingeniería de Software (23.6\%). La mitad de los titulados tiene 31 años
+o más y el grupo más numeroso es el de 35 años o más, de modo que la
+demanda viene en buena parte de profesionales con trayectoria y no solo
+de recién titulados. El puntaje de 2.67 indica que siete de cada diez
+titulados creen que la FCyT tiene programas afines, pero 43 (29.1\%) creen
+que no. Se concluye que la demanda de posgrado es alta y se concentra en
+IA, y que la UMSS capta menos de la mitad de ella: seis de cada diez
+interesados harían su posgrado fuera, y uno de cada cuatro en una
+universidad internacional. La carrera, junto con la Dirección de Posgrado
+de la FCyT, puede priorizar programas en Inteligencia Artificial, que es
+el área con más demanda.
+
+\subsubsection{Paso 2. Prueba de uniformidad}
+
+\begin{mitabla}{Pruebas de uniformidad de la demanda de posgrado}\label{tab:a2-unif}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Variable} & \textbf{Opción} & \textbf{$FO$} & \textbf{$FE = n/k$} & \textbf{$(FE-FO)^2$} & \textbf{$\frac{(FE-FO)^2}{FE}$} \\
+\midrule
+$X$ & Sí & 123 & 74.00 & 2401.00 & 32.446 \\
+ & No & 25 & 74.00 & 2401.00 & 32.446 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 64.892 \\
+\midrule
+$Y$ & Inteligencia Artificial & 54 & 30.75 & 540.56 & 17.579 \\
+ & Ingeniería de Software & 29 & 30.75 & 3.06 & 0.100 \\
+ & Redes y Seguridad & 25 & 30.75 & 33.06 & 1.075 \\
+ & Otras áreas & 15 & 30.75 & 248.06 & 8.067 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 26.821 \\
+\midrule
+$V$ & Posgrado FCyT & 38 & 17.57 & 417.33 & 23.750 \\
+ & Univ. internacionales & 31 & 17.57 & 180.33 & 10.262 \\
+ & Univ. públicas nacionales & 17 & 17.57 & 0.33 & 0.019 \\
+ & EUPG & 13 & 17.57 & 20.90 & 1.189 \\
+ & Otro & 11 & 17.57 & 43.18 & 2.458 \\
+ & Univ. privadas nacionales & 10 & 17.57 & 57.33 & 3.262 \\
+ & IBNORCA & 3 & 17.57 & 212.33 & 12.084 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 53.024 \\
+\midrule
+$W$ & Totalmente en desacuerdo & 17 & 37.00 & 400.00 & 10.811 \\
+ & En desacuerdo & 26 & 37.00 & 121.00 & 3.270 \\
+ & De acuerdo & 94 & 37.00 & 3249.00 & 87.811 \\
+ & Totalmente de acuerdo & 11 & 37.00 & 676.00 & 18.270 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 120.162 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Los valores críticos son $x^2_{0.05,\,1} = 3.841$ para $X$, $x^2_{0.05,\,3}
+= 7.815$ para $Y$ y $W$, y $x^2_{0.05,\,6} = 12.592$ para $V$. En las
+cuatro variables $x_0^2$ supera el valor crítico ($64.892$, $26.821$,
+$53.024$ y $120.162$), por lo que ninguna es uniforme.
+
+La prueba comprueba si las preferencias del paso 1 son reales. En el área
+de interés, 17.579 de los 26.821 puntos los aporta la Inteligencia
+Artificial, con 54 interesados donde un reparto parejo daría 30.75: la
+preferencia por IA no es una casualidad de la muestra. En la institución,
+la Dirección de Posgrado de la FCyT y las universidades internacionales
+reciben más titulados de lo esperado (38 y 31 frente a 17.57), e IBNORCA
+muchos menos (3). Por lo tanto, la prioridad de la IA y la competencia de
+las universidades internacionales pueden afirmarse para los titulados en
+general, y no solo para quienes respondieron.
+
+\subsubsection{Paso 3. Tablas de contingencia y mapas de calor}
+
+Se plantean tres cruces:
+
+\begin{enumerate}
+  \item Edad $\times$ área de interés: ¿el área que se quiere estudiar
+  cambia con la edad?
+  \item Edad $\times$ interés en posgrado: ¿el interés por un posgrado
+  cambia con la edad?
+  \item Afinidad de la oferta de la FCyT $\times$ institución elegida:
+  ¿quienes creen que la FCyT no tiene programas afines eligen estudiar
+  fuera de la UMSS? La afinidad se agrupa en desacuerdo (niveles 1 y 2) y
+  acuerdo (niveles 3 y 4).
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (4.40,0.9) {Edad $\times$ área de interés};
+\node[font=\small] at (1.10,0.35) {IA};
+\node[font=\small] at (3.30,0.35) {Software};
+\node[font=\small] at (5.50,0.35) {Redes};
+\node[font=\small] at (7.70,0.35) {Otras};
+\celda{0.00}{-0.00}{29}{17 (29.3\%)}
+\celda{2.20}{-0.00}{36}{21 (36.2\%)}
+\celda{4.40}{-0.00}{22}{13 (22.4\%)}
+\celda{6.60}{-0.00}{12}{7 (12.1\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Hasta 30};
+\celda{0.00}{-0.90}{57}{37 (56.9\%)}
+\celda{2.20}{-0.90}{12}{8 (12.3\%)}
+\celda{4.40}{-0.90}{18}{12 (18.5\%)}
+\celda{6.60}{-0.90}{12}{8 (12.3\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {31 o más};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Edad $\times$ interés en posgrado};
+\node[font=\small] at (1.10,0.35) {Sí};
+\node[font=\small] at (3.30,0.35) {No};
+\celda{0.00}{-0.00}{84}{58 (84.1\%)}
+\celda{2.20}{-0.00}{16}{11 (15.9\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Hasta 30};
+\celda{0.00}{-0.90}{82}{65 (82.3\%)}
+\celda{2.20}{-0.90}{18}{14 (17.7\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {31 o más};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Afinidad de la oferta $\times$ institución};
+\node[font=\small] at (1.10,0.35) {UMSS};
+\node[font=\small] at (3.30,0.35) {Fuera};
+\celda{0.00}{-0.00}{27}{9 (27.3\%)}
+\celda{2.20}{-0.00}{73}{24 (72.7\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Desacuerdo};
+\celda{0.00}{-0.90}{47}{42 (46.7\%)}
+\celda{2.20}{-0.90}{53}{48 (53.3\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Acuerdo};
+\end{tikzpicture}
+\caption{Mapas de calor de la demanda de posgrado (frecuencia y porcentaje por fila).}\label{fig:a2-calor}
+\end{figure}
+
+Los mapas muestran, antes de la prueba, si las filas se comportan
+distinto. En el área de interés los tonos se invierten: entre los menores
+de 30 la opción más elegida es Software (36.2\%), y entre los de 31 años
+o más es IA (56.9\%). En el interés por un posgrado las dos filas son casi
+iguales (84.1\% y 82.3\% de Sí). En la institución, quienes creen que la
+FCyT no tiene programas afines eligen estudiar fuera en un 72.7\%, frente
+al 53.3\% de quienes creen que sí. A simple vista, la edad cambia el área
+elegida pero no el interés, y la opinión sobre la oferta podría influir
+en dónde se estudia; el paso 4 comprueba si esas diferencias son reales.
+
+\subsubsection{Paso 4. Prueba de independencia}
+
+En cada celda, $FE$ es el total de su fila por el total de su columna
+dividido entre $N$; por ejemplo, en hasta 30 años e IA, $58 \cdot 54/123
+= 25.46$: si la edad no influyera se esperarían 25.46 interesados en IA
+menores de 30, pero hay 17. En la columna $FE$ de la
+Tabla~\ref{tab:a2-chi} se ven el total de fila y el de columna de cada
+celda.
+
+\begin{mitabla}{Cálculo de $x_0^2$ de los cruces de demanda de posgrado}\label{tab:a2-chi}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Celda} & \textbf{$FO$} & \textbf{$FE$} & \textbf{$\frac{(FO-FE)^2}{FE}$} \\
+\midrule
+\multicolumn{4}{l}{\textit{Edad $\times$ área de interés ($N = 123$)}} \\
+Hasta 30, IA & 17 & $58 \cdot 54/123 = 25.46$ & 2.8130 \\
+Hasta 30, Software & 21 & $58 \cdot 29/123 = 13.67$ & 3.9239 \\
+Hasta 30, Redes & 13 & $58 \cdot 25/123 = 11.79$ & 0.1245 \\
+Hasta 30, Otras & 7 & $58 \cdot 15/123 = 7.07$ & 0.0008 \\
+31 o más, IA & 37 & $65 \cdot 54/123 = 28.54$ & 2.5101 \\
+31 o más, Software & 8 & $65 \cdot 29/123 = 15.33$ & 3.5013 \\
+31 o más, Redes & 12 & $65 \cdot 25/123 = 13.21$ & 0.1111 \\
+31 o más, Otras & 8 & $65 \cdot 15/123 = 7.93$ & 0.0007 \\
+ & & & $x_0^2 = 12.9853$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Edad $\times$ interés en posgrado ($N = 148$)}} \\
+Hasta 30, Sí & 58 & $69 \cdot 123/148 = 57.34$ & 0.0075 \\
+Hasta 30, No & 11 & $69 \cdot 25/148 = 11.66$ & 0.0369 \\
+31 o más, Sí & 65 & $79 \cdot 123/148 = 65.66$ & 0.0065 \\
+31 o más, No & 14 & $79 \cdot 25/148 = 13.34$ & 0.0322 \\
+ & & & $x_0^2 = 0.0831$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Afinidad de la oferta $\times$ institución ($N = 123$)}} \\
+Desacuerdo, UMSS & 9 & $33 \cdot 51/123 = 13.68$ & 1.6027 \\
+Desacuerdo, Fuera & 24 & $33 \cdot 72/123 = 19.32$ & 1.1353 \\
+Acuerdo, UMSS & 42 & $90 \cdot 51/123 = 37.32$ & 0.5877 \\
+Acuerdo, Fuera & 48 & $90 \cdot 72/123 = 52.68$ & 0.4163 \\
+ & & & $x_0^2 = 3.7419$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+\begin{mitabla}{Resultado de las pruebas de independencia de la demanda de posgrado}\label{tab:a2-indep}
+\begin{tabular}{lccccl}
+\toprule
+\textbf{Cruce} & \textbf{$N$} & \textbf{$gl$} & \textbf{$x_0^2$} & \textbf{$x^2_{gl,\,0.05}$} & \textbf{Conclusión} \\
+\midrule
+Edad $\times$ área de interés & 123 & 3 & 12.9853 & 7.815 & Dependencia \\
+Edad $\times$ interés en posgrado & 148 & 1 & 0.0831 & 3.841 & Independencia \\
+Afinidad $\times$ institución & 123 & 1 & 3.7419 & 3.841 & Independencia \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+La tabla de edad por área tiene 2 filas y 4 columnas, así que $gl =
+(2-1)(4-1) = 3$; las otras dos tienen $gl = 1$. Todas las frecuencias
+esperadas son mayores que 5 (la menor es 7.07). Solo el cruce edad por
+área supera su valor crítico ($12.9853 > 7.815$) y se concluye
+dependencia; en los otros dos se acepta la independencia ($0.0831 < 3.841$
+y $3.7419 < 3.841$).
+
+La prueba decide si lo que se vio en los mapas es real. El área de
+interés sí depende de la edad: la diferencia entre jóvenes y mayores es
+demasiado grande para ser azar. El interés por un posgrado, en cambio, es
+el mismo a cualquier edad. La relación entre la opinión sobre la oferta y
+la institución elegida queda justo por debajo del límite (3.7419 frente a
+3.841): con estos datos no se puede afirmar, pero está cerca de serlo y
+conviene volver a probarla cuando la encuesta tenga más respuestas. En
+consecuencia, la oferta de posgrado no necesita dirigirse a una edad en
+particular, pero sí ajustar el área según el público: IA para los
+titulados con más trayectoria y Software para los más jóvenes.
+
+\subsubsection{Paso 5. Incidencia}
+
+Solo el cruce edad por área resultó dependiente. Se calcula la
+incidencia en las dos áreas donde la diferencia es mayor:
+\begin{gather*}
+\text{IA: } \frac{37}{65} = 56.9\% \text{ (31 o más)}, \quad \frac{17}{58} = 29.3\% \text{ (hasta 30)}, \\
+56.9 - 29.3 = 27.6 \text{ puntos}, \quad \frac{56.9}{29.3} = 1.94
+\end{gather*}
+\begin{gather*}
+\text{Software: } \frac{21}{58} = 36.2\% \text{ (hasta 30)}, \quad \frac{8}{65} = 12.3\% \text{ (31 o más)}, \\
+36.2 - 12.3 = 23.9 \text{ puntos}, \quad \frac{36.2}{12.3} = 2.94
+\end{gather*}
+Estos valores miden cuánto influye la edad en el área elegida. Los
+titulados de 31 años o más eligen IA casi el doble que los menores de 30,
+y los menores de 30 eligen Software casi tres veces más que los mayores.
+La influencia de la edad es fuerte y en sentidos opuestos, por lo que un
+solo programa no cubre a los dos grupos.
+
+\subsubsection{Paso 6. Factor de riesgo}
+
+Para la carrera, la situación desfavorable es que un titulado interesado
+realice su posgrado fuera de la UMSS, lo que ocurre en el 58.5\% de los
+casos. El cruce que estudia esa situación (afinidad de la oferta por
+institución) resultó independiente, así que \textbf{no se identifica un
+factor de riesgo confirmado}. El candidato más cercano es creer que la
+FCyT no ofrece programas afines: de ese grupo, el 72.7\% elegiría estudiar
+fuera, frente al 53.3\% del resto, con un $x_0^2$ casi en el límite. Como
+29.1\% de los titulados cree que no hay programas afines, es posible que
+parte de ellos no conozca la oferta existente. Se recomienda difundir la
+oferta de posgrado de la FCyT entre los titulados y repetir esta prueba
+en la siguiente aplicación de la encuesta.
+
+\subsubsection{Paso 7. Análisis exploratorio multivariable}
+
+Se cruzan el área de interés ($Y$) y la edad ($Z$), y en cada combinación
+se calcula la frecuencia, el puntaje de afinidad de la oferta de la FCyT
+($\bar{W}$) y el porcentaje que estudiaría en la UMSS ($V$).
+
+\begin{mitabla}{Tabulación cruzada de la demanda de posgrado}\label{tab:a2-multi}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Área ($Y$)} & \textbf{Edad ($Z$)} & \textbf{$n$} & \textbf{$\bar{W} = \sum W/n$} & \textbf{En la UMSS ($V$)} \\
+\midrule
+Inteligencia Artificial & Hasta 30 & 17 & $51/17 = 3.00$ & $4/17 = 23.5\%$ \\
+ & 31 o más & 37 & $89/37 = 2.41$ & $16/37 = 43.2\%$ \\
+Ingeniería de Software & Hasta 30 & 21 & $61/21 = 2.90$ & $9/21 = 42.9\%$ \\
+ & 31 o más & 8 & $19/8 = 2.38$ & $4/8 = 50.0\%$ \\
+Redes y Seguridad & Hasta 30 & 13 & $38/13 = 2.92$ & $6/13 = 46.2\%$ \\
+ & 31 o más & 12 & $35/12 = 2.92$ & $4/12 = 33.3\%$ \\
+Otras áreas & Hasta 30 & 7 & $18/7 = 2.57$ & $4/7 = 57.1\%$ \\
+ & 31 o más & 8 & $22/8 = 2.75$ & $4/8 = 50.0\%$ \\
+\midrule
+\multicolumn{2}{l}{Total de interesados} & 123 & $333/123 = 2.71$ & $51/123 = 41.5\%$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Cada fila es un grupo de titulados interesados en un posgrado, y sus
+valores se comparan con el total (2.71 de afinidad y 41.5\% en la UMSS).
+En Inteligencia Artificial, el área con más demanda, aparecen dos
+perfiles opuestos. Los menores de 30 son los que mejor valoran la oferta
+de la FCyT de toda la tabla (3.00), pero solo 4 de 17 (23.5\%) harían su
+posgrado en la UMSS: creen que hay programas afines y aun así eligen otra
+institución. Los de 31 años o más, el grupo más numeroso (37), valoran
+la oferta por debajo del total (2.41), aunque casi la mitad (43.2\%)
+estudiaría en la UMSS. En Software se repite el patrón: los mayores valoran peor la
+oferta (2.38) que los jóvenes (2.90). En Redes y Seguridad la valoración
+es igual en ambas edades (2.92). Los grupos de Otras áreas y de Software
+con 31 años o más tienen 8 casos o menos, por lo que sus valores son
+indicativos.
+
+La tabla muestra algo que los cruces de dos variables no mostraban: los
+titulados con trayectoria que quieren IA no encuentran afín la oferta de
+la FCyT, y los jóvenes que quieren IA sí la consideran afín, pero la
+buscan fuera. En el primer caso el problema parece ser el contenido de
+la oferta; en el segundo, otro motivo que la encuesta no pregunta (costo,
+modalidad o prestigio, por ejemplo). Se recomienda que la Dirección de
+Posgrado de la FCyT diseñe un programa en Inteligencia Artificial
+orientado a profesionales que trabajan, y que la próxima encuesta
+pregunte por qué se elige una institución, para entender a los jóvenes
+que eligen estudiar fuera.
+
+Con 4 áreas y 2 grupos de edad hay 8 celdas para 123 interesados. Si la
+institución entrara como tercera variable nominal serían 16 celdas y la
+mayoría quedaría con menos de cinco casos; por eso entra como porcentaje,
+igual que la afinidad entra como promedio.
+
+\subsection{Análisis 3. Calidad del empleo}\label{sec:a3}
+
+Este análisis busca saber si el trabajo de los titulados es pertinente a
+su formación, cuánto tardaron en conseguirlo y cuánto ganan, y si eso
+cambia entre el sector público y el privado. Responde al criterio 3.2.3,
+que pide el tiempo medio para obtener el primer empleo, el destino
+laboral de los graduados y la concordancia entre la titulación y el
+empleo. Estas preguntas solo se hacen a quienes trabajan en una
+organización, así que el análisis usa a esos 108 titulados.
+
+\subsubsection{Variables y escala de medición}
+
+\begin{mitabla}{Variables del análisis de calidad del empleo}\label{tab:a3-variables}
+\begin{tabular}{cL{6.2cm}L{2.6cm}cL{3.4cm}}
+\toprule
+\textbf{Var.} & \textbf{Pregunta} & \textbf{Escala} & \textbf{$n$} & \textbf{Criterio ARCU-SUR} \\
+\midrule
+$X$ & El trabajo en el que se encuentra, ¿a qué sector corresponde?
+(Público, Privado) & Nominal & 108 & 3.2.3 Destino laboral \\
+$Y$ & Remuneración promedio mensual en su actual trabajo (6 rangos) &
+Ordinal & 108 & 3.2.3 \\
+$Z$ & ¿Cuánto tiempo se demoró en conseguir su primer trabajo
+relacionado con su formación? (rangos) & Numérica (puntos medios) & 74
+& 3.2.3 Tiempo al primer empleo \\
+$W$ & Las labores de su puesto son pertinentes a su formación (1 a 4) &
+Ordinal, subjetiva & 108 & 3.2.3 Concordancia \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+$Z$ se responde por rangos y, como indica la regla 5 de la
+Sección~\ref{sec:procedimiento}, cada rango se reemplaza por su punto
+medio en meses; solo 74 de los 108 titulados respondieron esta pregunta.
+Para los cruces, la remuneración se agrupa en tres tramos: hasta Bs.
+5\,000, de Bs. 5\,001 a 10\,000 y más de Bs. 10\,000.
+
+\subsubsection{Paso 1. Análisis descriptivo}
+
+\begin{mitabla}{Distribución de frecuencias del sector y la remuneración}\label{tab:a3-frec}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Variable} & \textbf{Categoría} & \textbf{$f_i$} & \textbf{$F_i$} & \textbf{$h_i = f_i/n$} \\
+\midrule
+$X$ Sector & Privado & 87 & & $87/108 = 0.806$ \\
+ & Público & 21 & & $21/108 = 0.194$ \\
+\midrule
+$Y$ Remuneración & Menos de Bs. 2\,500 & 5 & 5 & $5/108 = 0.046$ \\
+ & Bs. 2\,500 -- 3\,500 & 9 & 14 & $9/108 = 0.083$ \\
+ & Bs. 3\,501 -- 5\,000 & 20 & 34 & $20/108 = 0.185$ \\
+ & Bs. 5\,001 -- 7\,000 & 19 & 53 & $19/108 = 0.176$ \\
+ & Bs. 7\,001 -- 10\,000 & 25 & 78 & $25/108 = 0.231$ \\
+ & Más de Bs. 10\,000 & 30 & 108 & $30/108 = 0.278$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+La moda del sector es el privado. En la remuneración, la mediana es el
+dato de la posición $(108+1)/2 = 54.5$, que según $F_i$ cae en Bs.
+7\,001 -- 10\,000 (hasta el tramo anterior se acumulan 53), y la moda es
+más de Bs. 10\,000.
+
+\begin{mitabla}{Cálculo del tiempo medio hasta el primer trabajo}\label{tab:a3-tiempo}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Rango} & \textbf{$x_i$ (meses)} & \textbf{$f_i$} & \textbf{$f_i \, x_i$} \\
+\midrule
+Ya trabajaba antes de titularse & 0 & 37 & 0.0 \\
+Menos de 1 mes & 0.5 & 8 & 4.0 \\
+1 -- 4 meses & 2.5 & 10 & 25.0 \\
+4 -- 8 meses & 6 & 5 & 30.0 \\
+8 -- 12 meses & 10 & 10 & 100.0 \\
+Más de 12 meses & 12 & 4 & 48.0 \\
+\midrule
+Total & & 74 & 207.0 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Con todos los que respondieron, el tiempo medio es $207.0/74 = 2.80$
+meses. La mitad (37) ya trabajaba antes de titularse; para los otros 37,
+que buscaron trabajo después de titularse:
+\[
+\bar{x} = \frac{207.0}{37} = 5.59 \text{ meses} \qquad
+s^2 = \frac{662.42}{36} = 18.40
+\]
+\[
+s = 4.29 \text{ meses} \qquad
+CV = \frac{4.29}{5.59} \times 100 = 76.7\%
+\]
+donde 662.42 es la suma de $f_i (x_i - 5.59)^2$ en los cinco rangos. La
+mediana es el dato 19 de 37, que cae en 4 -- 8 meses. Con $t_{36,\,0.025}
+= 2.028$, el margen es $4.29/\sqrt{37} \times 2.028 = 0.705 \times 2.028 =
+1.43$, y el intervalo de confianza del 95\% es $4.16 \le \mu \le 7.02$
+meses. Como ``más de 12 meses'' se toma como 12, estos tiempos son una
+cota inferior.
+
+\begin{mitabla}{Puntaje de pertinencia del puesto}\label{tab:a3-pond}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Nivel} & \textbf{Peso $w_i$} & \textbf{$f_i$} & \textbf{$f_i \, w_i$} \\
+\midrule
+Totalmente en desacuerdo & 1 & 5 & 5 \\
+En desacuerdo & 2 & 5 & 10 \\
+De acuerdo & 3 & 56 & 168 \\
+Totalmente de acuerdo & 4 & 42 & 168 \\
+\midrule
+Total & & 108 & 351 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+\bar{x} = \frac{351}{108} = 3.25 \qquad \frac{56 + 42}{108} = \frac{98}{108} = 90.7\% \text{ de acuerdo}
+\]
+
+Estos valores describen el empleo que consiguen los titulados. Ocho de
+cada diez trabajan en el sector privado. La mitad gana más de Bs. 7\,000
+al mes y casi tres de cada diez más de Bs. 10\,000, mientras que 14
+(13.0\%) ganan menos de Bs. 3\,500. El tiempo medio hasta el primer
+trabajo, el indicador que pide el criterio 3.2.3, es de 2.80 meses, y es
+tan corto porque la mitad ya trabajaba antes de titularse. Quienes
+tuvieron que buscar tardaron en promedio 5.59 meses, con una dispersión
+alta (CV de 76.7\%): 8 lo consiguieron en menos de un mes y 4 tardaron
+más de un año. La pertinencia del puesto obtiene 3.25, por encima de la
+satisfacción con la formación (2.78 en el Análisis 1): nueve de cada diez
+titulados dicen que sus labores corresponden a su formación. Se concluye
+que el empleo es pertinente, mayoritariamente privado y de inserción
+rápida, y que los titulados valoran más la pertinencia de su trabajo que
+la formación recibida. Como la mitad ya trabajaba antes de titularse, la
+carrera puede apoyarse en ese hecho y promover prácticas laborales
+durante los últimos semestres.
+
+\subsubsection{Paso 2. Prueba de uniformidad}
+
+\begin{mitabla}{Pruebas de uniformidad de la calidad del empleo}\label{tab:a3-unif}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Variable} & \textbf{Opción} & \textbf{$FO$} & \textbf{$FE = n/k$} & \textbf{$(FE-FO)^2$} & \textbf{$\frac{(FE-FO)^2}{FE}$} \\
+\midrule
+$X$ & Privado & 87 & 54.00 & 1089.00 & 20.167 \\
+ & Público & 21 & 54.00 & 1089.00 & 20.167 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 40.333 \\
+\midrule
+$Y$ & Hasta Bs. 5\,000 & 34 & 36.00 & 4.00 & 0.111 \\
+ & Bs. 5\,001 -- 10\,000 & 44 & 36.00 & 64.00 & 1.778 \\
+ & Más de Bs. 10\,000 & 30 & 36.00 & 36.00 & 1.000 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 2.889 \\
+\midrule
+$W$ & Totalmente en desacuerdo & 5 & 27.00 & 484.00 & 17.926 \\
+ & En desacuerdo & 5 & 27.00 & 484.00 & 17.926 \\
+ & De acuerdo & 56 & 27.00 & 841.00 & 31.148 \\
+ & Totalmente de acuerdo & 42 & 27.00 & 225.00 & 8.333 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 75.333 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Los valores críticos son 3.841 para $X$ ($k=2$), 5.991 para $Y$ ($k=3$)
+y 7.815 para $W$ ($k=4$). El sector ($40.333$) y la pertinencia
+($75.333$) no son uniformes, pero la remuneración sí lo es: $2.889 <
+5.991$.
+
+Es el primer resultado uniforme del estudio, y tiene un significado
+propio: los tres tramos de sueldo tienen casi la misma cantidad de
+titulados (34, 44 y 30, frente a 36 esperados en cada uno), y esas
+diferencias pueden deberse al azar. No existe un sueldo típico del
+ingeniero de sistemas: un tercio gana hasta Bs. 5\,000, cuatro de cada
+diez entre Bs. 5\,001 y 10\,000 y casi tres de cada diez más de
+Bs. 10\,000. En cambio, la preferencia por el sector privado y la
+percepción de pertinencia son reales. Por eso, el informe no debe
+resumir el ingreso con un solo valor; conviene presentarlo por tramos y,
+como se hace en los pasos siguientes, buscar qué explica las diferencias.
+
+\subsubsection{Paso 3. Tablas de contingencia y mapas de calor}
+
+Se plantean tres cruces:
+
+\begin{enumerate}
+  \item Sector $\times$ remuneración: ¿el sueldo depende del sector?
+  \item Pertinencia $\times$ remuneración: ¿quienes hacen labores más
+  pertinentes ganan más? Como solo 10 titulados están en desacuerdo, la
+  pertinencia se agrupa en ``totalmente de acuerdo'' (42) y el resto (66).
+  \item Sector $\times$ pertinencia: ¿el trabajo es más pertinente en un
+  sector que en otro?
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (3.30,0.9) {Sector $\times$ remuneración};
+\node[font=\small] at (1.10,0.35) {Hasta 5\,000};
+\node[font=\small] at (3.30,0.35) {5\,001--10\,000};
+\node[font=\small] at (5.50,0.35) {Más de 10\,000};
+\celda{0.00}{-0.00}{52}{11 (52.4\%)}
+\celda{2.20}{-0.00}{43}{9 (42.9\%)}
+\celda{4.40}{-0.00}{5}{1 (4.8\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Público};
+\celda{0.00}{-0.90}{26}{23 (26.4\%)}
+\celda{2.20}{-0.90}{40}{35 (40.2\%)}
+\celda{4.40}{-0.90}{33}{29 (33.3\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Privado};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (3.30,0.9) {Pertinencia $\times$ remuneración};
+\node[font=\small] at (1.10,0.35) {Hasta 5\,000};
+\node[font=\small] at (3.30,0.35) {5\,001--10\,000};
+\node[font=\small] at (5.50,0.35) {Más de 10\,000};
+\celda{0.00}{-0.00}{19}{8 (19.0\%)}
+\celda{2.20}{-0.00}{52}{22 (52.4\%)}
+\celda{4.40}{-0.00}{29}{12 (28.6\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Total. acuerdo};
+\celda{0.00}{-0.90}{39}{26 (39.4\%)}
+\celda{2.20}{-0.90}{33}{22 (33.3\%)}
+\celda{4.40}{-0.90}{27}{18 (27.3\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Resto};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Sector $\times$ pertinencia};
+\node[font=\small] at (1.10,0.35) {Total. acuerdo};
+\node[font=\small] at (3.30,0.35) {Resto};
+\celda{0.00}{-0.00}{24}{5 (23.8\%)}
+\celda{2.20}{-0.00}{76}{16 (76.2\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Público};
+\celda{0.00}{-0.90}{43}{37 (42.5\%)}
+\celda{2.20}{-0.90}{57}{50 (57.5\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Privado};
+\end{tikzpicture}
+\caption{Mapas de calor de la calidad del empleo (frecuencia y porcentaje por fila).}\label{fig:a3-calor}
+\end{figure}
+
+En sector por remuneración los tonos se invierten: el 52.4\% de los
+titulados del sector público gana hasta Bs. 5\,000 y solo uno (4.8\%)
+más de Bs. 10\,000, mientras que en el privado el tramo más alto reúne al
+33.3\%. En pertinencia por remuneración, quienes están totalmente de
+acuerdo se concentran en el tramo medio (52.4\%) y el resto en el más
+bajo (39.4\%), una diferencia visible pero menor. En sector por
+pertinencia, el 42.5\% del privado está totalmente de acuerdo frente al
+23.8\% del público. El paso 4 comprueba cuáles de estas diferencias son
+reales.
+
+\subsubsection{Paso 4. Prueba de independencia}
+
+\begin{mitabla}{Cálculo de $x_0^2$ de los cruces de calidad del empleo}\label{tab:a3-chi}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Celda} & \textbf{$FO$} & \textbf{$FE$} & \textbf{$\frac{(FO-FE)^2}{FE}$} \\
+\midrule
+\multicolumn{4}{l}{\textit{Sector $\times$ remuneración ($N = 108$)}} \\
+Público, hasta 5\,000 & 11 & $21 \cdot 34/108 = 6.61$ & 2.9136 \\
+Público, 5\,001--10\,000 & 9 & $21 \cdot 44/108 = 8.56$ & 0.0231 \\
+Público, más de 10\,000 & 1 & $21 \cdot 30/108 = 5.83$ & 4.0048 \\
+Privado, hasta 5\,000 & 23 & $87 \cdot 34/108 = 27.39$ & 0.7033 \\
+Privado, 5\,001--10\,000 & 35 & $87 \cdot 44/108 = 35.44$ & 0.0056 \\
+Privado, más de 10\,000 & 29 & $87 \cdot 30/108 = 24.17$ & 0.9667 \\
+ & & & $x_0^2 = 8.6170$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Pertinencia $\times$ remuneración ($N = 108$)}} \\
+Total. acuerdo, hasta 5\,000 & 8 & $42 \cdot 34/108 = 13.22$ & 2.0626 \\
+Total. acuerdo, 5\,001--10\,000 & 22 & $42 \cdot 44/108 = 17.11$ & 1.3968 \\
+Total. acuerdo, más de 10\,000 & 12 & $42 \cdot 30/108 = 11.67$ & 0.0095 \\
+Resto, hasta 5\,000 & 26 & $66 \cdot 34/108 = 20.78$ & 1.3125 \\
+Resto, 5\,001--10\,000 & 22 & $66 \cdot 44/108 = 26.89$ & 0.8889 \\
+Resto, más de 10\,000 & 18 & $66 \cdot 30/108 = 18.33$ & 0.0061 \\
+ & & & $x_0^2 = 5.6764$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Sector $\times$ pertinencia ($N = 108$)}} \\
+Público, total. acuerdo & 5 & $21 \cdot 42/108 = 8.17$ & 1.2279 \\
+Público, resto & 16 & $21 \cdot 66/108 = 12.83$ & 0.7814 \\
+Privado, total. acuerdo & 37 & $87 \cdot 42/108 = 33.83$ & 0.2964 \\
+Privado, resto & 50 & $87 \cdot 66/108 = 53.17$ & 0.1886 \\
+ & & & $x_0^2 = 2.4943$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+\begin{mitabla}{Resultado de las pruebas de independencia de la calidad del empleo}\label{tab:a3-indep}
+\begin{tabular}{lccccl}
+\toprule
+\textbf{Cruce} & \textbf{$N$} & \textbf{$gl$} & \textbf{$x_0^2$} & \textbf{$x^2_{gl,\,0.05}$} & \textbf{Conclusión} \\
+\midrule
+Sector $\times$ remuneración & 108 & 2 & 8.6170 & 5.991 & Dependencia \\
+Pertinencia $\times$ remuneración & 108 & 2 & 5.6764 & 5.991 & Independencia \\
+Sector $\times$ pertinencia & 108 & 1 & 2.4943 & 3.841 & Independencia \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Las tablas con tres tramos de sueldo tienen $gl = (2-1)(3-1) = 2$ y
+valor crítico 5.991; la de sector por pertinencia tiene $gl = 1$. La
+menor frecuencia esperada es 5.83, así que las tres pruebas son
+aplicables. Solo sector por remuneración supera su valor crítico
+($8.6170 > 5.991$); pertinencia por remuneración queda cerca pero por
+debajo ($5.6764 < 5.991$), y sector por pertinencia lejos ($2.4943 <
+3.841$).
+
+Se concluye que el sueldo sí depende del sector: hay 11 titulados del
+sector público que ganan hasta Bs. 5\,000 donde se esperaban 6.61, y uno
+solo que gana más de Bs. 10\,000 donde se esperaban 5.83. En cambio, la
+pertinencia del trabajo no depende del sueldo ni del sector: un trabajo
+pertinente a la formación se encuentra en los dos sectores y en todos los
+tramos de sueldo.
+
+\subsubsection{Paso 5. Incidencia}
+
+En el cruce dependiente, la categoría de interés es el tramo más bajo,
+hasta Bs. 5\,000:
+\[
+p_{\text{público}} = \frac{11}{21} = 52.4\% \qquad
+p_{\text{privado}} = \frac{23}{87} = 26.4\% \qquad
+52.4 - 26.4 = 26.0 \text{ puntos} \qquad
+\frac{52.4}{26.4} = 1.98
+\]
+De cada 100 titulados del sector público, 26 más que en el privado ganan
+hasta Bs. 5\,000, y la proporción es casi el doble. En el tramo más alto
+la diferencia es todavía mayor (33.3\% en el privado frente a 4.8\% en el
+público), aunque en el público se basa en un solo caso. La influencia del
+sector sobre el sueldo es fuerte.
+
+\subsubsection{Paso 6. Factor de riesgo}
+
+Situación desfavorable: ganar hasta Bs. 5\,000. El grupo con mayor
+proporción es el sector público (52.4\% frente a 26.4\%), así que
+\textbf{trabajar en el sector público es un factor de riesgo de baja
+remuneración}. El tiempo hasta el primer trabajo y la pertinencia no se
+asocian con el sueldo, por lo que no son factores de riesgo. La carrera
+no puede cambiar los sueldos, pero sí puede usar este resultado en la
+orientación profesional de sus estudiantes y en el seguimiento de los
+graduados (criterio 3.2.2), para que conozcan las condiciones de cada
+sector antes de elegir.
+
+\subsubsection{Paso 7. Análisis exploratorio multivariable}
+
+Se cruzan el sector ($X$) y el tramo de sueldo ($Y$), y en cada
+combinación se calcula la frecuencia, los años de vida profesional
+($\bar{A}$), la pertinencia ($\bar{W}$) y el tiempo al primer trabajo
+($\bar{Z}$, en meses).
+
+\begin{mitabla}{Tabulación cruzada de la calidad del empleo}\label{tab:a3-multi}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Sector} & \textbf{Sueldo (Bs.)} & \textbf{$n$} & \textbf{$\bar{A}$ (años)} & \textbf{$\bar{W}$ (1--4)} & \textbf{$\bar{Z}$ (meses)} \\
+\midrule
+Privado & Hasta 5\,000 & 23 & $56.5/22 = 2.57$ & $73/23 = 3.17$ & $48.5/18 = 2.69$ \\
+ & 5\,001 -- 10\,000 & 35 & $363.0/34 = 10.68$ & $123/35 = 3.51$ & $70.0/22 = 3.18$ \\
+ & Más de 10\,000 & 29 & $404.0/29 = 13.93$ & $90/29 = 3.10$ & $27.5/19 = 1.45$ \\
+Público & Hasta 5\,000 & 11 & $58.0/11 = 5.27$ & $32/11 = 2.91$ & $31.0/9 = 3.44$ \\
+ & 5\,001 -- 10\,000 & 9 & $106.0/9 = 11.78$ & $29/9 = 3.22$ & $30.0/5 = 6.00$ \\
+ & Más de 10\,000 & 1 & $20.0/1 = 20.00$ & $4/1 = 4.00$ & $0/1 = 0.00$ \\
+\midrule
+\multicolumn{2}{l}{Total} & 108 & $1007.5/106 = 9.50$ & $351/108 = 3.25$ & $207.0/74 = 2.80$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Cada promedio usa solo las respuestas válidas de la celda, por eso los
+divisores son distintos. En el sector privado el sueldo sigue a la
+experiencia: los que ganan hasta Bs. 5\,000 llevan 2.57 años, los del
+tramo medio 10.68 y los del más alto 13.93. Además, los que más ganan son
+los que más rápido consiguieron su primer trabajo (1.45 meses). En el
+sector público, en cambio, quienes ganan hasta Bs. 5\,000 llevan 5.27
+años, el doble que en el privado: en el sector público el sueldo bajo no
+es solo de los recién titulados. La pertinencia va de 2.91 a 3.51 en
+todos los grupos, lo que coincide con su independencia del sueldo. Las
+celdas del sector público tienen 11 casos o menos, por lo que sus valores
+son indicativos.
+
+La tabla agrega algo que la prueba de independencia no mostraba: el
+factor de riesgo del paso 6 no se explica por la experiencia, porque en
+el sector público los sueldos bajos alcanzan también a titulados con
+varios años de trabajo. Se recomienda seguir este grupo en las próximas
+aplicaciones de la encuesta, para confirmar el resultado con más casos.
+
+\subsection{Análisis 4. Inserción laboral antes y después de la inteligencia artificial}\label{sec:a4}
+
+Este análisis busca saber si la inserción laboral de los titulados y lo
+que buscan estudiar cambiaron desde que la inteligencia artificial
+generativa llegó al mercado laboral. Responde al criterio 2.1.7, que pide
+actualizar el currículo en consonancia con los desarrollos disciplinares
+y profesionales, y al criterio 3.2.3.
+
+La encuesta se respondió en 2026, y ChatGPT, la primera herramienta de
+IA generativa de uso masivo, se publicó a fines de noviembre de 2022
+(OpenAI, 2022). Quien declara 3 años o menos de vida profesional empezó a
+trabajar en 2023 o después, ya con la IA en el mercado. Con eso se
+definen dos grupos, o \textbf{cohortes}: \textbf{antes de la IA} (más de 3
+años, 90 titulados) y \textbf{después de la IA} (3 años o menos, 53
+titulados), con los 143 titulados que tienen años de vida profesional
+válidos.
+
+Este análisis tiene tres límites que se declaran antes de los
+resultados. Primero, la encuesta no pregunta nada sobre la IA: solo se
+comparan las dos cohortes, y una diferencia entre ellas no prueba que la
+cause la IA. Segundo, la cohorte coincide con la experiencia y la edad;
+por eso no se comparan el desempleo ni el sueldo, que ya se explican por
+la experiencia (Análisis 1 y 3). Tercero, la pregunta de años de vida
+profesional no indica desde cuándo contar, así que el corte en 3 años es
+aproximado.
+
+\subsubsection{Variables y escala de medición}
+
+\begin{mitabla}{Variables del análisis antes y después de la IA}\label{tab:a4-variables}
+\begin{tabular}{cL{6.4cm}L{2.6cm}cL{3.0cm}}
+\toprule
+\textbf{Var.} & \textbf{Pregunta o definición} & \textbf{Escala} & \textbf{$n$} & \textbf{Criterio ARCU-SUR} \\
+\midrule
+$X$ & Cohorte: antes de la IA (más de 3 años de vida profesional) o
+después (3 años o menos) & Nominal & 143 & 2.1.7 \\
+$Y$ & Tiempo hasta el primer trabajo relacionado (hasta 4 meses, más de
+4 meses), sin quienes ya trabajaban & Ordinal & 46 & 3.2.3 \\
+$V$ & Área de interés del posgrado & Nominal & 120 & 2.1.7, 2.4.1 \\
+$W$ & Concordancia entre la formación recibida y los requerimientos del
+mercado laboral (1 a 4) & Ordinal, subjetiva & 142 & 2.1.7 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+$Y$ deja fuera a quienes ya trabajaban antes de titularse, porque no
+tuvieron que buscar; solo 46 titulados con cohorte válida respondieron
+que buscaron trabajo después de titularse. $W$ es subjetiva: es la
+opinión del titulado sobre si su formación responde a lo que pide el
+mercado, que es justamente lo que la IA podría haber cambiado.
+
+\subsubsection{Paso 1. Análisis descriptivo}
+
+\begin{mitabla}{Comparación descriptiva de las dos cohortes}\label{tab:a4-desc}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Indicador} & \textbf{Antes de la IA} & \textbf{Después de la IA} \\
+\midrule
+Titulados & 90 & 53 \\
+Tiempo medio al primer trabajo (meses) & $95.5/19 = 5.03$ & $158.0/27 = 5.85$ \\
+Consiguió trabajo en 4 meses o menos & $11/19 = 57.9\%$ & $12/27 = 44.4\%$ \\
+Interés en posgrado de IA & $40/73 = 54.8\%$ & $14/47 = 29.8\%$ \\
+Interés en posgrado de Software & $9/73 = 12.3\%$ & $19/47 = 40.4\%$ \\
+Concordancia formación--mercado (puntaje) & $233/89 = 2.62$ & $141/53 = 2.66$ \\
+De acuerdo con la concordancia & $54/89 = 60.7\%$ & $35/53 = 66.0\%$ \\
+Afinidad de la oferta de posgrado FCyT & $234/90 = 2.60$ & $148/53 = 2.79$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+El tiempo medio usa los puntos medios de la regla 5 (por ejemplo, la
+cohorte de después suma 158.0 meses entre 27 titulados), y los puntajes
+usan los pesos 1 a 4. Con esta comparación se busca ver, primero sin
+pruebas, en qué se diferencian las dos cohortes. Los titulados de después
+de la IA tardaron en promedio casi un mes más en conseguir su primer
+trabajo (5.85 frente a 5.03 meses), y una proporción menor lo consiguió
+en cuatro meses o menos (44.4\% frente a 57.9\%). La diferencia más
+grande está en el posgrado que quieren: en la cohorte de antes, más de la
+mitad quiere IA; en la de después, solo tres de cada diez, y la primera
+opción pasa a ser Software. La concordancia entre la formación y el
+mercado es casi igual en las dos (2.62 y 2.66), y la cohorte de después
+valora algo mejor la oferta de posgrado de la FCyT. A primera vista, lo
+que cambió no es tanto la inserción como lo que se quiere estudiar; los
+pasos siguientes comprueban qué diferencias son reales.
+
+\subsubsection{Paso 2. Prueba de uniformidad}
+
+\begin{mitabla}{Prueba de uniformidad de las cohortes}\label{tab:a4-unif}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Variable} & \textbf{Opción} & \textbf{$FO$} & \textbf{$FE = n/k$} & \textbf{$(FE-FO)^2$} & \textbf{$\frac{(FE-FO)^2}{FE}$} \\
+\midrule
+$X$ & Antes de la IA & 90 & 71.50 & 342.25 & 4.787 \\
+ & Después de la IA & 53 & 71.50 & 342.25 & 4.787 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 9.573 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Con $x_0^2 = 9.573 > 3.841$, las cohortes no son uniformes: hay más
+titulados de antes de la IA que de después. Esto no es un hallazgo sobre
+el mercado, sino sobre la muestra: la mayoría de quienes respondieron
+lleva más de tres años trabajando. Significa que la cohorte de después
+tiene menos casos y sus resultados tienen más margen de error, lo que se
+tiene en cuenta al leer los pasos siguientes. Las demás variables ya se
+probaron en los análisis anteriores.
+
+\subsubsection{Paso 3. Tablas de contingencia y mapas de calor}
+
+Se plantean tres cruces, todos con la cohorte en las filas:
+
+\begin{enumerate}
+  \item Cohorte $\times$ tiempo al primer trabajo: ¿después de la IA se
+  tarda más en conseguir el primer trabajo?
+  \item Cohorte $\times$ área de interés del posgrado: ¿cambió lo que
+  los titulados quieren estudiar?
+  \item Cohorte $\times$ concordancia formación--mercado: ¿los titulados
+  de después de la IA sienten que su formación responde menos al
+  mercado? La concordancia se agrupa en desacuerdo (1 y 2) y acuerdo (3 y
+  4).
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Cohorte $\times$ tiempo al primer trabajo};
+\node[font=\small] at (1.10,0.35) {Hasta 4 meses};
+\node[font=\small] at (3.30,0.35) {Más de 4};
+\celda{0.00}{-0.00}{58}{11 (57.9\%)}
+\celda{2.20}{-0.00}{42}{8 (42.1\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Antes};
+\celda{0.00}{-0.90}{44}{12 (44.4\%)}
+\celda{2.20}{-0.90}{56}{15 (55.6\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Después};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (4.40,0.9) {Cohorte $\times$ área de interés};
+\node[font=\small] at (1.10,0.35) {IA};
+\node[font=\small] at (3.30,0.35) {Software};
+\node[font=\small] at (5.50,0.35) {Redes};
+\node[font=\small] at (7.70,0.35) {Otras};
+\celda{0.00}{-0.00}{55}{40 (54.8\%)}
+\celda{2.20}{-0.00}{12}{9 (12.3\%)}
+\celda{4.40}{-0.00}{19}{14 (19.2\%)}
+\celda{6.60}{-0.00}{14}{10 (13.7\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Antes};
+\celda{0.00}{-0.90}{30}{14 (29.8\%)}
+\celda{2.20}{-0.90}{40}{19 (40.4\%)}
+\celda{4.40}{-0.90}{21}{10 (21.3\%)}
+\celda{6.60}{-0.90}{9}{4 (8.5\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Después};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Cohorte $\times$ concordancia};
+\node[font=\small] at (1.10,0.35) {Desacuerdo};
+\node[font=\small] at (3.30,0.35) {Acuerdo};
+\celda{0.00}{-0.00}{39}{35 (39.3\%)}
+\celda{2.20}{-0.00}{61}{54 (60.7\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Antes};
+\celda{0.00}{-0.90}{34}{18 (34.0\%)}
+\celda{2.20}{-0.90}{66}{35 (66.0\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {Después};
+\end{tikzpicture}
+\caption{Mapas de calor de las cohortes antes y después de la IA (frecuencia y porcentaje por fila).}\label{fig:a4-calor}
+\end{figure}
+
+En el tiempo al primer trabajo los tonos cambian poco: la celda más
+oscura pasa de ``hasta 4 meses'' (57.9\%) en la cohorte de antes a ``más
+de 4'' (55.6\%) en la de después. En el área de interés el cambio es
+claro: la celda más oscura pasa de IA (54.8\%) a Software (40.4\%). En la
+concordancia las dos filas tienen casi el mismo tono. A simple vista, el
+área de interés es lo único que cambia con claridad.
+
+\subsubsection{Paso 4. Prueba de independencia}
+
+\begin{mitabla}{Cálculo de $x_0^2$ de los cruces por cohorte}\label{tab:a4-chi}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Celda} & \textbf{$FO$} & \textbf{$FE$} & \textbf{$\frac{(FO-FE)^2}{FE}$} \\
+\midrule
+\multicolumn{4}{l}{\textit{Cohorte $\times$ tiempo al primer trabajo ($N = 46$)}} \\
+Antes, hasta 4 meses & 11 & $19 \cdot 23/46 = 9.50$ & 0.2368 \\
+Antes, más de 4 & 8 & $19 \cdot 23/46 = 9.50$ & 0.2368 \\
+Después, hasta 4 meses & 12 & $27 \cdot 23/46 = 13.50$ & 0.1667 \\
+Después, más de 4 & 15 & $27 \cdot 23/46 = 13.50$ & 0.1667 \\
+ & & & $x_0^2 = 0.8070$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Cohorte $\times$ área de interés ($N = 120$)}} \\
+Antes, IA & 40 & $73 \cdot 54/120 = 32.85$ & 1.5562 \\
+Antes, Software & 9 & $73 \cdot 28/120 = 17.03$ & 3.7887 \\
+Antes, Redes & 14 & $73 \cdot 24/120 = 14.60$ & 0.0247 \\
+Antes, Otras & 10 & $73 \cdot 14/120 = 8.52$ & 0.2583 \\
+Después, IA & 14 & $47 \cdot 54/120 = 21.15$ & 2.4171 \\
+Después, Software & 19 & $47 \cdot 28/120 = 10.97$ & 5.8846 \\
+Después, Redes & 10 & $47 \cdot 24/120 = 9.40$ & 0.0383 \\
+Después, Otras & 4 & $47 \cdot 14/120 = 5.48$ & 0.4013 \\
+ & & & $x_0^2 = 14.3693$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Cohorte $\times$ concordancia ($N = 142$)}} \\
+Antes, desacuerdo & 35 & $89 \cdot 53/142 = 33.22$ & 0.0956 \\
+Antes, acuerdo & 54 & $89 \cdot 89/142 = 55.78$ & 0.0569 \\
+Después, desacuerdo & 18 & $53 \cdot 53/142 = 19.78$ & 0.1605 \\
+Después, acuerdo & 35 & $53 \cdot 89/142 = 33.22$ & 0.0956 \\
+ & & & $x_0^2 = 0.4085$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+\begin{mitabla}{Resultado de las pruebas de independencia por cohorte}\label{tab:a4-indep}
+\begin{tabular}{lccccl}
+\toprule
+\textbf{Cruce} & \textbf{$N$} & \textbf{$gl$} & \textbf{$x_0^2$} & \textbf{$x^2_{gl,\,0.05}$} & \textbf{Conclusión} \\
+\midrule
+Cohorte $\times$ tiempo al primer trabajo & 46 & 1 & 0.8070 & 3.841 & Independencia \\
+Cohorte $\times$ área de interés & 120 & 3 & 14.3693 & 7.815 & Dependencia \\
+Cohorte $\times$ concordancia & 142 & 1 & 0.4085 & 3.841 & Independencia \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+La menor frecuencia esperada es 5.48, así que las tres pruebas son
+aplicables. Solo el área de interés supera su valor crítico ($14.3693 >
+7.815$, con $gl = 3$); el tiempo al primer trabajo ($0.8070$) y la
+concordancia ($0.4085$) quedan muy por debajo de 3.841.
+
+La prueba decide si las diferencias entre cohortes son reales. El casi
+mes adicional que tarda la cohorte de después en conseguir su primer
+trabajo puede deberse al azar: con estos datos \textbf{no se puede
+afirmar que después de la IA sea más difícil insertarse}. Tampoco cambió
+la opinión sobre si la formación responde al mercado. Lo que sí cambió, y
+no por azar, es el área de posgrado que se quiere estudiar. Como la
+cohorte coincide con la edad, este resultado concuerda con el del
+Análisis 2 (edad por área) y no permite separar cuánto se debe a la IA y
+cuánto a la edad.
+
+\subsubsection{Paso 5. Incidencia}
+
+En el cruce dependiente se calcula la incidencia en las dos áreas que
+más cambian:
+\begin{gather*}
+\text{IA: } \frac{40}{73} = 54.8\% \text{ (antes)}, \quad \frac{14}{47} = 29.8\% \text{ (después)}, \\
+54.8 - 29.8 = 25.0 \text{ puntos}, \quad \frac{54.8}{29.8} = 1.84
+\end{gather*}
+\begin{gather*}
+\text{Software: } \frac{19}{47} = 40.4\% \text{ (después)}, \quad \frac{9}{73} = 12.3\% \text{ (antes)}, \\
+40.4 - 12.3 = 28.1 \text{ puntos}, \quad \frac{40.4}{12.3} = 3.28
+\end{gather*}
+Los titulados de antes de la IA eligen un posgrado de IA casi el doble
+que los de después, y los de después eligen Software más de tres veces
+más. La influencia de la cohorte sobre el área elegida es fuerte.
+
+\subsubsection{Paso 6. Factor de riesgo}
+
+Situación desfavorable: tardar más de cuatro meses en conseguir el primer
+trabajo relacionado con la formación. El cruce con la cohorte resultó
+independiente, así que \textbf{titularse después de la llegada de la IA
+no es un factor de riesgo de inserción lenta}, con los 46 casos
+disponibles. Como la cohorte de después tiene pocos casos, este resultado
+debe confirmarse con más respuestas.
+
+\subsubsection{Paso 7. Análisis exploratorio multivariable}
+
+Se cruzan la cohorte ($X$) y el área de interés ($V$), y en cada
+combinación se calcula la frecuencia, la concordancia formación--mercado
+($\bar{W}$) y la afinidad de la oferta de posgrado de la FCyT ($\bar{O}$).
+
+\begin{mitabla}{Tabulación cruzada de cohorte y área de interés}\label{tab:a4-multi}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Cohorte ($X$)} & \textbf{Área ($V$)} & \textbf{$n$} & \textbf{$\bar{W}$ concordancia} & \textbf{$\bar{O}$ oferta FCyT} \\
+\midrule
+Antes de la IA & Inteligencia Artificial & 40 & $107/40 = 2.67$ & $99/40 = 2.48$ \\
+ & Ingeniería de Software & 9 & $25/9 = 2.78$ & $22/9 = 2.44$ \\
+ & Redes y Seguridad & 14 & $37/14 = 2.64$ & $43/14 = 3.07$ \\
+ & Otras áreas & 10 & $26/10 = 2.60$ & $27/10 = 2.70$ \\
+Después de la IA & Inteligencia Artificial & 14 & $36/14 = 2.57$ & $41/14 = 2.93$ \\
+ & Ingeniería de Software & 19 & $51/19 = 2.68$ & $56/19 = 2.95$ \\
+ & Redes y Seguridad & 10 & $29/10 = 2.90$ & $27/10 = 2.70$ \\
+ & Otras áreas & 4 & $10/4 = 2.50$ & $10/4 = 2.50$ \\
+\midrule
+\multicolumn{2}{l}{Total (antes / después)} & 73 / 47 & 2.67 / 2.68 & 2.62 / 2.85 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+El grupo más numeroso de la tabla son los titulados de antes de la IA
+que quieren un posgrado de IA (40). Ese grupo valora la oferta de la
+FCyT en 2.48, por debajo del total, mientras que los de después que
+quieren IA o Software la valoran mejor (2.93 y 2.95). La concordancia
+entre formación y mercado, en cambio, está entre 2.50 y 2.90 en todos los
+grupos, sin un patrón claro, lo que coincide con su independencia de la
+cohorte. Las celdas con 10 casos o menos son indicativas.
+
+La tabla muestra algo que los cruces no mostraban: el cambio después de
+la IA no aparece en la inserción, sino en la demanda de formación. Los
+profesionales que se titularon antes de la IA quieren actualizarse en IA
+y no encuentran afín la oferta actual de la FCyT; los titulados recientes
+prefieren Software. Una explicación posible es que los recientes ya
+tuvieron contacto con la IA durante sus estudios, pero la encuesta no
+permite comprobarlo. Se recomienda, primero, ofrecer formación en IA para
+profesionales con trayectoria, lo que coincide con el Análisis 2, y
+segundo, agregar a la próxima encuesta preguntas directas sobre la IA:
+si la usan en su trabajo, si cambió sus tareas y si la carrera los
+preparó para usarla.
 
 \section{Análisis de la Oferta Laboral y Requerimientos del Sector Productivo}\label{sec:empleadores}
 
-El criterio 2.1.2 exige que el perfil de egreso sea coherente con las
-competencias que demandan los agentes sociales relevantes, y el 2.4.2
-que la Carrera mantenga relaciones con organizaciones públicas y
-privadas. Los empleadores son esos agentes: su opinión es la única
-fuente del estudio que mira a los titulados desde fuera de la
-universidad. El análisis es descriptivo: se presentan las frecuencias
-de cada respuesta ($N=\nEmpleadores$ organizaciones). En la escala de perfil
-profesional no se calcula media porque sus opciones no son simétricas.
+Este análisis busca saber si las organizaciones contratan y piensan
+contratar ingenieros de sistemas, qué nivel de formación piden y cómo
+valoran el desempeño de los titulados de la carrera, y si eso cambia
+según el tamaño de la organización. Responde a los criterios 2.4.2
+(relaciones con el sector público y privado) y 2.1.2 (coherencia entre
+el perfil de egreso y lo que demandan los empleadores). Se usan las 53
+respuestas de empleadores. Como se indicó en la
+Sección~\ref{sec:procedimiento}, la escala de acuerdo de esta encuesta no
+tiene niveles igualmente espaciados, por lo que no se pondera: se
+reportan porcentajes.
 
-\subsection{Organizaciones Encuestadas}
+\subsection{Variables y escala de medición}
 
-\input{generado/organizaciones}
+\begin{mitabla}{Variables del análisis de empleadores}\label{tab:a5-variables}
+\begin{tabular}{cL{6.6cm}L{2.6cm}cL{2.6cm}}
+\toprule
+\textbf{Var.} & \textbf{Pregunta} & \textbf{Escala} & \textbf{$n$} & \textbf{Criterio ARCU-SUR} \\
+\midrule
+$X$ & Tamaño de la organización (Grande, Mediana, Pequeña, Micro) &
+Ordinal & 53 & 2.4.2 \\
+$Y$ & ¿Existe la posibilidad de incorporar Ingenieros de Sistemas en los
+próximos años? & Nominal & 53 & 2.4.2 \\
+$C$ & ¿La organización ha contratado Ingenieros de la carrera de
+Sistemas en los últimos 5 años? (Sí, No) & Nominal & 53 & 2.4.2 \\
+$W$ & La formación de la Carrera permite a sus titulados alcanzar un
+desempeño destacado (Totalmente de acuerdo, Parcialmente de acuerdo,
+Totalmente desacuerdo, No sabe) & Ordinal, subjetiva & 52 & 2.1.2 \\
+$L$ & Nivel de formación que demanda la organización para contratar &
+Nominal & 53 & 2.1.2 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\subsection{Contratación y Perfil Profesional}
+Para los cruces, las organizaciones medianas, pequeñas y micro se agrupan
+como \textbf{MiPyME} (33), frente a las grandes (20); el desempeño se
+agrupa en ``totalmente de acuerdo'' y el resto, sin la respuesta ``No
+sabe''; y el nivel demandado, en licenciatura y posgrado (especialidad,
+diplomado o maestría).
 
-\input{generado/empleadores}
+\subsection{Paso 1. Análisis descriptivo}
 
-\subsection{Áreas, Herramientas y Habilidades Demandadas}
+\begin{mitabla}{Distribución de frecuencias de las respuestas de empleadores}\label{tab:a5-frec}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Variable} & \textbf{Categoría} & \textbf{$f_i$} & \textbf{$h_i = f_i/n$} \\
+\midrule
+$X$ Tamaño & Grande (100 funcionarios o más) & 20 & $20/53 = 0.377$ \\
+ & Micro (hasta 10) & 17 & $17/53 = 0.321$ \\
+ & Pequeña (11 a 30) & 9 & $9/53 = 0.170$ \\
+ & Mediana (31 a 99) & 7 & $7/53 = 0.132$ \\
+\midrule
+Tipo de organización & Privada & 40 & $40/53 = 0.755$ \\
+ & Pública & 13 & $13/53 = 0.245$ \\
+\midrule
+$C$ Contrató en 5 años & Sí & 42 & $42/53 = 0.792$ \\
+ & No & 11 & $11/53 = 0.208$ \\
+\midrule
+$Y$ Contratación futura & Sí, según crecimiento o proyectos & 27 & $27/53 = 0.509$ \\
+ & Sí, alta probabilidad & 16 & $16/53 = 0.302$ \\
+ & No prevista actualmente & 10 & $10/53 = 0.189$ \\
+\midrule
+$W$ Desempeño destacado & Parcialmente de acuerdo & 28 & $28/53 = 0.528$ \\
+ & Totalmente de acuerdo & 19 & $19/53 = 0.358$ \\
+ & Totalmente desacuerdo & 5 & $5/53 = 0.094$ \\
+ & No sabe & 1 & $1/53 = 0.019$ \\
+\midrule
+$L$ Nivel demandado & Licenciatura & 38 & $38/53 = 0.717$ \\
+ & Especialidad & 8 & $8/53 = 0.151$ \\
+ & Diplomado & 4 & $4/53 = 0.075$ \\
+ & Maestría & 3 & $3/53 = 0.057$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-Las tres preguntas abiertas (10, 11 y 12) se responden con texto libre,
-así que para poder contarlas se codificaron en categorías con una regla
-explícita: cada categoría tiene una lista de palabras clave
-(tablas de regla de codificación, al final de esta subsección) y una
-respuesta cuenta una vez en cada categoría que menciona. Por eso una
-respuesta puede caer en varias categorías y las frecuencias no suman
-$n$. Las respuestas que no mencionan ninguna (texto sin contenido, como
-``ll'', o demasiado general) se reportan como ``sin categoría''. La
-codificación la hace la herramienta, de modo que se puede revisar y
-repetir con nuevas respuestas.
+Estos valores describen la demanda de ingenieros de sistemas. Ocho de
+cada diez organizaciones contrataron titulados de la carrera en los
+últimos cinco años. Hacia adelante, el $(27+16)/53 = 43/53 = 81.1\%$
+incorporaría ingenieros de sistemas, pero en la mayoría de los casos la
+contratación depende del crecimiento o de nuevos proyectos (50.9\%); solo
+tres de cada diez tienen una probabilidad alta, y ninguna organización
+respondió que no requiere profesionales del área. Sobre el desempeño,
+solo el 35.8\% está totalmente de acuerdo en que la formación permite un
+desempeño destacado; la mayoría (52.8\%) lo está solo parcialmente y el
+9.4\% está en desacuerdo. La pregunta sobre competencias laborales da un
+resultado casi igual (35.8\% totalmente de acuerdo, 50.9\% parcialmente).
+Siete de cada diez organizaciones piden solo licenciatura para contratar.
 
-\input{generado/preguntas_abiertas}
+Se concluye que el mercado está abierto a los titulados pero de forma
+condicionada al crecimiento de cada organización, y que los empleadores
+reconocen la formación con reservas: más de la mitad no la aprueba del
+todo. Se recomienda identificar esas reservas con las preguntas abiertas
+de la encuesta (habilidades y herramientas que piden los empleadores),
+para orientar la actualización del perfil de egreso (criterios 2.1.2 y
+2.1.7). Como la mayoría pide solo licenciatura, la alta demanda de
+posgrado de los titulados (Análisis 2) responde más a su propia
+actualización que a un requisito para ser contratados.
 
-\input{generado/abiertas_interpretacion}
+\subsection{Paso 2. Prueba de uniformidad}
 
-\section{Diagnóstico y Síntesis de Resultados}
+\begin{mitabla}{Pruebas de uniformidad de las respuestas de empleadores}\label{tab:a5-unif}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Variable} & \textbf{Opción} & \textbf{$FO$} & \textbf{$FE = n/k$} & \textbf{$(FE-FO)^2$} & \textbf{$\frac{(FE-FO)^2}{FE}$} \\
+\midrule
+$X$ & Grande & 20 & 13.25 & 45.56 & 3.439 \\
+ & Micro & 17 & 13.25 & 14.06 & 1.061 \\
+ & Pequeña & 9 & 13.25 & 18.06 & 1.363 \\
+ & Mediana & 7 & 13.25 & 39.06 & 2.948 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 8.811 \\
+\midrule
+$C$ & Sí & 42 & 26.50 & 240.25 & 9.066 \\
+ & No & 11 & 26.50 & 240.25 & 9.066 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 18.132 \\
+\midrule
+$Y$ & Según crecimiento & 27 & 17.67 & 87.11 & 4.931 \\
+ & Alta probabilidad & 16 & 17.67 & 2.78 & 0.157 \\
+ & No prevista & 10 & 17.67 & 58.78 & 3.327 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 8.415 \\
+\midrule
+$W$ & Parcialmente de acuerdo & 28 & 17.33 & 113.78 & 6.564 \\
+ & Totalmente de acuerdo & 19 & 17.33 & 2.78 & 0.160 \\
+ & Totalmente desacuerdo & 5 & 17.33 & 152.11 & 8.776 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 15.500 \\
+\midrule
+$L$ & Licenciatura & 38 & 13.25 & 612.56 & 46.231 \\
+ & Especialidad & 8 & 13.25 & 27.56 & 2.080 \\
+ & Diplomado & 4 & 13.25 & 85.56 & 6.458 \\
+ & Maestría & 3 & 13.25 & 105.06 & 7.929 \\
+ & \multicolumn{4}{r}{$x_0^2 =$} & 62.698 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\subsection{Pruebas de Uniformidad}\label{sec:resultado-uniformidad}
+En $W$ no se incluye la única respuesta ``No sabe'', por lo que $n = 52$.
+Los valores críticos son 3.841 ($k=2$), 5.991 ($k=3$) y 7.815 ($k=4$).
+Ninguna variable es uniforme: $8.811$, $18.132$, $8.415$, $15.500$ y
+$62.698$ superan su valor crítico.
 
-Antes de cruzar variables, se verifica el principio de uniformidad en las
-preguntas de opción única más importantes de ambas encuestas: si las
-respuestas se reparten por igual entre las opciones o si hay opciones
-preferidas. Cada prueba se resuelve con los seis pasos de la
-Sección~\ref{sec:uniformidad}.
+El tamaño queda apenas por encima del límite (8.811 frente a 7.815): en
+la muestra hay más organizaciones grandes y micro que medianas y
+pequeñas, de modo que los resultados representan sobre todo a esos dos
+grupos. En las demás variables, las preferencias del paso 1 son reales:
+la mayoría contrató, la contratación futura depende sobre todo del
+crecimiento, el acuerdo parcial predomina sobre el total y la
+licenciatura es el nivel que más se pide.
 
-\input{generado/uniformidad_F1}
-\input{generado/uniformidad_F2}
-\input{generado/uniformidad_F3}
-\input{generado/uniformidad_F4}
-\input{generado/uniformidad_F5}
-\input{generado/uniformidad_F6}
-\input{generado/uniformidad_F7}
-\input{generado/uniformidad_F8}
+\subsection{Paso 3. Tablas de contingencia y mapas de calor}
 
-\subsubsection*{Síntesis de las pruebas de uniformidad}
+Se plantean tres cruces, todos con el tamaño en las filas:
 
-\input{generado/resumen_uniformidad}
+\begin{enumerate}
+  \item Tamaño $\times$ contratación futura: ¿las organizaciones grandes
+  piensan contratar más? Con tres categorías, una celda tiene frecuencia
+  esperada de 3.77, así que se agrupa en alta probabilidad y el resto.
+  \item Tamaño $\times$ desempeño: ¿las grandes valoran distinto a los
+  titulados?
+  \item Tamaño $\times$ nivel demandado: ¿las grandes exigen más
+  formación?
+\end{enumerate}
 
-\subsection{Pruebas de Independencia}\label{sec:cruces}
+Otros cruces no pueden probarse. Tamaño por contratación en los últimos
+cinco años tiene una frecuencia esperada de 4.15, y tipo de organización
+por contratación futura, de 3.92. Las dos tablas ya son de $2 \times 2$ y
+no se pueden agrupar más, así que, según la regla 6 de la
+Sección~\ref{sec:procedimiento}, solo se describen: contrató el 75.0\% de
+las grandes y el 81.8\% de las MiPyME, y tiene alta probabilidad de
+contratar el 32.5\% de las privadas y el 23.1\% de las públicas.
 
-Los indicadores anteriores describen cada variable por separado; los
-cruces permiten saber si dos de ellas están relacionadas, lo que ayuda a
-explicar los resultados (por ejemplo, si quienes perciben una formación
-alineada al mercado consiguen empleo antes). Cada cruce de la
-Tabla~\ref{tab:cruces} se resuelve con los seis pasos de la prueba
-chi-cuadrada de la Sección~\ref{sec:chi}.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Tamaño $\times$ contratación futura};
+\node[font=\small] at (1.10,0.35) {Alta};
+\node[font=\small] at (3.30,0.35) {Resto};
+\celda{0.00}{-0.00}{30}{6 (30.0\%)}
+\celda{2.20}{-0.00}{70}{14 (70.0\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Grande};
+\celda{0.00}{-0.90}{30}{10 (30.3\%)}
+\celda{2.20}{-0.90}{70}{23 (69.7\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {MiPyME};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Tamaño $\times$ desempeño destacado};
+\node[font=\small] at (1.10,0.35) {Total. acuerdo};
+\node[font=\small] at (3.30,0.35) {Resto};
+\celda{0.00}{-0.00}{45}{9 (45.0\%)}
+\celda{2.20}{-0.00}{55}{11 (55.0\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Grande};
+\celda{0.00}{-0.90}{31}{10 (31.2\%)}
+\celda{2.20}{-0.90}{69}{22 (68.8\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {MiPyME};
+\end{tikzpicture}
+\par\medskip
+\begin{tikzpicture}
+\node[font=\small\bfseries] at (2.20,0.9) {Tamaño $\times$ nivel demandado};
+\node[font=\small] at (1.10,0.35) {Licenciatura};
+\node[font=\small] at (3.30,0.35) {Posgrado};
+\celda{0.00}{-0.00}{65}{13 (65.0\%)}
+\celda{2.20}{-0.00}{35}{7 (35.0\%)}
+\node[font=\small, anchor=east] at (-0.1,-0.45) {Grande};
+\celda{0.00}{-0.90}{76}{25 (75.8\%)}
+\celda{2.20}{-0.90}{24}{8 (24.2\%)}
+\node[font=\small, anchor=east] at (-0.1,-1.35) {MiPyME};
+\end{tikzpicture}
+\caption{Mapas de calor de los empleadores (frecuencia y porcentaje por fila).}\label{fig:a5-calor}
+\end{figure}
 
-\input{generado/cruce_C1}
-\input{generado/cruce_C2}
-\input{generado/cruce_C3}
-\input{generado/cruce_C4}
-\input{generado/cruce_C5}
-\input{generado/cruce_C6}
-\input{generado/cruce_C7}
-\input{generado/cruce_C8}
-\input{generado/cruce_C9}
-\input{generado/cruce_C10}
-\input{generado/cruce_C11}
-\input{generado/cruce_C12}
-\input{generado/cruce_C13}
+En la contratación futura las dos filas son idénticas (30.0\% y 30.3\% de
+alta probabilidad). En el desempeño, las grandes están totalmente de
+acuerdo en un 45.0\% y las MiPyME en un 31.2\%, y en el nivel demandado
+las grandes piden posgrado en un 35.0\% frente al 24.2\%. Las diferencias
+son pequeñas; el paso 4 comprueba si alguna es real.
 
-\subsubsection*{Síntesis de los cruces}
+\subsection{Paso 4. Prueba de independencia}
 
-\input{generado/resumen_cruces}
+\begin{mitabla}{Cálculo de $x_0^2$ de los cruces de empleadores}\label{tab:a5-chi}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Celda} & \textbf{$FO$} & \textbf{$FE$} & \textbf{$\frac{(FO-FE)^2}{FE}$} \\
+\midrule
+\multicolumn{4}{l}{\textit{Tamaño $\times$ contratación futura ($N = 53$)}} \\
+Grande, alta & 6 & $20 \cdot 16/53 = 6.04$ & 0.0002 \\
+Grande, resto & 14 & $20 \cdot 37/53 = 13.96$ & 0.0001 \\
+MiPyME, alta & 10 & $33 \cdot 16/53 = 9.96$ & 0.0001 \\
+MiPyME, resto & 23 & $33 \cdot 37/53 = 23.04$ & 0.0001 \\
+ & & & $x_0^2 = 0.0005$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Tamaño $\times$ desempeño ($N = 52$)}} \\
+Grande, total. acuerdo & 9 & $20 \cdot 19/52 = 7.31$ & 0.3919 \\
+Grande, resto & 11 & $20 \cdot 33/52 = 12.69$ & 0.2256 \\
+MiPyME, total. acuerdo & 10 & $32 \cdot 19/52 = 11.69$ & 0.2449 \\
+MiPyME, resto & 22 & $32 \cdot 33/52 = 20.31$ & 0.1410 \\
+ & & & $x_0^2 = 1.0035$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Tamaño $\times$ nivel demandado ($N = 53$)}} \\
+Grande, licenciatura & 13 & $20 \cdot 38/53 = 14.34$ & 0.1251 \\
+Grande, posgrado & 7 & $20 \cdot 15/53 = 5.66$ & 0.3170 \\
+MiPyME, licenciatura & 25 & $33 \cdot 38/53 = 23.66$ & 0.0758 \\
+MiPyME, posgrado & 8 & $33 \cdot 15/53 = 9.34$ & 0.1921 \\
+ & & & $x_0^2 = 0.7102$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+\begin{mitabla}{Resultado de las pruebas de independencia de empleadores}\label{tab:a5-indep}
+\begin{tabular}{lccccl}
+\toprule
+\textbf{Cruce} & \textbf{$N$} & \textbf{$gl$} & \textbf{$x_0^2$} & \textbf{$x^2_{gl,\,0.05}$} & \textbf{Conclusión} \\
+\midrule
+Tamaño $\times$ contratación futura & 53 & 1 & 0.0005 & 3.841 & Independencia \\
+Tamaño $\times$ desempeño & 52 & 1 & 1.0035 & 3.841 & Independencia \\
+Tamaño $\times$ nivel demandado & 53 & 1 & 0.7102 & 3.841 & Independencia \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
 
-\subsection{Análisis Exploratorio Multivariable}\label{sec:resultado-multivariable}
+Las tres tablas tienen $gl = 1$ y todas sus frecuencias esperadas son
+mayores que 5 (la menor es 5.66). Los tres valores ($0.0005$, $1.0035$ y
+$0.7102$) quedan por debajo de 3.841, así que en los tres casos se acepta
+la independencia.
 
-Con el procedimiento de la Sección~\ref{sec:multivariable}, se cruzan el
-nivel del programa de posgrado cursado ($X$), la fuente de financiamiento
-($Y$) y los años de vida profesional ($Z$) de los titulados que hicieron
-formación complementaria.
+La prueba indica que el tamaño de la organización no cambia la intención
+de contratar, la valoración del desempeño ni el nivel de formación que se
+pide. Por ejemplo, se esperaban 6.04 organizaciones grandes con alta
+probabilidad de contratar y hay 6: la tabla observada es prácticamente
+igual a la esperada. Se concluye que la opinión de los empleadores es
+homogénea, de modo que lo encontrado en el paso 1 vale para las
+organizaciones grandes y para las MiPyME, y la carrera puede dirigirse a
+ambas con el mismo mensaje.
 
-\input{generado/multivariable}
+\subsection{Paso 5. Incidencia}
 
-\subsection{Respuesta a los Criterios ARCU-SUR}\label{sec:criterios}
+Ningún cruce resultó dependiente, así que la incidencia no se
+interpreta: las diferencias de los mapas de calor (por ejemplo, 45.0\%
+frente a 31.2\% en el desempeño) pueden deberse al azar y no miden una
+influencia del tamaño.
 
-La Guía de Autoevaluación ARCU-SUR pide, para cada componente, analizar
-la carrera en relación con sus criterios y mencionar los aspectos
-favorables y desfavorables (ARCU-SUR, 2016a). A continuación se resume,
-para cada criterio al que este estudio aporta evidencia, qué pide el
-criterio, qué resultado de este trabajo lo respalda y cómo se valora.
-Se considera favorable un indicador cuando la mayoría de los
-encuestados (más del 50\%) responde en el sentido que el criterio
-espera, y desfavorable en caso contrario; los indicadores que no tienen
-un valor de referencia se reportan como línea base.
+\subsection{Paso 6. Factor de riesgo}
 
-\input{generado/criterios_arcusur}
+Situación desfavorable: que la organización no tenga prevista la
+contratación de ingenieros de sistemas (18.9\%). Ninguno de los cruces
+probados mostró dependencia, así que \textbf{no se identifica un factor de
+riesgo} asociado al tamaño de la organización: las grandes y las MiPyME
+tienen la misma disposición a contratar.
+
+\subsection{Paso 7. Análisis exploratorio multivariable}
+
+Se cruzan el tamaño ($X$) y la contratación futura ($Y$, en sus tres
+categorías), y en cada combinación se calcula la frecuencia y el
+porcentaje que contrató en los últimos cinco años ($C$), que está
+totalmente de acuerdo con el desempeño ($W$) y que pide posgrado ($L$).
+
+\begin{mitabla}{Tabulación cruzada de los empleadores}\label{tab:a5-multi}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Tamaño} & \textbf{Contratación futura} & \textbf{$n$} & \textbf{Contrató ($C$)} & \textbf{Acuerdo total ($W$)} & \textbf{Posgrado ($L$)} \\
+\midrule
+Grande & Alta & 6 & $4/6 = 66.7\%$ & $3/6 = 50.0\%$ & $3/6 = 50.0\%$ \\
+ & Según crecimiento & 8 & $6/8 = 75.0\%$ & $4/8 = 50.0\%$ & $2/8 = 25.0\%$ \\
+ & No prevista & 6 & $5/6 = 83.3\%$ & $2/6 = 33.3\%$ & $2/6 = 33.3\%$ \\
+MiPyME & Alta & 10 & $8/10 = 80.0\%$ & $3/10 = 30.0\%$ & $3/10 = 30.0\%$ \\
+ & Según crecimiento & 19 & $16/19 = 84.2\%$ & $5/18 = 27.8\%$ & $5/19 = 26.3\%$ \\
+ & No prevista & 4 & $3/4 = 75.0\%$ & $2/4 = 50.0\%$ & $0/4 = 0.0\%$ \\
+\midrule
+\multicolumn{2}{l}{Total} & 53 & $42/53 = 79.2\%$ & $19/52 = 36.5\%$ & $15/53 = 28.3\%$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Cada fila es un grupo de organizaciones, comparado con el total. El
+grupo más numeroso es el de las MiPyME que contratarían según su
+crecimiento (19, más de un tercio de los empleadores). Es también el que
+más contrató en los últimos cinco años (84.2\%) y el que menos está
+totalmente de acuerdo con el desempeño de los titulados (27.8\%): contrata
+a menudo, pero con reservas sobre la formación. Entre las organizaciones
+que no tienen prevista la contratación, 8 de 10 contrataron en los
+últimos cinco años, lo que sugiere que ya cuentan con ingenieros de
+sistemas y no que los rechacen. Las organizaciones grandes con alta
+probabilidad de contratar son las que más piden posgrado (50.0\%). Todas
+las celdas tienen 19 casos o menos, por lo que los valores son
+indicativos.
+
+La tabla muestra algo que los cruces no mostraban: la mayor fuente de
+empleo, las MiPyME que crecen por proyectos, es la que valora con más
+reservas a los titulados. Se recomienda que la carrera establezca
+convenios de prácticas y proyectos con este tipo de organizaciones
+(criterio 2.4.2) y que les consulte qué competencias echan en falta, para
+llevar esa información a la actualización del perfil de egreso (criterio
+2.1.2).
+
+\section{Diagnóstico y Síntesis de Resultados}\label{sec:diagnostico}
 
 \section{Conclusiones y Propuestas Estratégicas}
-
-\subsection*{Conclusiones}
-
-\input{generado/conclusiones}
-
-\subsection*{Propuestas Estratégicas}
-
-\input{generado/propuestas}
-
-\subsection*{Limitaciones}
-
-\begin{itemize}
-  \item El formulario de Microsoft Forms no preguntaba el año de
-  titulación, por lo que no se pueden analizar resultados por cohorte; la
-  antigüedad se aproxima con los años de vida profesional. El formulario
-  de la herramienta ya incluye esa pregunta para las respuestas nuevas.
-  \item El formulario pregunta por el nivel y el financiamiento del
-  programa \emph{ya cursado}, no por el nivel de posgrado \emph{deseado} ni
-  por el financiamiento \emph{futuro} que mencionan las Historias de
-  Usuario~2 y~3; por eso la demanda de posgrado se mide por área de
-  interés e institución, y el financiamiento con lo ya cursado.
-  \item Las escalas de acuerdo del formulario tienen 4 niveles, no 5 como
-  sugiere la Historia de Usuario~4; las medias se calculan sobre la escala
-  de 1 a 4.
-  \item El tiempo al primer empleo solo lo responde quien hoy trabaja en
-  una organización, y su media es una cota inferior.
-  \item La escala de empleadores no es simétrica y algunos de sus ítems
-  agrupan varias afirmaciones.
-  \item El análisis de empleadores es descriptivo: no se cruzaron sus
-  respuestas entre sí ni se aplicaron pruebas de independencia.
-\end{itemize}
 
 \section*{Referencias Bibliográficas}
 \addcontentsline{toc}{section}{Referencias Bibliográficas}
@@ -1132,40 +2622,21 @@ Ali Rodriguez, J. G. (2021). \textit{Simulación de Sistemas: apuntes de
 clases} [Apuntes de la materia dictada por H. F. Villarroel Tapia].
 Carrera de Ingeniería de Sistemas, Universidad Mayor de San Simón.
 
-ARCU-SUR. (2016a). \textit{Guía de autoevaluación para carreras de
-Ingeniería}. Red de Agencias Nacionales de Acreditación, Sector Educativo
-del MERCOSUR.
-\url{https://www.arcusur.org/wp-content/uploads/2024/02/Guia_de_Autoevaluacion_Ingenieria.pdf}
-
-ARCU-SUR. (2016b). \textit{Guía de evaluación para los comités de pares
-evaluadores: Titulación Ingeniería}. Red de Agencias Nacionales de
-Acreditación, Sector Educativo del MERCOSUR.
-\url{https://www.arcusur.org/wp-content/uploads/2024/02/Guia_de_Pares_Ingenieria.pdf}
-
 ARCU-SUR. (2019). \textit{Criterios de calidad para la acreditación
 ARCU-SUR: Ingeniería}. Red de Agencias Nacionales de Acreditación,
 Sector Educativo del MERCOSUR.
 \url{https://www.arcusur.org/wp-content/uploads/2024/03/Criterios_de_Ingenieria_Mayo_2019.pdf}
 
 Coss Bu, R. (1998). \textit{Simulación: un enfoque práctico}. Limusa.
+
+OpenAI. (2022, 30 de noviembre). \textit{Introducing ChatGPT}.
+\url{https://openai.com/index/chatgpt/}
 \end{hangparas}
 
 \appendix
 
-\section{Pruebas Unitarias (Caja Blanca)}\label{anexo:pruebas}
+\section{Organizaciones Encuestadas}\label{anexo:organizaciones}
 
-Como el sistema se entrega a otros equipos, las clases de la herramienta
-que no dependen de la base de datos tienen pruebas unitarias automatizadas
-de caja blanca (se conoce y se verifica directamente la lógica interna, no
-solo la respuesta de la API). Se hicieron con JUnit 5, sin Maven, igual que
-el resto del backend; instrucciones para correrlas en el \texttt{README} del
-sistema. Al cierre de este informe, las 36 pruebas pasan. El código completo
-de las tres clases de prueba se transcribe a continuación.
-
-\lstinputlisting[language=Java, caption={EstadisticaTest.java -- media, IC 95\%, prueba de las frecuencias y chi-cuadrada, incluyendo los ejemplos de las Secciones~\ref{sec:ic}, \ref{sec:uniformidad} y~\ref{sec:chi}}]{../sistema/backend/src/test/java/com/actividad2/EstadisticaTest.java}
-
-\lstinputlisting[language=Java, caption={CsvTest.java -- lectura y escritura de CSV (separador, comillas, filas vacías)}]{../sistema/backend/src/test/java/com/actividad2/CsvTest.java}
-
-\lstinputlisting[language=Java, caption={DatasetTest.java -- privacidad de datos personales y normalización de fechas}]{../sistema/backend/src/test/java/com/actividad2/DatasetTest.java}
+\input{generado/organizaciones}
 
 \end{document}

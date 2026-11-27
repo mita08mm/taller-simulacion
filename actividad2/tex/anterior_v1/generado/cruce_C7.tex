@@ -1,0 +1,117 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/titulados.csv (titulados) / /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/empleadores.csv (empleadores)
+\subsubsection*{C7. Nivel del programa cursado $\times$ fuente de financiamiento}
+
+\textit{Paso 1. Describir el problema.} Establecer si la fuente de financiamiento (variable dependiente) depende del nivel del programa de formación complementaria cursado (variable independiente). Como las becas son pocas, el financiamiento se agrupa en recursos propios y con beca.
+
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Nivel cursado.
+  \item Variable dependiente $Y$: Financiamiento.
+  \item Población: con formación complementaria ($N = 98$). Criterio ARCU-SUR: 2.4.1. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Nivel cursado» (X) y «Financiamiento» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Nivel cursado» (X) y «Financiamiento» (Y).
+\end{itemize}
+
+\textit{Datos.} Primeros 10 de los 98 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C7: datos de los primeros titulados}
+\begin{tabular}{lll}
+\toprule
+Titulado & $X$: Nivel cursado & $Y$: Financiamiento \\
+\midrule
+T1 & Diplomado o Especialidad & Recursos propios \\
+T2 & Maestría o superior & Con beca (total o parcial) \\
+T3 & Diplomado o Especialidad & Recursos propios \\
+T4 & Diplomado o Especialidad & Recursos propios \\
+T5 & Maestría o superior & Recursos propios \\
+T6 & Diplomado o Especialidad & Recursos propios \\
+T7 & Diplomado o Especialidad & Recursos propios \\
+T8 & Diplomado o Especialidad & Recursos propios \\
+T9 & Diplomado o Especialidad & Recursos propios \\
+T10 & Diplomado o Especialidad & Recursos propios \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 98$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C7: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Nivel cursado \textbackslash{} $Y$: Financiamiento & Recursos propios & Con beca (total o parcial) & Total \\
+\midrule
+Diplomado o Especialidad & 66 & 3 & 69 \\
+Maestría o superior & 24 & 5 & 29 \\
+\midrule
+Total & 90 & 8 & $N = 98$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C7: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Nivel cursado \textbackslash{} $Y$: Financiamiento & Recursos propios & Con beca (total o parcial) \\
+\midrule
+Diplomado o Especialidad & \cellcolor{gray!75}66 & \cellcolor{gray!3}3 \\
+Maestría o superior & \cellcolor{gray!27}24 & \cellcolor{gray!6}5 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Diplomado o Especialidad y Recursos propios:
+\[
+FE_{11} = \frac{(69)(90)}{98} = 63.37
+\]
+
+\begin{mitabla}{C7: frecuencia esperada $FE_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Nivel cursado \textbackslash{} $Y$: Financiamiento & Recursos propios & Con beca (total o parcial) \\
+\midrule
+Diplomado o Especialidad & $69\cdot90/98 = 63.37$ & $69\cdot8/98 = 5.63$ \\
+Maestría o superior & $29\cdot90/98 = 26.63$ & $29\cdot8/98 = 2.37$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
+
+\begin{mitabla}{C7: cálculo de $X_0^2$ celda por celda}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
+\toprule
+$X$: Nivel cursado \textbackslash{} $Y$: Financiamiento & Recursos propios & Con beca (total o parcial) & Suma fila \\
+\midrule
+Diplomado o Especialidad & $\dfrac{(66-63.37)^2}{63.37}$\newline $= 0.1094$ & $\dfrac{(3-5.63)^2}{5.63}$\newline $= 1.2305$ & $1.3399$ \\[6pt]
+Maestría o superior & $\dfrac{(24-26.63)^2}{26.63}$\newline $= 0.2602$ & $\dfrac{(5-2.37)^2}{2.37}$\newline $= 2.9277$ & $3.1879$ \\[6pt]
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+X_0^2 = 1.3399 + 3.1879 = 4.5278
+\]
+
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
+
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+$4.5278 \ge 3.841 \rightarrow$ falso\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad ``Independencia''\\
+Sino\\
+\quad \fbox{NO ``Independencia''}\\
+FinSi
+\end{tabular}
+\end{center}
+
+Se rechaza $H_0$ y se acepta $H_1$: «Financiamiento» depende de «Nivel cursado». Porcentaje de cada fila en la columna ``Recursos propios'': Diplomado o Especialidad $66/69 = 95.7\%$; Maestría o superior $24/29 = 82.8\%$.
+
+\textit{Observación:} 1 de 4 celdas tienen $FE < 5$, por lo que la prueba pierde confiabilidad y la conclusión debe tomarse con cautela.
+
+\textit{Recomendación.} Las becas se concentran en algunos niveles: gestionar becas y convenios de financiamiento (organismos internacionales, instituciones, empresas) para los niveles que hoy se pagan casi solo con recursos propios.
+

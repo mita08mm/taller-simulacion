@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C6. Concordancia formación–mercado $\times$ tiempo al primer empleo}
 
 \textit{Paso 1. Describir el problema.} Determinar si percibir la formación alineada con los requerimientos del mercado se asocia con un menor tiempo para obtener el primer empleo.
@@ -44,6 +44,19 @@ En desacuerdo & 17 & 7 & 24 \\
 De acuerdo & 38 & 12 & 50 \\
 \midrule
 Total & 55 & 19 & $N = 74$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C6: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Concordancia \textbackslash{} $Y$: Tiempo al primer empleo & Hasta 4 meses & Más de 4 meses \\
+\midrule
+En desacuerdo & \cellcolor{gray!34}17 & \cellcolor{gray!14}7 \\
+De acuerdo & \cellcolor{gray!75}38 & \cellcolor{gray!24}12 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

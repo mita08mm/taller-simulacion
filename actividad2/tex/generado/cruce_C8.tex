@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C8. Edad $\times$ área de interés del posgrado}
 
 \textit{Paso 1. Describir el problema.} Analizar el patrón demográfico: establecer si el área en que el titulado quiere hacer un posgrado depende de su edad, para orientar la oferta a cada grupo.
@@ -45,6 +45,20 @@ $X$: Edad \textbackslash{} $Y$: Área de interés & IA y Robótica & Software y 
 35 o más & 32 & 13 & 6 & 51 \\
 \midrule
 Total & 59 & 39 & 25 & $N = 123$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C8: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Edad \textbackslash{} $Y$: Área de interés & IA y Robótica & Software y Base de Datos & Redes y Seguridad \\
+\midrule
+26 o menos & \cellcolor{gray!28}12 & \cellcolor{gray!42}18 & \cellcolor{gray!9}4 \\
+27–34 & \cellcolor{gray!35}15 & \cellcolor{gray!19}8 & \cellcolor{gray!35}15 \\
+35 o más & \cellcolor{gray!75}32 & \cellcolor{gray!30}13 & \cellcolor{gray!14}6 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

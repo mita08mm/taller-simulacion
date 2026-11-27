@@ -1,0 +1,67 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/titulados.csv (titulados) / /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/empleadores.csv (empleadores)
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} Los valores son numéricos y se agrupan por valor repetido ($x_i$ con su frecuencia $f_i$). Se descartan las filas en que los años desempleado superan los años de vida profesional (2 en esta muestra). El tamaño de la muestra es $n = 143$.
+
+\begin{mitabla}{Cálculo de la media y la desviación estándar de años de vida profesional}
+\begin{tabular}{lccccc}
+\toprule
+Respuesta & $x_i$ & $f_i$ & $f_i\,x_i$ & $(x_i-\bar{x})^2$ & $f_i\,(x_i-\bar{x})^2$ \\
+\midrule
+1 años & 1 & 23 & 23.00 & 63.2748 & 1455.3202 \\
+1.5 años & 1.5 & 1 & 1.50 & 55.5702 & 55.5702 \\
+2 años & 2 & 20 & 40.00 & 48.3657 & 967.3140 \\
+3 años & 3 & 9 & 27.00 & 35.4566 & 319.1095 \\
+4 años & 4 & 7 & 28.00 & 24.5475 & 171.8326 \\
+5 años & 5 & 10 & 50.00 & 15.6384 & 156.3843 \\
+6 años & 6 & 7 & 42.00 & 8.7293 & 61.1054 \\
+7 años & 7 & 2 & 14.00 & 3.8202 & 7.6405 \\
+8 años & 8 & 5 & 40.00 & 0.9112 & 4.5558 \\
+9 años & 9 & 1 & 9.00 & 0.0021 & 0.0021 \\
+10 años & 10 & 2 & 20.00 & 1.0930 & 2.1860 \\
+11 años & 11 & 2 & 22.00 & 4.1839 & 8.3678 \\
+12 años & 12 & 5 & 60.00 & 9.2748 & 46.3740 \\
+13 años & 13 & 5 & 65.00 & 16.3657 & 81.8285 \\
+14 años & 14 & 9 & 126.00 & 25.4566 & 229.1095 \\
+15 años & 15 & 7 & 105.00 & 36.5475 & 255.8326 \\
+16 años & 16 & 2 & 32.00 & 49.6384 & 99.2769 \\
+17 años & 17 & 3 & 51.00 & 64.7293 & 194.1880 \\
+18 años & 18 & 1 & 18.00 & 81.8202 & 81.8202 \\
+19 años & 19 & 1 & 19.00 & 100.9112 & 100.9112 \\
+20 años & 20 & 8 & 160.00 & 122.0021 & 976.0165 \\
+21 años & 21 & 1 & 21.00 & 145.0930 & 145.0930 \\
+22 años & 22 & 2 & 44.00 & 170.1839 & 340.3678 \\
+23 años & 23 & 2 & 46.00 & 197.2748 & 394.5496 \\
+25 años & 25 & 4 & 100.00 & 257.4566 & 1029.8264 \\
+26 años & 26 & 1 & 26.00 & 290.5475 & 290.5475 \\
+28 años & 28 & 2 & 56.00 & 362.7293 & 725.4587 \\
+35 años & 35 & 1 & 35.00 & 678.3657 & 678.3657 \\
+\midrule
+$\Sigma$ & & 143 & 1280.50 & & 8878.9545 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Calcular la media muestral.}
+\[
+\bar{x} = \frac{\sum f_i\,x_i}{n} = \frac{1280.50}{143} = 8.9545\ \text{años}
+\]
+
+\textit{Paso 3. Calcular la desviación estándar muestral} (Coss Bu, ecuación 6.5).
+\[
+S = \sqrt{\frac{\sum f_i\,(x_i-\bar{x})^2}{n-1}} = \sqrt{\frac{8878.9545}{142}} = 7.9075
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y $n-1 = 142$ grados de libertad, como los grados de libertad son más de 30 la distribución $t$ se aproxima con la normal, igual que en la prueba de los promedios: $t_{142,\,0.025} \approx z_{0.025} = 1.96$.
+
+\textit{Paso 5. Calcular el margen de error.}
+\[
+\frac{S}{\sqrt{n}}\,t_{n-1,\,\alpha/2} = \frac{7.9075}{\sqrt{143}}\times 1.960 = 0.6613 \times 1.960 = 1.2961
+\]
+
+\textit{Paso 6. Construir el intervalo y concluir.}
+\[
+8.9545 - 1.2961 \;\le\; \mu \;\le\; 8.9545 + 1.2961 \quad\Longrightarrow\quad 7.66 \le \mu \le 10.25
+\]
+
+Con un 95\% de confianza, la media de años de vida profesional de todos los titulados está entre 7.66 y 10.25 años.
+

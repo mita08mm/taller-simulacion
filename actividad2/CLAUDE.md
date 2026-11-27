@@ -91,6 +91,16 @@
   1.63 como teórico para gl=6 (cola izquierda); el sistema usa la cola
   derecha (12.592), como Coss Bu — pendiente confirmar con el docente.
 
+- **Informe nuevo (2026-11-26):** el informe anterior quedó congelado en
+  `tex/anterior_v1/` (con su copia de `generado/`); `tex/Informe.tex` se rehace
+  sección por sección. Conceptos de clase ordenados como un solo análisis:
+  medición (tipo de variable, subjetividad) → descriptivo → uniformidad →
+  contingencia + mapa de calor → independencia → si hay dependencia,
+  incidencia ("influencia de otras variables") → factor de riesgo →
+  multivariable. **Factores de ponderación = pesos de las escalas de acuerdo**
+  (Totalmente en desacuerdo = 1 … Totalmente de acuerdo = 4) para obtener un
+  puntaje promedio (decisión del usuario). No se arman índices con pesos
+  inventados.
 - **Uniformidad e independencia (2026-11-23, corrección del docente "Uniformidad"):**
   los apuntes (cap. 3) separan dos principios. Los cruces chi-cuadrada cubren
   **independencia**; la **uniformidad** se cubre con la prueba de las frecuencias
@@ -104,6 +114,13 @@
   Otras correcciones del docente aún pendientes: factores de riesgo, mapas de
   calor en el PDF, secciones "Análisis descriptivo"/"Análisis exploratorio",
   incidencia de unas variables sobre otras.
+- **Análisis con datos reales (2026-11-27):** la sección 3 tiene cuatro análisis
+  de titulados (1 inserción y experiencia, 2 demanda de posgrado, 3 calidad del
+  empleo, 4 antes/después de la IA con cohorte = años de vida profesional ≤ 3) y
+  la sección 4 el de empleadores, cada uno con pasos 1–7 y la interpretación en
+  texto corrido (qué significa, a qué se llega, recomendación), sin etiquetas.
+  Números escritos a mano desde la base de datos. `Ejemplo_Completo.tex` y
+  `Consulta_Modelamientos.tex` se borraron por no usarse más.
 
 - **Informe 100% dinámico (2026-11-04, pedido del usuario: "para que nuestras
   encuestas puedan actualizar"):** ningún número de resultados va escrito a mano

@@ -34,8 +34,8 @@ public class ReporteTex {
         boolean desdeCsv = args.length >= 3 && !args[1].equals("-");
         int iFechas;
         if (desdeCsv) {
-            titulados = new Dataset(args[1], Csv.leer(Files.readString(Path.of(args[1]))));
-            empleadores = new Dataset(args[2], Csv.leer(Files.readString(Path.of(args[2]))));
+            titulados = new Dataset("CSV importado", Csv.leer(Files.readString(Path.of(args[1]))));
+            empleadores = new Dataset("CSV importado", Csv.leer(Files.readString(Path.of(args[2]))));
             iFechas = 3;
         } else {
             Db.iniciar();
@@ -87,6 +87,7 @@ public class ReporteTex {
         escribir(salida, "ic_tiempo_primer_empleo.tex", icTiempoPrimerEmpleo());
         escribir(salida, "ic_vida_profesional.tex", icNumerica("anios_vida_profesional", "años de vida profesional", "años"));
         escribir(salida, "ic_desempleo.tex", icNumerica("anios_desempleado", "años desempleado", "años"));
+        escribir(salida, "factores_riesgo.tex", factoresRiesgo());
         escribir(salida, "experiencia.tex", experiencia());
         escribir(salida, "destino_laboral.tex", destinoLaboral());
         escribir(salida, "formacion.tex", formacion());
@@ -95,6 +96,7 @@ public class ReporteTex {
             escribir(salida, "cruce_" + c.id() + ".tex", cruce(Analisis.cruce(titulados, c)));
         }
         escribir(salida, "resumen_cruces.tex", resumenCruces());
+        escribir(salida, "incidencia.tex", incidencia());
         for (Analisis.Uniformidad u : Analisis.UNIFORMIDAD) {
             Dataset d = u.encuesta().equals("titulados") ? titulados : empleadores;
             escribir(salida, "uniformidad_" + u.id() + ".tex", uniformidad(Analisis.uniformidad(d, u)));
@@ -110,7 +112,26 @@ public class ReporteTex {
         escribir(salida, "abiertas_interpretacion.tex", abiertasInterpretacion());
         escribir(salida, "conclusiones.tex", conclusiones());
         escribir(salida, "propuestas.tex", propuestas());
-        escribir(salida, "multivariable.tex", multivariable());
+        escribir(salida, "multivariable.tex", multivariable(
+            titulados, "programa_nivel", "programa_financiamiento", "anios_vida_profesional",
+            "Sobre los titulados que hicieron formación complementaria, se cruzan dos variables "
+                + "cualitativas -- $X$ = nivel del programa cursado, $Y$ = fuente de financiamiento -- "
+                + "con una variable cuantitativa -- $Z$ = años de vida profesional --",
+            "nivel del programa", "fuente de financiamiento", "antigüedad promedio", "años",
+            "A mayor nivel del programa cursado, mayor la antigüedad promedio de quienes lo cursaron: "
+                + "quienes ya acumularon más años de vida profesional son los que llegan a programas de "
+                + "nivel más alto (maestría o doctorado), mientras que los titulados más recientes se "
+                + "concentran en diplomados. Los recursos propios dominan el financiamiento en todos los niveles."));
+        escribir(salida, "multivariable2.tex", multivariable(
+            titulados, "genero", "situacion_laboral", "anios_vida_profesional",
+            "Sobre todos los titulados que respondieron, se cruzan dos variables cualitativas -- "
+                + "$X$ = género, $Y$ = situación laboral -- con una variable cuantitativa -- $Z$ = años "
+                + "de vida profesional --",
+            "género", "situación laboral", "antigüedad promedio", "años",
+            "La antigüedad promedio varía más por la situación laboral que por el género dentro de cada "
+                + "grupo: quienes están en un emprendimiento propio o no trabajan tienden a mostrar "
+                + "promedios distintos a quienes trabajan en una organización, independientemente del "
+                + "género. Esto es exploración descriptiva, no una prueba de independencia."));
     }
 
     // ===================== utilidades =====================
@@ -410,6 +431,46 @@ public class ReporteTex {
             + tablaFrecuencias("Remuneración mensual ($n=" + n + "$)", lista(dest.get("remuneracion_promedio")), "Remuneración", n, false);
     }
 
+    private static String factoresRiesgo() {
+        Map<String, Object> emp = Analisis.empleabilidad(titulados);
+        List<Map<String, Object>> frec = lista(emp.get("razonNoTrabaja"));
+        int n = frec.stream().mapToInt(f -> i(f.get("frecuencia"))).sum();
+        if (n == 0) return "No hay respuestas de titulados que declaren no estar trabajando actualmente.\n\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("De los ").append(titulados.n()).append(" titulados que respondieron, ").append(n)
+          .append(" declaran no estar trabajando actualmente (ni en una organización ni en un ")
+          .append("emprendimiento propio). La Tabla y el gráfico siguientes muestran la razón que ")
+          .append("indican, tomada como un factor de riesgo de desempleo.").append(marca()).append("\n\n");
+        sb.append(tablaFrecuencias("Razón por la que actualmente no trabaja ($n=" + n + "$)", frec, "Razón", n, false));
+        sb.append(graficoBarrasHorizontal("Razón por la que actualmente no trabaja ($n=" + n + "$)", frec));
+        sb.append("Esta razón declarada no es el único factor de riesgo que registra el estudio: los ")
+          .append("cruces C12 (edad $\\times$ situación laboral) y C14 (formación complementaria $\\times$ ")
+          .append("situación laboral) de la Sección~\\ref{sec:cruces} prueban estadísticamente si la edad y la ")
+          .append("formación complementaria también se asocian con el riesgo de no tener trabajo.\n\n");
+        return sb.toString();
+    }
+
+    /**
+     * Gráfico de barras horizontales (pgfplots) a partir de una lista de {etiqueta, frecuencia}.
+     * Usa posiciones numéricas en el eje Y (no coordenadas simbólicas) para evitar que el cotejo
+     * de texto de pgfplots falle con etiquetas acentuadas.
+     */
+    private static String graficoBarrasHorizontal(String titulo, List<Map<String, Object>> frec) {
+        StringBuilder sb = new StringBuilder();
+        int cant = frec.size();
+        List<String> etiquetas = frec.stream().map(f -> t((String) f.get("etiqueta"))).toList();
+        sb.append("\\begin{figure}[H]\n\\centering\n\\caption{").append(titulo).append("}\n");
+        sb.append("\\begin{tikzpicture}\n\\begin{axis}[\n  xbar, bar width=9pt,\n  width=12cm, height=").append(n(1.0 + 0.6 * cant, 1)).append("cm,\n")
+          .append("  xlabel={Frecuencia}, xmin=0,\n  ytick={0,...,").append(cant - 1).append("},\n")
+          .append("  yticklabels={").append(String.join(",", etiquetas)).append("},\n")
+          .append("  ymin=-0.6, ymax=").append(cant - 1 + 0.6).append(",\n")
+          .append("  nodes near coords, y dir=reverse,\n  every axis plot/.style={fill=gray!60}\n]\n");
+        sb.append("\\addplot coordinates {");
+        for (int idx = 0; idx < cant; idx++) sb.append("(").append(i(frec.get(idx).get("frecuencia"))).append(",").append(idx).append(") ");
+        sb.append("};\n\\end{axis}\n\\end{tikzpicture}\n\\end{figure}\n\n");
+        return sb.toString();
+    }
+
     private static String formacion() {
         Map<String, Object> f = Analisis.formacionContinua(titulados);
         Map<String, Object> fin = Analisis.financiamiento(titulados);
@@ -528,6 +589,22 @@ public class ReporteTex {
         sb.append("\\midrule\nTotal");
         for (int b = 0; b < m; b++) sb.append(" & ").append(tc.get(b));
         sb.append(" & $N = ").append(nTot).append("$ \\\\\n\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+
+        // Mapa de calor de la misma tabla (más oscuro = más respuestas observadas)
+        int maxFo = 0;
+        for (int[] fila : fo) for (int v : fila) maxFo = Math.max(maxFo, v);
+        sb.append("\\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:\n\n");
+        sb.append("\\begin{mitabla}{").append(id).append(": mapa de calor de $FO_{ij}$}\n");
+        sb.append("\\begin{tabular}{L{3.8cm}").append(colY.repeat(m)).append("}\n\\toprule\n").append(esquina).append(" & ").append(cabeceraY).append(" \\\\\n\\midrule\n");
+        for (int a = 0; a < f; a++) {
+            sb.append(t(filas.get(a)));
+            for (int b = 0; b < m; b++) {
+                int sombra = maxFo == 0 ? 0 : Math.round(75f * fo[a][b] / maxFo);
+                sb.append(" & \\cellcolor{gray!").append(sombra).append("}").append(fo[a][b]);
+            }
+            sb.append(" \\\\\n");
+        }
+        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
 
         // Paso 3: frecuencia esperada
         sb.append("\\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda ")
@@ -696,6 +773,32 @@ public class ReporteTex {
               .append(indep ? "Independientes" : "\\textbf{Relacionadas}").append(" \\\\\n");
         }
         sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+        return sb.toString();
+    }
+
+    private static String incidencia() {
+        List<Map<String, Object>> dependientes = Analisis.cruces(titulados).stream()
+            .filter(c -> !(Boolean) c.get("independientes")).toList();
+        if (dependientes.isEmpty()) return "Con los datos actuales, ningún cruce muestra dependencia significativa entre sus dos variables.\n\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("De los ").append(Analisis.cruces(titulados).size()).append(" cruces de la Sección~\\ref{sec:cruces}, ")
+          .append(dependientes.size()).append(" muestran dependencia significativa: ahí una variable incide directamente sobre la otra.\n\n");
+        sb.append("\\begin{mitabla}{Cruces con dependencia significativa ($\\alpha = 0.05$)").append(marca()).append("}\n");
+        sb.append("\\begin{tabular}{clcc}\n\\toprule\nId & $X$ incide sobre $Y$ & $X_0^2$ & $X_{0.05,\\,gl}^2$ \\\\\n\\midrule\n");
+        for (Map<String, Object> c : dependientes) {
+            sb.append(c.get("id")).append(" & ").append(t((String) c.get("variableFilas"))).append(" incide sobre ")
+              .append(t((String) c.get("variableColumnas"))).append(" & ").append(n(d(c.get("chiCuadrada")), 2))
+              .append(" & ").append(n(d(c.get("chiTeorico")), 2)).append(" \\\\\n");
+        }
+        sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
+
+        List<String> etiquetas = dependientes.stream().map(c -> t((String) c.get("id")) + ": " + t((String) c.get("variableFilas")) + " -- " + t((String) c.get("variableColumnas"))).toList();
+        List<Double> valores = dependientes.stream().map(c -> d(c.get("chiCuadrada"))).toList();
+        sb.append(graficoBarrasDecimal("$X_0^2$ de los cruces con dependencia significativa", etiquetas, valores));
+
+        sb.append("El análisis multivariable de la Sección~\\ref{sec:resultado-multivariable} complementa esta lista: ")
+          .append("mientras que estos cruces dicen \\emph{si} dos variables están relacionadas, el multivariable describe ")
+          .append("\\emph{cómo} se ve esa relación sobre una tercera variable cuantitativa.\n\n");
         return sb.toString();
     }
 
@@ -1267,24 +1370,22 @@ public class ReporteTex {
     }
 
     @SuppressWarnings("unchecked")
-    private static String multivariable() {
-        Map<String, Object> m = Analisis.multivariable(titulados);
+    private static String multivariable(Dataset d, String campoX, String campoY, String campoZ,
+            String paso1, String etiquetaX, String etiquetaY, String etiquetaZ, String unidadZ, String interpretacion) {
+        Map<String, Object> m = Analisis.multivariable(d, campoX, campoY, campoZ);
         List<Map<String, Object>> filas = (List<Map<String, Object>>) m.get("filas");
-        if (filas.isEmpty()) return "No hay suficientes respuestas con nivel, financiamiento y años de vida profesional a la vez para este análisis.\n\n";
+        if (filas.isEmpty()) return "No hay suficientes respuestas con " + etiquetaX + ", " + etiquetaY + " y " + etiquetaZ + " a la vez para este análisis.\n\n";
         int nTotal = i(m.get("nTotal"));
         double zPromGeneral = d(m.get("zPromGeneral"));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("\\textit{Paso 1. Variables.} Sobre los titulados que hicieron formación ")
-          .append("complementaria, se cruzan dos variables cualitativas -- $X$ = nivel del ")
-          .append("programa cursado, $Y$ = fuente de financiamiento -- con una variable ")
-          .append("cuantitativa -- $Z$ = años de vida profesional --, siguiendo la tabulación ")
-          .append("cruzada multivariada de la asignatura: frecuencia ($n$) y promedio de $Z$ ")
-          .append("($\\bar{Z}$) en cada combinación $X$--$Y$ que aparece en los datos.\n\n");
+        sb.append("\\textit{Paso 1. Variables.} ").append(paso1)
+          .append(", siguiendo la tabulación cruzada multivariada de la asignatura: frecuencia ($n$) ")
+          .append("y promedio de $Z$ ($\\bar{Z}$) en cada combinación $X$--$Y$ que aparece en los datos.\n\n");
 
-        sb.append("\\textit{Paso 2. Tabulación cruzada de frecuencias y antigüedad promedio.}\n\n");
-        sb.append("\\begin{mitabla}{Nivel del programa ($X$) y fuente de financiamiento ($Y$), con antigüedad promedio ($n=").append(nTotal).append("$)").append(marca()).append("}\n");
-        sb.append("\\begin{tabular}{llcc}\n\\toprule\n$X$ (nivel) & $Y$ (financiamiento) & $n$ & $\\bar{Z}$ (años) \\\\\n\\midrule\n");
+        sb.append("\\textit{Paso 2. Tabulación cruzada de frecuencias y ").append(etiquetaZ).append(".}\n\n");
+        sb.append("\\begin{mitabla}{").append(t(capitalizar(etiquetaX))).append(" ($X$) y ").append(t(etiquetaY)).append(" ($Y$), con ").append(t(etiquetaZ)).append(" ($n=").append(nTotal).append("$)").append(marca()).append("}\n");
+        sb.append("\\begin{tabular}{llcc}\n\\toprule\n$X$ (").append(t(etiquetaX)).append(") & $Y$ (").append(t(etiquetaY)).append(") & $n$ & $\\bar{Z}$ (").append(t(unidadZ)).append(") \\\\\n\\midrule\n");
         for (Map<String, Object> f : filas) {
             sb.append(t((String) f.get("x"))).append(" & ").append(t((String) f.get("y"))).append(" & ")
               .append(i(f.get("n"))).append(" & ").append(n(d(f.get("zProm")), 2)).append(" \\\\\n");
@@ -1292,24 +1393,44 @@ public class ReporteTex {
         sb.append("\\midrule\n\\multicolumn{2}{l}{Total / Promedio general} & ").append(nTotal).append(" & ").append(n(zPromGeneral, 2)).append(" \\\\\n");
         sb.append("\\bottomrule\n\\end{tabular}\n\\end{mitabla}\n\n");
 
-        sb.append("\\textit{Paso 3. Hallazgos por categoría de $X$.} Para cada nivel de programa, ")
-          .append("la fuente de financiamiento más frecuente y si su antigüedad promedio queda por ")
-          .append("encima o por debajo del promedio general (").append(n(zPromGeneral, 2)).append(" años):\n\n");
+        List<String> etiquetasXY = filas.stream().map(f -> t((String) f.get("x")) + " -- " + t((String) f.get("y"))).toList();
+        List<Double> valoresZ = filas.stream().map(f -> d(f.get("zProm"))).toList();
+        sb.append(graficoBarrasDecimal("Promedio de " + etiquetaZ + " por combinación $X$--$Y$ (" + unidadZ + ")", etiquetasXY, valoresZ));
+
+        sb.append("\\textit{Paso 3. Hallazgos por categoría de $X$.} Para cada categoría de ").append(t(etiquetaX)).append(", ")
+          .append("la categoría de ").append(t(etiquetaY)).append(" más frecuente y si ").append(t(etiquetaZ)).append(" queda por ")
+          .append("encima o por debajo del promedio general (").append(n(zPromGeneral, 2)).append(" ").append(t(unidadZ)).append("):\n\n");
         sb.append("\\begin{itemize}\n");
         for (Map<String, Object> h : (List<Map<String, Object>>) m.get("hallazgos")) {
             boolean sobre = (boolean) h.get("sobrePromedio");
             sb.append("  \\item \\textbf{").append(t((String) h.get("x"))).append("} ($n=").append(i(h.get("n"))).append("$): ")
-              .append("antigüedad promedio de ").append(n(d(h.get("zProm")), 2)).append(" años, ")
+              .append(t(capitalizar(etiquetaZ))).append(" de ").append(n(d(h.get("zProm")), 2)).append(" ").append(t(unidadZ)).append(", ")
               .append(sobre ? "por encima" : "por debajo").append(" del promedio general. ")
-              .append("La fuente de financiamiento más frecuente es ").append(t(((String) h.get("financiamientoFrecuente")).toLowerCase()))
-              .append(" (").append(n(100 * d(h.get("pctFinanciamientoFrecuente")), 1)).append("\\% de este grupo).\n");
+              .append("La categoría de ").append(t(etiquetaY)).append(" más frecuente es ").append(t(((String) h.get("yFrecuente")).toLowerCase()))
+              .append(" (").append(n(100 * d(h.get("pctYFrecuente")), 1)).append("\\% de este grupo).\n");
         }
         sb.append("\\end{itemize}\n\n");
-        sb.append("\\textit{Interpretación.} A mayor nivel del programa cursado, mayor la ")
-          .append("antigüedad promedio de quienes lo cursaron: quienes ya acumularon más años de ")
-          .append("vida profesional son los que llegan a programas de nivel más alto (maestría o ")
-          .append("doctorado), mientras que los titulados más recientes se concentran en diplomados. ")
-          .append("Los recursos propios dominan el financiamiento en todos los niveles.").append(marca()).append("\n\n");
+        sb.append("\\textit{Interpretación.} ").append(interpretacion).append(marca()).append("\n\n");
         return sb.toString();
+    }
+
+    /** Igual que graficoBarrasHorizontal pero para valores decimales (ej. promedios), no frecuencias enteras. */
+    private static String graficoBarrasDecimal(String titulo, List<String> etiquetas, List<Double> valores) {
+        int cant = etiquetas.size();
+        StringBuilder sb = new StringBuilder();
+        sb.append("\\begin{figure}[H]\n\\centering\n\\caption{").append(titulo).append("}\n");
+        sb.append("\\begin{tikzpicture}\n\\begin{axis}[\n  xbar, bar width=9pt,\n  width=12cm, height=").append(n(1.0 + 0.6 * cant, 1)).append("cm,\n")
+          .append("  xmin=0,\n  ytick={0,...,").append(cant - 1).append("},\n")
+          .append("  yticklabels={").append(String.join(",", etiquetas)).append("},\n")
+          .append("  ymin=-0.6, ymax=").append(cant - 1 + 0.6).append(",\n")
+          .append("  nodes near coords, y dir=reverse,\n  every axis plot/.style={fill=gray!60}\n]\n");
+        sb.append("\\addplot coordinates {");
+        for (int idx = 0; idx < cant; idx++) sb.append("(").append(n(valores.get(idx), 2)).append(",").append(idx).append(") ");
+        sb.append("};\n\\end{axis}\n\\end{tikzpicture}\n\\end{figure}\n\n");
+        return sb.toString();
+    }
+
+    private static String capitalizar(String s) {
+        return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
 }

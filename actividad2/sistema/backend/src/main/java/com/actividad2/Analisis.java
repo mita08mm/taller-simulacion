@@ -311,7 +311,15 @@ public class Analisis {
             "interes_posgrado", "Interés en posgrado", c -> Catalogo.etiqueta("interes_posgrado", c), SI_NO,
             f -> true, "Todos los titulados",
             "El interés en un posgrado difiere por género: revisar si la oferta (horarios, modalidad, becas) es igual de accesible para hombres y mujeres.",
-            "El interés en un posgrado es parecido en hombres y mujeres: la oferta no necesita diferenciarse por género.")
+            "El interés en un posgrado es parecido en hombres y mujeres: la oferta no necesita diferenciarse por género."),
+        new Cruce("C14", "Formación complementaria × situación laboral",
+            "Factor de riesgo de desempleo: determinar si contar con formación complementaria (diplomado, especialidad, maestría o doctorado) se asocia con un menor riesgo de no tener trabajo.", "2.4.1 / 3.2.3",
+            "formacion_complementaria", "Formación complementaria", c -> Catalogo.etiqueta("formacion_complementaria", c), SI_NO,
+            "situacion_laboral", "Situación laboral", c -> Catalogo.etiqueta("situacion_laboral", c),
+            List.of("Trabaja en una organización", "Emprendimiento propio", "No trabaja"),
+            f -> true, "Todos los titulados",
+            "La situación laboral depende de tener formación complementaria: promocionar esa formación también como una vía para reducir el riesgo de desempleo.",
+            "La situación laboral no depende de tener formación complementaria: no hay evidencia de que por sí sola reduzca el riesgo de desempleo en esta muestra.")
     );
 
     /** Mediana de los años de vida profesional (mismas filas que el intervalo de confianza). */
@@ -533,22 +541,20 @@ public class Analisis {
 
     /**
      * Análisis exploratorio multivariable (referencias/analisis_exploratorio_multivariable.tex,
-     * ejemplo del docente): tabulación cruzada de dos variables cualitativas (X, Y) con la
-     * frecuencia y el promedio de una variable cuantitativa (Z) en cada combinación que aparece.
-     * Aquí: X = nivel del programa cursado, Y = fuente de financiamiento, Z = años de vida
-     * profesional (solo quienes hicieron formación complementaria).
+     * ejemplo del docente): tabulación cruzada de dos variables cualitativas (campoX, campoY) con
+     * la frecuencia y el promedio de una variable cuantitativa (campoZ) en cada combinación que
+     * aparece en el dataset.
      */
-    public static Map<String, Object> multivariable(Dataset d) {
+    public static Map<String, Object> multivariable(Dataset d, String campoX, String campoY, String campoZ) {
         record Grupo(String x, String y, List<Double> z) {}
         Map<String, Grupo> grupos = new LinkedHashMap<>();
         for (Map<String, String> f : d.filas(x -> true)) {
-            String x = d.valor(f, "programa_nivel"), y = d.valor(f, "programa_financiamiento"),
-                zTxt = d.valor(f, "anios_vida_profesional");
+            String x = d.valor(f, campoX), y = d.valor(f, campoY), zTxt = d.valor(f, campoZ);
             if (x.isEmpty() || y.isEmpty() || zTxt.isEmpty()) continue;
             double z;
             try { z = Double.parseDouble(zTxt); } catch (NumberFormatException e) { continue; }
             grupos.computeIfAbsent(x + "|" + y, k -> new Grupo(
-                Catalogo.etiqueta("programa_nivel", x), Catalogo.etiqueta("programa_financiamiento", y), new ArrayList<>()
+                Catalogo.etiqueta(campoX, x), Catalogo.etiqueta(campoY, y), new ArrayList<>()
             )).z().add(z);
         }
         List<Map<String, Object>> filas = grupos.values().stream()
@@ -574,14 +580,14 @@ public class Analisis {
             List<Map<String, Object>> deX = e.getValue();
             int nX = deX.stream().mapToInt(f -> (int) f.get("n")).sum();
             double zPromX = deX.stream().mapToDouble(f -> (int) f.get("n") * (double) f.get("zProm")).sum() / nX;
-            Map<String, Object> financiamientoFrecuente = deX.stream().max((a, b) -> (int) a.get("n") - (int) b.get("n")).orElseThrow();
+            Map<String, Object> yFrecuente = deX.stream().max((a, b) -> (int) a.get("n") - (int) b.get("n")).orElseThrow();
             Map<String, Object> h = new LinkedHashMap<>();
             h.put("x", e.getKey());
             h.put("n", nX);
             h.put("zProm", zPromX);
             h.put("sobrePromedio", zPromX > zPromGeneral);
-            h.put("financiamientoFrecuente", financiamientoFrecuente.get("y"));
-            h.put("pctFinanciamientoFrecuente", (double) (int) financiamientoFrecuente.get("n") / nX);
+            h.put("yFrecuente", yFrecuente.get("y"));
+            h.put("pctYFrecuente", (double) (int) yFrecuente.get("n") / nX);
             hallazgos.add(h);
         }
         hallazgos.sort((a, b) -> Double.compare((double) b.get("zProm"), (double) a.get("zProm")));

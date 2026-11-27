@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C12. Edad $\times$ situación laboral}
 
 \textit{Paso 1. Describir el problema.} Analizar el patrón demográfico: establecer si la situación laboral del titulado depende de su edad.
@@ -45,6 +45,20 @@ $X$: Edad \textbackslash{} $Y$: Situación laboral & Trabaja en una organizació
 35 o más & 52 & 7 & 5 & 64 \\
 \midrule
 Total & 108 & 15 & 25 & $N = 148$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C12: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Edad \textbackslash{} $Y$: Situación laboral & Trabaja en una organización & Emprendimiento propio & No trabaja \\
+\midrule
+26 o menos & \cellcolor{gray!30}21 & \cellcolor{gray!3}2 & \cellcolor{gray!23}16 \\
+27–34 & \cellcolor{gray!50}35 & \cellcolor{gray!9}6 & \cellcolor{gray!6}4 \\
+35 o más & \cellcolor{gray!75}52 & \cellcolor{gray!10}7 & \cellcolor{gray!7}5 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

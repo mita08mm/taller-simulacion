@@ -1,0 +1,115 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/titulados.csv (titulados) / /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/empleadores.csv (empleadores)
+\subsubsection*{C13. Género $\times$ interés en posgrado}
+
+\textit{Paso 1. Describir el problema.} Analizar el patrón demográfico: establecer si el interés en realizar un posgrado depende del género.
+
+\begin{itemize}[nosep]
+  \item Variable independiente $X$: Género.
+  \item Variable dependiente $Y$: Interés en posgrado.
+  \item Población: todos los titulados ($N = 148$). Criterio ARCU-SUR: 2.4.1. Nivel de significancia $\alpha = 0.05$.
+  \item $H_0$: Las variables «Género» (X) y «Interés en posgrado» (Y) son independientes.
+  \item $H_1$: Existe dependencia significativa entre las variables «Género» (X) y «Interés en posgrado» (Y).
+\end{itemize}
+
+\textit{Datos.} Primeros 10 de los 148 titulados que respondieron ambas preguntas (sin datos personales).
+
+\begin{mitabla}{C13: datos de los primeros titulados}
+\begin{tabular}{lll}
+\toprule
+Titulado & $X$: Género & $Y$: Interés en posgrado \\
+\midrule
+T1 & Hombre & Sí \\
+T2 & Mujer & Sí \\
+T3 & Hombre & Sí \\
+T4 & Hombre & Sí \\
+T5 & Hombre & Sí \\
+T6 & Hombre & Sí \\
+T7 & Hombre & Sí \\
+T8 & Hombre & Sí \\
+T9 & Hombre & Sí \\
+T10 & Hombre & Sí \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 2. Tabla de contingencia} (frecuencia observada $FO_{ij}$, $N = 148$). Cada celda cuenta a los titulados que respondieron a la vez la fila ($X$) y la columna ($Y$).
+
+\begin{mitabla}{C13: tabla de contingencia, frecuencia observada $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}|c}
+\toprule
+$X$: Género \textbackslash{} $Y$: Interés en posgrado & Sí & No & Total \\
+\midrule
+Hombre & 92 & 23 & 115 \\
+Mujer & 31 & 2 & 33 \\
+\midrule
+Total & 123 & 25 & $N = 148$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C13: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Género \textbackslash{} $Y$: Interés en posgrado & Sí & No \\
+\midrule
+Hombre & \cellcolor{gray!75}92 & \cellcolor{gray!19}23 \\
+Mujer & \cellcolor{gray!25}31 & \cellcolor{gray!2}2 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 3. Frecuencia esperada.} Es lo que habría en cada celda si $X$ e $Y$ fueran independientes. Por ejemplo, para la celda Hombre y Sí:
+\[
+FE_{11} = \frac{(115)(123)}{148} = 95.57
+\]
+
+\begin{mitabla}{C13: frecuencia esperada $FE_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Género \textbackslash{} $Y$: Interés en posgrado & Sí & No \\
+\midrule
+Hombre & $115\cdot123/148 = 95.57$ & $115\cdot25/148 = 19.43$ \\
+Mujer & $33\cdot123/148 = 27.43$ & $33\cdot25/148 = 5.57$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Estadístico chi-cuadrado.} En cada celda se calcula $\frac{(FO_{ij}-FE_{ij})^2}{FE_{ij}}$ y luego se suman todas.
+
+\begin{mitabla}{C13: cálculo de $X_0^2$ celda por celda}
+\begin{tabular}{L{3.2cm}C{3.20cm}C{3.20cm}|c}
+\toprule
+$X$: Género \textbackslash{} $Y$: Interés en posgrado & Sí & No & Suma fila \\
+\midrule
+Hombre & $\dfrac{(92-95.57)^2}{95.57}$\newline $= 0.1337$ & $\dfrac{(23-19.43)^2}{19.43}$\newline $= 0.6577$ & $0.7913$ \\[6pt]
+Mujer & $\dfrac{(31-27.43)^2}{27.43}$\newline $= 0.4658$ & $\dfrac{(2-5.57)^2}{5.57}$\newline $= 2.2919$ & $2.7577$ \\[6pt]
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\[
+X_0^2 = 0.7913 + 2.7577 = 3.5491
+\]
+
+\textit{Paso 5. Estadístico teórico.} Con $f = 2$ filas y $c = 2$ columnas: $gl = (2-1)(2-1) = 1$. De la tabla chi-cuadrada, con $\alpha = 0.05$: $X^2_{1,\,0.05} = 3.841$.
+
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+$3.5491 < 3.841 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
+Sino\\
+\quad NO ``Independencia''\\
+FinSi
+\end{tabular}
+\end{center}
+
+No se rechaza $H_0$: con estos datos, «Interés en posgrado» no depende de «Género».
+
+\textit{Recomendación.} El interés en un posgrado es parecido en hombres y mujeres: la oferta no necesita diferenciarse por género.
+

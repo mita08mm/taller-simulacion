@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C1. Situación laboral $\times$ satisfacción con la formación}
 
 \textit{Paso 1. Describir el problema.} Determinar si la valoración de la formación recibida cambia según la situación laboral actual del titulado, como evidencia del resultado del proceso formativo frente a las condiciones de empleo.
@@ -45,6 +45,20 @@ Emprendimiento propio & 5 & 9 & 14 \\
 No trabaja & 6 & 19 & 25 \\
 \midrule
 Total & 38 & 109 & $N = 147$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C1: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Situación laboral \textbackslash{} $Y$: Satisfacción con la formación & En desacuerdo & De acuerdo \\
+\midrule
+Trabaja en una organización & \cellcolor{gray!25}27 & \cellcolor{gray!75}81 \\
+Emprendimiento propio & \cellcolor{gray!5}5 & \cellcolor{gray!8}9 \\
+No trabaja & \cellcolor{gray!6}6 & \cellcolor{gray!18}19 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

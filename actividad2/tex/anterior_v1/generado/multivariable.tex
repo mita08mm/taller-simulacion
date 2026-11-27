@@ -1,0 +1,55 @@
+% Generado por sistema/backend ReporteTex.java -- no editar a mano.
+% Datos: /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/titulados.csv (titulados) / /private/tmp/claude-501/-Users-miguel-project-taller-s/a868368b-4351-4d87-8017-fb9a5bc093aa/scratchpad/empleadores.csv (empleadores)
+\textit{Paso 1. Variables.} Sobre los titulados que hicieron formación complementaria, se cruzan dos variables cualitativas -- $X$ = nivel del programa cursado, $Y$ = fuente de financiamiento -- con una variable cuantitativa -- $Z$ = años de vida profesional --, siguiendo la tabulación cruzada multivariada de la asignatura: frecuencia ($n$) y promedio de $Z$ ($\bar{Z}$) en cada combinación $X$--$Y$ que aparece en los datos.
+
+\textit{Paso 2. Tabulación cruzada de frecuencias y antigüedad promedio.}
+
+\begin{mitabla}{Nivel del programa ($X$) y fuente de financiamiento ($Y$), con antigüedad promedio ($n=96$)}
+\begin{tabular}{llcc}
+\toprule
+$X$ (nivel del programa) & $Y$ (fuente de financiamiento) & $n$ & $\bar{Z}$ (años) \\
+\midrule
+Diplomado & Recursos propios & 61 & 6.85 \\
+Maestría & Recursos propios & 22 & 11.95 \\
+Maestría & Beca parcial & 3 & 10.00 \\
+Especialidad & Recursos propios & 3 & 12.33 \\
+Doctorado & Recursos propios & 2 & 16.00 \\
+Diplomado & Beca parcial & 2 & 6.50 \\
+Maestría & Beca total & 2 & 25.50 \\
+Diplomado & Beca total & 1 & 13.00 \\
+\midrule
+\multicolumn{2}{l}{Total / Promedio general} & 96 & 8.93 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\begin{figure}[H]
+\centering
+\caption{Promedio de antigüedad promedio por combinación $X$--$Y$ (años)}
+\begin{tikzpicture}
+\begin{axis}[
+  xbar, bar width=9pt,
+  width=12cm, height=5.8cm,
+  xmin=0,
+  ytick={0,...,7},
+  yticklabels={Diplomado -- Recursos propios,Maestría -- Recursos propios,Maestría -- Beca parcial,Especialidad -- Recursos propios,Doctorado -- Recursos propios,Diplomado -- Beca parcial,Maestría -- Beca total,Diplomado -- Beca total},
+  ymin=-0.6, ymax=7.6,
+  nodes near coords, y dir=reverse,
+  every axis plot/.style={fill=gray!60}
+]
+\addplot coordinates {(6.85,0) (11.95,1) (10.00,2) (12.33,3) (16.00,4) (6.50,5) (25.50,6) (13.00,7) };
+\end{axis}
+\end{tikzpicture}
+\end{figure}
+
+\textit{Paso 3. Hallazgos por categoría de $X$.} Para cada categoría de nivel del programa, la categoría de fuente de financiamiento más frecuente y si antigüedad promedio queda por encima o por debajo del promedio general (8.93 años):
+
+\begin{itemize}
+  \item \textbf{Doctorado} ($n=2$): Antigüedad promedio de 16.00 años, por encima del promedio general. La categoría de fuente de financiamiento más frecuente es recursos propios (100.0\% de este grupo).
+  \item \textbf{Maestría} ($n=27$): Antigüedad promedio de 12.74 años, por encima del promedio general. La categoría de fuente de financiamiento más frecuente es recursos propios (81.5\% de este grupo).
+  \item \textbf{Especialidad} ($n=3$): Antigüedad promedio de 12.33 años, por encima del promedio general. La categoría de fuente de financiamiento más frecuente es recursos propios (100.0\% de este grupo).
+  \item \textbf{Diplomado} ($n=64$): Antigüedad promedio de 6.94 años, por debajo del promedio general. La categoría de fuente de financiamiento más frecuente es recursos propios (95.3\% de este grupo).
+\end{itemize}
+
+\textit{Interpretación.} A mayor nivel del programa cursado, mayor la antigüedad promedio de quienes lo cursaron: quienes ya acumularon más años de vida profesional son los que llegan a programas de nivel más alto (maestría o doctorado), mientras que los titulados más recientes se concentran en diplomados. Los recursos propios dominan el financiamiento en todos los niveles.
+

@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C13. Género $\times$ interés en posgrado}
 
 \textit{Paso 1. Describir el problema.} Analizar el patrón demográfico: establecer si el interés en realizar un posgrado depende del género.
@@ -44,6 +44,19 @@ Hombre & 92 & 23 & 115 \\
 Mujer & 31 & 2 & 33 \\
 \midrule
 Total & 123 & 25 & $N = 148$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C13: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Género \textbackslash{} $Y$: Interés en posgrado & Sí & No \\
+\midrule
+Hombre & \cellcolor{gray!75}92 & \cellcolor{gray!19}23 \\
+Mujer & \cellcolor{gray!25}31 & \cellcolor{gray!2}2 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

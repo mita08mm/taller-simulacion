@@ -1,5 +1,5 @@
 % Generado por sistema/backend ReporteTex.java -- no editar a mano.
-% Datos: Base de datos: 148 importado (titulados) / Base de datos: 53 importado (empleadores)
+% Datos: CSV importado (titulados) / CSV importado (empleadores)
 \subsubsection*{C9. Experiencia profesional $\times$ remuneración}
 
 \textit{Paso 1. Describir el problema.} Establecer si la remuneración depende de la experiencia del titulado (junior o consolidado, con corte en la mediana de los años de vida profesional), para conocer el grado de madurez profesional de la muestra.
@@ -45,6 +45,19 @@ Junior & 30 & 23 & 53 \\
 Consolidado & 3 & 50 & 53 \\
 \midrule
 Total & 33 & 73 & $N = 106$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La misma tabla de contingencia, pintada por color en vez de por número:
+
+\begin{mitabla}{C9: mapa de calor de $FO_{ij}$}
+\begin{tabular}{L{3.8cm}C{3.00cm}C{3.00cm}}
+\toprule
+$X$: Experiencia \textbackslash{} $Y$: Remuneración & Hasta Bs 5.000 & Más de Bs 5.000 \\
+\midrule
+Junior & \cellcolor{gray!45}30 & \cellcolor{gray!35}23 \\
+Consolidado & \cellcolor{gray!5}3 & \cellcolor{gray!75}50 \\
 \bottomrule
 \end{tabular}
 \end{mitabla}

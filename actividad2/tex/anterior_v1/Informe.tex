@@ -1,0 +1,1185 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{fix-cm}
+
+\usepackage[spanish]{babel}
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{listings}
+\usepackage{pdflscape}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{hanging}
+\usepackage{xurl}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+
+\geometry{margin=2cm, top=3cm, bottom=3cm}
+\setlength{\headheight}{13.6pt}
+
+% Configuración global de tablas
+\renewcommand{\arraystretch}{1.2}
+\captionsetup[table]{skip=8pt}
+
+% Tipos de columna con salto de línea automático
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}   % Izquierda con ancho
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}    % Derecha con ancho
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}     % Centrado con ancho
+\newcolumntype{J}[1]{>{\arraybackslash}p{#1}}               % Justificado con ancho
+
+% Para tabularx (ancho flexible)
+\newcolumntype{X}{>{\raggedright\arraybackslash}X}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{Z}{>{\raggedleft\arraybackslash}X}
+
+% Entorno de tabla estándar
+\newenvironment{mitabla}[2][H]{%
+  \begin{table}[#1]
+  \centering
+  \caption{#2}
+  \small
+}{%
+  \end{table}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small Análisis de Mercado y Herramienta de Recolección de Datos}
+\lhead{\small Informe de Actividad}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape,
+  stringstyle=\ttfamily,
+  numbers=left,
+  numberstyle=\tiny,
+  frame=single,
+  breaklines=true,
+  tabsize=4,
+  literate=
+    {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'\i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+    {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+    {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+}
+
+\begin{document}
+\input{generado/valores}
+
+\setlength{\parindent}{0pt}
+\pagenumbering{roman}
+
+\begin{titlepage}
+\centering
+{\large\bfseries UNIVERSIDAD MAYOR DE SAN SIMÓN\par}
+\vspace{4pt}
+{\bfseries FACULTAD DE CIENCIAS Y TECNOLOGÍA\par}
+\vspace{4pt}
+{\bfseries CARRERA DE INGENIERÍA DE SISTEMAS\par}
+
+\vspace*{\fill}
+{\huge\bfseries ANÁLISIS DE MERCADO Y HERRAMIENTA\\DE RECOLECCIÓN DE DATOS\par}
+\vspace{0.8cm}
+{\Large Enfoque ARCUSUR\par}
+\vspace{0.8cm}
+{\normalsize Informe de Actividad 2\par}
+\vspace*{\fill}
+
+\begin{flushleft}
+\begin{tabular}{@{}ll}
+\textbf{Integrantes:} & Mita Choque Miguel \\[4pt]
+                      & Aliaga García Edilson Daniel \\[4pt]
+                      & Aldunate Guzmán André Helian \\[4pt]
+\textbf{Docente:}     & Henrry Frank Villarroel Tapia \\[4pt]
+\textbf{Materia:}     & Taller de Simulación de Sistemas \\
+\end{tabular}
+\end{flushleft}
+
+\vspace{1.5cm}
+{\bfseries Cochabamba, Bolivia\par}
+\end{titlepage}
+
+\tableofcontents
+\listoftables
+\newpage
+
+\section*{Resumen}
+
+Este informe presenta el análisis de mercado sobre el perfil, la
+formación continua y la empleabilidad de los titulados de la Carrera de
+Ingeniería de Sistemas de la Universidad Mayor de San Simón, como insumo
+para el proceso de Autoevaluación orientado a la acreditación ARCU-SUR.
+Las variables analizadas se eligieron a partir de los indicadores que el
+documento de Criterios de Calidad ARCU-SUR para Ingeniería pide sobre
+graduados, perfil de egreso, posgrado y vinculación con el sector
+productivo, y se obtienen de dos encuestas: una a titulados y otra a
+empleadores. Los datos se procesan en una herramienta de software
+propia que calcula frecuencias, medias con intervalo de confianza del
+95\% y pruebas de independencia chi-cuadrada sobre tablas de
+contingencia. \input{generado/resumen_resultados}
+
+\textbf{Palabras clave:} análisis de mercado, empleabilidad, ARCU-SUR,
+Ingeniería de Sistemas.
+
+\newpage
+
+\pagenumbering{arabic}
+\setlength{\parskip}{10pt}
+
+\section{Introducción y Justificación}
+
+\subsection{Antecedentes}
+
+La Carrera de Ingeniería de Sistemas de la Universidad Mayor de San Simón
+se encuentra en un proceso de Autoevaluación orientado a la elaboración de
+un Plan de Desarrollo Estratégico, en el marco de una futura postulación
+de acreditación ante el sistema ARCU-SUR. Este proceso requiere contar con
+información empírica actualizada sobre el perfil, las expectativas de
+formación continua y la situación de empleabilidad de sus titulados, así
+como sobre los requerimientos que el sector productivo plantea a los
+profesionales egresados de la carrera.
+
+El propio documento de Criterios de Calidad ARCU-SUR, en su apartado de
+documentación y fuentes de información, pide presentar las ``encuestas
+aplicadas para la autoevaluación'' y la ``información sobre mecanismos
+de seguimiento de graduados'' (ARCU-SUR, 2019). El presente estudio
+levanta esa información mediante dos instrumentos propios (encuestas a
+titulados y a empleadores) y la procesa con una herramienta de software
+desarrollada para este fin.
+
+\subsection{Objetivos}
+
+\subsubsection{Objetivo General}
+
+Analizar el perfil, la formación continua y la empleabilidad de los
+titulados de la Carrera de Ingeniería de Sistemas de la UMSS, de acuerdo
+con los criterios de calidad ARCU-SUR para graduados y perfil de egreso.
+
+\subsubsection{Objetivos Específicos}
+
+\begin{enumerate}
+  \item Calcular los indicadores de condiciones de empleo que pide el
+  criterio ARCU-SUR 3.2.3 (tasa de empleo, tiempo medio para obtener el
+  primer empleo y concordancia entre titulación y empleo).
+  \item Determinar, mediante pruebas de independencia chi-cuadrada, la
+  relación entre la situación laboral, la formación complementaria y la
+  valoración de la formación recibida.
+  \item Describir la valoración que los empleadores hacen del perfil
+  profesional y de las competencias de los titulados.
+  \item Desarrollar una herramienta de software que importe, procese y
+  visualice los datos recolectados.
+\end{enumerate}
+
+\subsection{Justificación}
+
+El sistema ARCU-SUR evalúa a las carreras de ingeniería en cuatro
+dimensiones: Contexto Institucional, Proyecto Académico, Comunidad
+Universitaria e Infraestructura (ARCU-SUR, 2019). Varios de sus
+criterios dependen directamente de información sobre los titulados y
+sobre quienes los emplean:
+
+\begin{itemize}
+  \item \textbf{3.2.3 Condiciones de empleo}, cuyos indicadores son el
+  ``tiempo medio para obtener el primer empleo'', el ``destino laboral y
+  profesional de los graduados; tasa de empleo'' y la ``concordancia
+  entre las características de la titulación y las del empleo''.
+  \item \textbf{3.2.1 Resultados} y \textbf{3.2.2 Vinculación y
+  seguimiento a los graduados}, que piden evaluar el resultado del
+  proceso formativo y contar con un sistema de seguimiento de
+  graduados.
+  \item \textbf{2.1.2 Perfil de Egreso}, que exige ``coherencia entre el
+  perfil de egreso y la demanda explícita de competencias profesionales
+  \ldots{} expresadas por agentes sociales relevantes''.
+  \item \textbf{2.1.7 Actualización curricular}, \textbf{2.4.1 Cursos de
+  actualización profesional permanente} y \textbf{1.1.5} (programas de
+  posgrado).
+\end{itemize}
+
+Este estudio produce, con datos propios, la evidencia que esos criterios
+piden. Además, la herramienta de software queda como un mecanismo
+permanente de seguimiento: cada nueva aplicación de las encuestas se
+importa y los indicadores se recalculan sin rehacer el análisis.
+
+\section{Marco Metodológico}
+
+\subsection{Diseño}
+
+El estudio es de tipo cuantitativo y exploratorio. Es cuantitativo
+porque se basa en respuestas estructuradas (categóricas y numéricas)
+resumidas mediante frecuencias, medias e intervalos de confianza. Es
+exploratorio porque busca identificar relaciones entre variables. Cada
+relación se plantea como una prueba de hipótesis: una variable
+independiente $X$, una variable dependiente $Y$, la hipótesis nula
+$H_0$ (``$X$ e $Y$ son independientes'') y la alternativa $H_1$
+(``existe dependencia significativa entre $X$ e $Y$''), que se contrastan
+con la prueba chi-cuadrada.
+
+El enunciado director menciona la experimentación por simulación y el
+análisis de diferentes escenarios. El modelo de simulación (generador
+congruencial y Transformada Inversa discreta para proyectar escenarios)
+se retiró del estudio por indicación del docente, porque proyectar
+resultados exige otras variables y datos que esta actividad no trabaja.
+El análisis de escenarios se resuelve con los datos observados: la
+herramienta permite recalcular todos los indicadores para cualquier
+período (gestión, semestre, mes o fechas exactas), comparar cualquier
+par de preguntas y armar reportes a medida con las variables que se
+quieran estudiar.
+
+\subsection{Población Objetivo}
+
+\begin{enumerate}
+  \item \textbf{Titulados} de la Carrera de Ingeniería de Sistemas de la
+  UMSS. La encuesta se distribuye únicamente a titulados de la Carrera,
+  por lo que el formulario no incluye una pregunta filtro.
+  \item \textbf{Empleadores} de titulados de la Carrera: el enunciado
+  exigía al menos cinco organizaciones, con una del ámbito público y una
+  del privado. La encuesta recibió respuestas de \nEmpleadores{} organizaciones.
+\end{enumerate}
+
+\subsection{Técnicas de Recolección de Datos}
+
+Se aplican dos encuestas estructuradas mediante formularios web: la de
+titulados en Microsoft Forms y la de empleadores en Google Forms. Ambos
+instrumentos se transcriben completos en los Anexos del enunciado. La
+encuesta a titulados tiene lógica condicional: según la situación
+laboral declarada, se muestra una rama distinta de preguntas
+(trabaja en una organización, tiene un emprendimiento propio o no
+trabaja).
+
+Ambos formularios registran automáticamente la fecha de cada respuesta.
+La herramienta usa esa fecha para delimitar el período analizado, de
+modo que el formulario puede seguir abierto y cada informe se cierra con
+una fecha de corte, o se comparan respuestas antiguas y nuevas.
+
+\input{generado/periodo}
+
+Las Historias de Usuario del enunciado orientaron el diseño de la
+herramienta. La Tabla~\ref{tab:hu} muestra qué preguntas reales del
+formulario responden a cada una; el análisis se hace siempre sobre las
+preguntas tal como fueron aplicadas.
+
+\begin{mitabla}{Historias de Usuario y preguntas del formulario que las responden\label{tab:hu}}
+\begin{tabular}{cL{4.2cm}L{8.8cm}}
+\toprule
+HU & Tema & Preguntas del formulario utilizadas \\
+\midrule
+1 & Antigüedad y empleabilidad & Años de vida profesional, tiempo desempleado, situación laboral, sector, rubro, cargo, remuneración, tiempo hasta el primer empleo \\
+2 & Formación continua y áreas de interés & Formación complementaria y su nivel, interés en posgrado, área de interés, institución elegida, opinión sobre la oferta de posgrado de la FCyT \\
+3 & Mecanismos de financiamiento & Fuente de financiamiento del programa cursado; financiamiento del emprendimiento \\
+4 & Brechas en competencias & Satisfacción con la formación, concordancia formación--mercado, aspectos útiles y a mejorar, asignaturas; escala de perfil profesional de empleadores \\
+5 & Reportes y matrices cruzadas & Exportación CSV y para Excel, tablas de contingencia (cruces del estudio y cruce libre), mapas de calor y diagrama de radar en la herramienta \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\subsection{Variables e Indicadores según ARCU-SUR}
+
+Una variable o un cruce se incluye en el análisis solo si responde a un
+indicador concreto del documento de Criterios ARCU-SUR y sale de una
+pregunta real del formulario. La Tabla~\ref{tab:indicadores} resume los
+indicadores calculados y la Tabla~\ref{tab:cruces} los cruces de
+variables.
+
+\begin{mitabla}{Indicadores calculados y criterio ARCU-SUR al que responden\label{tab:indicadores}}
+\begin{tabular}{cL{4.6cm}L{6.6cm}c}
+\toprule
+Id & Indicador & Cálculo & Criterio \\
+\midrule
+U1 & Tasa de empleo & Proporción que trabaja en una organización o en un emprendimiento propio & 3.2.3 \\
+U2 & Tiempo medio al primer empleo & Media e IC 95\% usando el punto medio de cada rango (meses) & 3.2.3 \\
+U3 & Años de vida profesional y desempleo & Media, desviación estándar e IC 95\% & 3.2.3 \\
+U4 & Destino laboral & Frecuencias de rubro, sector, departamento, cargo y remuneración & 3.2.3 \\
+U5 & Concordancia titulación--empleo & Frecuencias y media de las escalas de pertinencia y concordancia (1--4) & 3.2.3 \\
+U6 & Satisfacción con la formación & Frecuencias y media; aspectos útiles y a mejorar & 3.2.1 \\
+U7 & Ranking de asignaturas & Menciones de asignaturas con ventaja y poco útiles & 2.1.7 \\
+U8 & Demanda de posgrado & \% con formación complementaria, \% con interés, área e institución & 2.4.1 / 1.1.5 \\
+U9 & Oferta de posgrado FCyT & Frecuencias y media de la escala (1--4) & 2.4.1 \\
+U10 & Seguimiento de graduados & \% interesado en la red de contactos de la Carrera & 3.2.2 \\
+U11 & Perfil según empleadores & Porcentaje de cada opción en los 18 ítems de perfil profesional y vinculación & 2.1.2 / 2.4.2 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\begin{mitabla}{Cruces de variables (pruebas de independencia)\label{tab:cruces}}
+\begin{tabular}{cL{5.4cm}L{5.8cm}c}
+\toprule
+Id & Cruce & Propósito & Criterio \\
+\midrule
+C1 & Situación laboral $\times$ satisfacción con la formación & Determinar si la valoración de la formación cambia según la situación laboral & 3.2.1 \\
+C2 & Sector $\times$ pertinencia del puesto & Determinar si la concordancia titulación--empleo depende del sector & 3.2.3 \\
+C3 & Formación complementaria $\times$ remuneración & Determinar si la formación complementaria se asocia con la remuneración & 2.4.1 / 3.2.3 \\
+C4 & Interés en posgrado $\times$ oferta FCyT afín & Determinar si la afinidad percibida de la oferta FCyT depende del interés en un posgrado & 2.4.1 / 1.1.5 \\
+C5 & Área de interés $\times$ institución elegida & Identificar áreas en que la oferta de la UMSS no capta la demanda de posgrado & 2.4.1 / 1.1.5 \\
+C6 & Concordancia $\times$ tiempo al primer empleo & Determinar si una formación alineada al mercado se asocia con un ingreso más rápido al empleo & 3.2.3 \\
+C7 & Nivel cursado $\times$ fuente de financiamiento & Determinar si la forma de financiar el programa (recursos propios o beca) depende de su nivel & 2.4.1 \\
+C8 & Edad $\times$ área de interés del posgrado & Patrón demográfico: orientar la oferta de posgrado a cada grupo de edad & 2.4.1 \\
+C9 & Experiencia $\times$ remuneración & Grado de madurez profesional: si la remuneración depende de ser junior o consolidado & 3.2.3 \\
+C10 & Experiencia $\times$ cargo & Distinguir a los profesionales junior de los mandos consolidados & 3.2.3 \\
+C11 & Formación complementaria $\times$ interés en posgrado & Determinar si quien ya cursó un programa quiere seguir estudiando & 2.4.1 \\
+C12 & Edad $\times$ situación laboral & Patrón demográfico: si la situación laboral depende de la edad & 3.2.3 \\
+C13 & Género $\times$ interés en posgrado & Patrón demográfico: si el interés en un posgrado depende del género & 2.4.1 \\
+C14 & Formación complementaria $\times$ situación laboral & Factor de riesgo: si tener formación complementaria se asocia con menor riesgo de desempleo & 2.4.1 / 3.2.3 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Para los empleadores el análisis es solo descriptivo (frecuencias de
+cada respuesta). \textit{[Confirmar: la encuesta reunió \nEmpleadores{} respuestas
+de empleadores, no las 5 que exigía el enunciado -- con esa cantidad
+podría ser posible aplicar chi-cuadrada también a empleadores; falta
+decidir si se mantiene el análisis solo descriptivo o se agregan
+cruces para esta encuesta.]}
+
+\subsection{Decisiones de Procesamiento}
+
+El formulario se aplica tal como fue diseñado. Las situaciones que
+afectan el cálculo se resuelven con las siguientes decisiones, que la
+herramienta aplica de forma automática:
+
+\begin{itemize}
+  \item \textbf{Tiempo hasta el primer empleo.} Solo lo responde la rama
+  ``trabaja en una organización''. Para calcular su media se reemplaza
+  cada rango por su punto medio en meses: ya trabajaba $=0$, menos de un
+  mes $=0.5$, 1--4 meses $=2.5$, 4--8 meses $=6$, 8--12 meses $=10$. La
+  opción ``más de 12 meses'' no tiene límite superior y se toma como 12,
+  por lo que la media obtenida es una cota inferior.
+  \item \textbf{Escalas de acuerdo de titulados} (4 niveles). Se
+  codifican de 1 (totalmente en desacuerdo) a 4 (totalmente de
+  acuerdo). La pregunta de satisfacción usa esta misma escala, por lo
+  que se interpreta como grado de acuerdo con estar satisfecho. Para las
+  tablas de contingencia los cuatro niveles se agrupan en ``en
+  desacuerdo'' y ``de acuerdo'', de modo que las celdas tengan
+  suficientes datos.
+  \item \textbf{Escala de empleadores.} Tiene dos niveles de acuerdo, uno
+  de desacuerdo y la opción ``no sabe''; al no ser simétrica, no se
+  calcula media: se reporta el porcentaje de cada opción.
+  \item \textbf{Otras agrupaciones para los cruces:} remuneración (hasta
+  Bs 5.000 / más de Bs 5.000), tiempo al primer empleo (hasta 4 meses /
+  más de 4 meses), institución de posgrado (UMSS: EUPG o FCyT / otra) y
+  nivel cursado (diplomado o especialidad / maestría o superior).
+  \item \textbf{Datos personales.} Correo, teléfono y LinkedIn se eliminan
+  al importar los datos, antes de cualquier cálculo. Las organizaciones
+  se listan, pero ningún resultado se atribuye a una organización con
+  nombre.
+\end{itemize}
+
+\subsection{Pipeline de Procesamiento}
+
+\begin{enumerate}
+  \item \textbf{Recolección e importación:} las respuestas llegan por
+  el formulario propio de la herramienta o se importan del CSV exportado
+  de Microsoft Forms (titulados) y Google Forms (empleadores). Al
+  importar, el texto de cada pregunta y opción se traduce al código de la
+  encuesta y se informa lo que no se pudo reconocer; los datos
+  personales se guardan aparte y no entran al análisis, y se toma la
+  fecha de cada respuesta.
+  \item \textbf{Selección del período:} se eligen las respuestas
+  recibidas entre dos fechas (o todas).
+  \item \textbf{Estadística univariada:} frecuencias absolutas y
+  relativas de cada pregunta; media, desviación estándar e intervalo de
+  confianza del 95\% para las variables numéricas y las escalas.
+  \item \textbf{Estadística bivariada:} tablas de contingencia y prueba
+  chi-cuadrada para los cruces C1--C14.
+  \item \textbf{Visualización y exportación:} panel de control con
+  gráficos de barras, mapas de calor y diagrama de radar; exportación de
+  los datos limpios y de cada matriz cruzada en CSV.
+\end{enumerate}
+
+\subsection{Formulación del Modelo Estadístico}
+
+Esta sección presenta la idea, la fórmula y el algoritmo de los dos
+procedimientos que se usan de forma transversal en todo el estudio (la
+distribución de frecuencias y el intervalo de confianza), en el mismo
+formato de los apuntes de la asignatura (Ali Rodriguez, 2021). Los otros
+tres procedimientos -- la prueba de las frecuencias (uniformidad), la
+prueba de independencia chi-cuadrada (dependencia) y el análisis
+exploratorio multivariable -- se presentan completos (idea, fórmula,
+algoritmo, ejemplo resuelto \textbf{y} resultado real) junto a sus
+resultados, en las Secciones~\ref{sec:resultado-uniformidad},
+\ref{sec:cruces} y~\ref{sec:resultado-multivariable} respectivamente, para
+no separar la teoría de su aplicación.
+
+\subsubsection{Distribución de Frecuencias y Mediana}\label{sec:frecuencias}
+
+Una pregunta de opción única se resume contando cuántas personas eligieron
+cada respuesta.
+
+\[
+\boxed{\;h_i = \frac{f_i}{n}\;}
+\qquad\qquad
+\boxed{\;Me = x_{\left(\frac{n+1}{2}\right)}\;}
+\]
+
+donde $f_i$ es la frecuencia absoluta (cantidad de personas que eligieron
+la respuesta $i$), $n$ el número de respuestas, $h_i$ la frecuencia
+relativa y $Me$ la mediana: el valor que queda al centro cuando los datos
+se ordenan de menor a mayor (si $n$ es par, el promedio de los dos
+centrales).
+
+\textbf{Algoritmo}
+
+Paso 1. Contar con la muestra y determinar su tamaño $n$.
+
+Paso 2. Contar la frecuencia absoluta $f_i$ de cada respuesta.
+
+Paso 3. Calcular la frecuencia relativa $h_i = f_i/n$.
+
+Paso 4. Para una variable numérica, ordenar los datos y ubicar la mediana
+en la posición $(n+1)/2$.
+
+\textbf{Ejemplo.} Años de vida profesional de 5 titulados: 6, 2, 9, 4, 4.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} $n = 5$.
+
+\textit{Paso 2 y 3. Frecuencias.}
+
+\begin{mitabla}{Ejemplo: distribución de frecuencias}
+\begin{tabular}{ccc}
+\toprule
+Años ($x_i$) & $f_i$ & $h_i = f_i/n$ \\
+\midrule
+2 & 1 & $1/5 = 0.20$ \\
+4 & 2 & $2/5 = 0.40$ \\
+6 & 1 & $1/5 = 0.20$ \\
+9 & 1 & $1/5 = 0.20$ \\
+\midrule
+Total & 5 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Mediana.} Datos ordenados: 2, 4, \textbf{4}, 6, 9. La
+posición central es $(5+1)/2 = 3$, entonces $Me = 4$ años: la mitad de
+los titulados tiene 4 años o menos de experiencia.
+
+\subsubsection{Intervalo de Confianza para una Media}\label{sec:ic}
+
+La encuesta llega a una parte de los titulados (una muestra), no a todos.
+La media de la muestra no es exactamente la media de todos los titulados;
+el intervalo de confianza indica entre qué valores está esa media con un
+95\% de confianza (Coss Bu, 1998, cap.~6, para varianza desconocida).
+
+\[
+\boxed{\;\bar{x} = \frac{\sum x_i}{n}\;}
+\qquad
+\boxed{\;S = \sqrt{\frac{\sum (x_i - \bar{x})^2}{n-1}}\;}
+\]
+\[
+\boxed{\;\bar{x} - \frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2} \;\le\; \mu \;\le\; \bar{x} + \frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2}\;}
+\]
+
+\textbf{Algoritmo}
+
+Paso 1. Contar con la muestra y determinar su tamaño $n$.
+
+Paso 2. Calcular la media muestral $\bar{x}$.
+
+Paso 3. Calcular la desviación estándar muestral $S$.
+
+Paso 4. Determinar el estadístico teórico $t_{n-1,\alpha/2}$ de la tabla
+$t$ de Student (con más de 30 grados de libertad se usa $z_{0.025}=1.96$,
+igual que en la prueba de los promedios).
+
+Paso 5. Calcular el margen de error $\dfrac{S}{\sqrt{n}}\,t_{n-1,\alpha/2}$.
+
+Paso 6. Construir el intervalo y concluir.
+
+\textbf{Ejemplo.} Con los mismos 5 titulados (6, 2, 9, 4, 4 años),
+construir el intervalo de confianza del 95\% para la media de años de
+vida profesional.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} $n = 5$.
+
+\textit{Paso 2. Calcular la media muestral.}
+\[
+\bar{x} = \frac{6 + 2 + 9 + 4 + 4}{5} = \frac{25}{5} = 5 \text{ años}
+\]
+
+\textit{Paso 3. Calcular la desviación estándar muestral.}
+
+\begin{mitabla}{Ejemplo: cálculo de la desviación estándar}
+\begin{tabular}{ccc}
+\toprule
+$x_i$ & $x_i - \bar{x}$ & $(x_i - \bar{x})^2$ \\
+\midrule
+6 & $6-5 = 1$ & 1 \\
+2 & $2-5 = -3$ & 9 \\
+9 & $9-5 = 4$ & 16 \\
+4 & $4-5 = -1$ & 1 \\
+4 & $4-5 = -1$ & 1 \\
+\midrule
+ & $\sum$ & 28 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+\[
+S = \sqrt{\frac{28}{5-1}} = \sqrt{7} = 2.6458
+\]
+
+\textit{Paso 4. Determinar el estadístico teórico.} Con $\alpha = 0.05$ y
+$n - 1 = 4$ grados de libertad, de la tabla $t$ de Student:
+$t_{4,\,0.025} = 2.776$.
+
+\textit{Paso 5. Calcular el margen de error.}
+\[
+\frac{S}{\sqrt{n}}\,t_{n-1,\alpha/2} = \frac{2.6458}{\sqrt{5}} \times 2.776 = 1.1832 \times 2.776 = 3.2846
+\]
+
+\textit{Paso 6. Construir el intervalo y concluir.}
+\[
+5 - 3.2846 \;\le\; \mu \;\le\; 5 + 3.2846 \quad\Longrightarrow\quad 1.72 \;\le\; \mu \;\le\; 8.28
+\]
+
+Con un 95\% de confianza, la media de años de vida profesional de todos
+los titulados está entre 1.72 y 8.28 años. El intervalo es ancho porque
+la muestra del ejemplo es muy pequeña; con las respuestas reales es
+mucho más estrecho (Sección~\ref{sec:titulados}).
+
+\section{Análisis Univariado: Demanda Educativa y Perfil de los Titulados}\label{sec:titulados}
+
+Todas las tablas de esta sección y de las dos siguientes se generan con
+la herramienta a partir de las respuestas importadas, de modo que cada
+número puede rastrearse hasta su cálculo. En las preguntas de opción
+única se cuenta cuántos titulados eligieron cada opción ($f_i$) y se
+divide entre el número de respuestas ($f_i/n$).
+
+\subsection{Caracterización Demográfica}
+
+La edad y el género no responden por sí mismos a un indicador ARCU-SUR.
+Se presentan para describir a quienes respondieron la encuesta, de modo
+que los resultados de las secciones siguientes se lean sabiendo a qué
+grupo de titulados representan.
+
+\input{generado/demografia}
+
+\subsection{Tasa de Empleo}
+
+La tasa de empleo es uno de los indicadores con que ARCU-SUR evalúa si
+la formación se refleja en las posibilidades de empleo de los graduados
+(criterio 3.2.3). Se calcula como la proporción de titulados que
+trabajan, ya sea en una organización o en un emprendimiento propio.
+
+\input{generado/tasa_empleo}
+
+\subsection{Tiempo Medio para Obtener el Primer Empleo}
+
+El criterio 3.2.3 pide expresamente el tiempo medio para obtener el
+primer empleo. Como la encuesta obtiene ese dato de una muestra y no de
+todos los titulados, además de la media se calcula su intervalo de
+confianza del 95\%, con el procedimiento de la Sección~\ref{sec:ic}, para
+indicar entre qué valores se encuentra la media de toda la población.
+
+\input{generado/ic_tiempo_primer_empleo}
+
+\subsection{Años de Vida Profesional y de Desempleo}
+
+Los años de vida profesional describen la experiencia acumulada de los
+titulados que respondieron, y los años de desempleo complementan la
+tasa de empleo: una tasa alta puede ocultar períodos largos sin trabajo.
+Ambos se estiman con su intervalo de confianza.
+
+\paragraph{Años de vida profesional.}
+
+\input{generado/ic_vida_profesional}
+
+\paragraph{Mediana y segmentación por experiencia.} La Historia de
+Usuario~1 pide también la mediana de los años transcurridos desde la
+titulación y separar a los profesionales junior de los consolidados. Como
+el formulario de Forms no preguntaba el año de titulación, se usan los
+años de vida profesional.
+
+\input{generado/experiencia}
+
+\paragraph{Años desempleado.}
+
+\input{generado/ic_desempleo}
+
+\subsection{Factores de Riesgo de Desempleo}\label{sec:factores-riesgo}
+
+Un factor de riesgo de desempleo es una condición que se asocia con que
+un titulado no consiga trabajo. Quien actualmente no trabaja (ni en una
+organización ni en un emprendimiento propio) indica en la encuesta la
+razón principal; esa razón es el factor de riesgo que registra el
+estudio para explicar por qué un titulado no consigue empleo.
+
+\input{generado/factores_riesgo}
+
+\subsection{Destino Laboral}
+
+El criterio 3.2.3 incluye el destino laboral y profesional de los
+graduados. Conocer en qué sector, rubro y cargo trabajan, y cuánto
+perciben, permite a la Carrera contrastar el perfil de egreso con los
+puestos que efectivamente ocupan. Solo responden quienes trabajan en una
+organización.
+
+\input{generado/destino_laboral}
+
+\subsection{Formación Continua y Fuentes de Financiamiento}
+
+Los criterios 2.4.1 y 1.1.5 piden que la institución ofrezca y promueva
+programas de actualización y posgrado afines a la carrera. Para que esa
+oferta responda a una demanda real se necesita saber qué formación ya
+tienen los titulados, qué les interesa estudiar, dónde lo harían y cómo
+financiaron lo que ya cursaron.
+
+\input{generado/formacion}
+
+\subsection{Valoración de la Formación Recibida}
+
+El criterio 3.2.1 pide evaluar el resultado del proceso formativo, y el
+2.1.7 actualizar el currículo según los desarrollos profesionales. La
+opinión de los titulados sobre su formación, sobre los aspectos útiles y
+a mejorar y sobre las asignaturas es la evidencia directa para ambos.
+Las escalas de acuerdo se codifican de 1 a 4 y se les aplica el mismo
+procedimiento del intervalo de confianza.
+
+\input{generado/valoracion}
+
+\section{Análisis Univariado: Oferta Laboral y Requerimientos del Sector Productivo}\label{sec:empleadores}
+
+El criterio 2.1.2 exige que el perfil de egreso sea coherente con las
+competencias que demandan los agentes sociales relevantes, y el 2.4.2
+que la Carrera mantenga relaciones con organizaciones públicas y
+privadas. Los empleadores son esos agentes: su opinión es la única
+fuente del estudio que mira a los titulados desde fuera de la
+universidad. El análisis es descriptivo: se presentan las frecuencias
+de cada respuesta ($N=\nEmpleadores$ organizaciones). En la escala de perfil
+profesional no se calcula media porque sus opciones no son simétricas.
+
+\subsection{Organizaciones Encuestadas}
+
+\input{generado/organizaciones}
+
+\subsection{Contratación y Perfil Profesional}
+
+\input{generado/empleadores}
+
+\subsection{Áreas, Herramientas y Habilidades Demandadas}
+
+Las tres preguntas abiertas (10, 11 y 12) se responden con texto libre,
+así que para poder contarlas se codificaron en categorías con una regla
+explícita: cada categoría tiene una lista de palabras clave
+(tablas de regla de codificación, al final de esta subsección) y una
+respuesta cuenta una vez en cada categoría que menciona. Por eso una
+respuesta puede caer en varias categorías y las frecuencias no suman
+$n$. Las respuestas que no mencionan ninguna (texto sin contenido, como
+``ll'', o demasiado general) se reportan como ``sin categoría''. La
+codificación la hace la herramienta, de modo que se puede revisar y
+repetir con nuevas respuestas.
+
+\input{generado/preguntas_abiertas}
+
+\input{generado/abiertas_interpretacion}
+
+\section{Diagnóstico y Síntesis de Resultados}
+
+Esta sección cierra el análisis estadístico en tres niveles, de menos a
+más variables a la vez: \textbf{univariado} (una variable, Sección~\ref{sec:resultado-uniformidad}),
+\textbf{bivariado} (dos variables, Sección~\ref{sec:cruces}) y
+\textbf{multivariable} (tres variables, Sección~\ref{sec:resultado-multivariable}).
+Las Secciones~\ref{sec:titulados} y~\ref{sec:empleadores} ya mostraron el
+análisis univariado de cada pregunta por separado (frecuencias, medias e
+intervalos de confianza); aquí se verifica además si esas preguntas se
+reparten de forma uniforme.
+
+\subsection{Análisis Univariado: Pruebas de Uniformidad}\label{sec:resultado-uniformidad}
+
+Las pruebas estadísticas de la asignatura verifican dos principios:
+\textbf{uniformidad} e \textbf{independencia} (Ali Rodriguez, 2021, cap.~3;
+Coss Bu, 1998, cap.~3). La uniformidad se verifica con la prueba de las
+frecuencias (Chi-Cuadrado): si se reparten $n$ respuestas entre las $k$
+opciones de una pregunta y nadie tuviera preferencia, cada opción
+recibiría la misma cantidad, $FE = n/k$ (como repartir 10 manzanas entre
+2 personas: 5 cada una). Se compara lo que \textbf{ocurre} ($FO_i$) con
+lo que se \textbf{espera} ($FE$). En la encuesta, ``Uniformidad'' quiere
+decir que las respuestas se reparten parejo y ninguna opción se destaca;
+``No uniformidad'' quiere decir que hay opciones preferidas de verdad, no
+por azar.
+
+\[
+\boxed{\;FE = \frac{n}{k} \qquad x_0^2 = \sum_{i=1}^{k} \frac{(FO_i - FE)^2}{FE} \;<\; x^2_{\alpha,\,k-1}\;}
+\]
+
+\textbf{Algoritmo}
+
+Paso 1. Contar con la muestra y determinar su tamaño.
+
+Paso 2. Calcular la frecuencia esperada.
+
+Paso 3. Calcular el estadístico Chi cuadrado.
+
+Paso 4. Determinar el estadístico teórico $x^2_{\alpha,\,k-1}$.
+
+Paso 5. Establecer relación entre estadísticos.
+
+Paso 6. Conclusión.
+
+\begin{center}
+\begin{tabular}{l}
+Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
+\quad ``Uniformidad''\\
+Sino\\
+\quad No ``Uniformidad''\\
+FinSi
+\end{tabular}
+\end{center}
+
+\textbf{Ejemplo.} Área de interés de los 10 titulados del ejemplo de
+análisis exploratorio de la asignatura: Ciencia de Datos (T1, T4, T8),
+Ciberseguridad (T2, T6), Ing.\ de Software (T3, T7, T9) y Redes (T5,
+T10). Aplicar la prueba de las frecuencias con $\alpha = 5\%$ y $k = 4$.
+
+\textit{Paso 1. Contar con la muestra y determinar su tamaño.} $n = 10$,
+$k = 4$ opciones.
+
+\textit{Paso 2. Calcular la frecuencia esperada.}
+\[
+FE = \frac{n}{k} = \frac{10}{4} = 2.5
+\]
+
+\textit{Paso 3. Calcular el estadístico Chi cuadrado.}
+
+\begin{mitabla}{Ejemplo: prueba de las frecuencias}
+\begin{tabular}{lccc}
+\toprule
+Área & $FO_i$ & $FE$ & $\frac{(FO_i-FE)^2}{FE}$ \\
+\midrule
+Ciencia de Datos  & 3 & 2.5 & $\frac{(3-2.5)^2}{2.5} = 0.1$ \\[3pt]
+Ciberseguridad    & 2 & 2.5 & $\frac{(2-2.5)^2}{2.5} = 0.1$ \\[3pt]
+Ing.\ de Software & 3 & 2.5 & $\frac{(3-2.5)^2}{2.5} = 0.1$ \\[3pt]
+Redes             & 2 & 2.5 & $\frac{(2-2.5)^2}{2.5} = 0.1$ \\[3pt]
+\midrule
+Total & 10 & 10 & $x_0^2 = 0.4$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Determinar el estadístico teórico.}
+$x^2_{0.05,\,4-1} = x^2_{0.05,\,3} = 7.815$.
+
+\textit{Paso 5. Establecer relación entre estadísticos.}
+$x_0^2 < x^2_{\alpha,\,k-1} \rightarrow 0.4 < 7.815 \rightarrow$ sí.
+
+\textit{Paso 6. Conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+$0.4 < 7.815$\\
+Si ($x_0^2 < x^2_{\alpha,\,k-1}$)\\
+\quad \fbox{``Uniformidad''}\\
+Sino\\
+\quad No ``Uniformidad''\\
+FinSi
+\end{tabular}
+\end{center}
+
+Los 10 titulados se reparten de forma pareja entre las cuatro áreas:
+ninguna es preferida. Como $FE = 2.5 < 5$, con tan pocos datos la
+conclusión es solo ilustrativa; con las respuestas reales la $FE$ es
+mucho mayor, como se ve a continuación. Antes de cruzar variables, se
+verifica este principio en las preguntas de opción única más importantes
+de ambas encuestas, resolviendo cada prueba con los seis pasos anteriores:
+
+\input{generado/uniformidad_F1}
+\input{generado/uniformidad_F2}
+\input{generado/uniformidad_F3}
+\input{generado/uniformidad_F4}
+\input{generado/uniformidad_F5}
+\input{generado/uniformidad_F6}
+\input{generado/uniformidad_F7}
+\input{generado/uniformidad_F8}
+
+\subsubsection*{Síntesis de las pruebas de uniformidad}
+
+\input{generado/resumen_uniformidad}
+
+\subsection{Análisis Bivariado: Pruebas de Independencia y Dependencia}\label{sec:cruces}
+
+Los indicadores anteriores describen cada variable por separado; los
+cruces permiten saber si dos de ellas están relacionadas (si hay
+\textbf{dependencia}), lo que ayuda a explicar los resultados (por
+ejemplo, si quienes perciben una formación alineada al mercado consiguen
+empleo antes). Sirve para saber si una variable $X$ (independiente)
+influye en otra variable $Y$ (dependiente), o si las diferencias que se
+ven en la tabla se deben al azar. Verifica el segundo principio de la
+asignatura, el de \textbf{independencia} (Sección~\ref{sec:resultado-uniformidad}):
+comparar lo que \textbf{ocurre} ($FO$) con lo que se \textbf{espera}
+($FE$). La diferencia es que aquí los datos se ordenan en una tabla de
+doble entrada ($f$ filas para $X$, $c$ columnas para $Y$), y lo esperado
+en cada celda es lo que habría \textbf{si $X$ e $Y$ fueran
+independientes}, calculado con los totales de la tabla.
+
+\textbf{Hipótesis}
+
+$H_0$: Las variables $X$ e $Y$ son independientes.
+
+$H_1$: Existe dependencia significativa entre las variables $X$ e $Y$.
+
+\[
+\boxed{\;FE_{ij} = \frac{(\text{total fila } i)(\text{total columna } j)}{N}\;}
+\qquad
+\boxed{\;gl = (f-1)(c-1)\;}
+\]
+\[
+\boxed{\;X_0^2 = \sum_{i=1}^{f}\sum_{j=1}^{c} \frac{(FO_{ij} - FE_{ij})^2}{FE_{ij}}\;}
+\]
+
+\begin{center}
+\begin{tabular}{l}
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad ``Independencia'' (no se rechaza $H_0$)\\
+Sino\\
+\quad NO ``Independencia'' (se rechaza $H_0$ y se acepta $H_1$)\\
+FinSi
+\end{tabular}
+\end{center}
+
+\textbf{Algoritmo}
+
+Paso 1. Describir el problema: definir $X$ (independiente) e $Y$
+(dependiente) y plantear las hipótesis.
+
+Paso 2. Contar con la muestra: construir la tabla de contingencia con la
+frecuencia observada $FO_{ij}$ (cuántos titulados respondieron a la vez la
+categoría $i$ de $X$ y la categoría $j$ de $Y$) y sus totales.
+
+Paso 3. Calcular la frecuencia esperada $FE_{ij}$ de cada celda.
+
+Paso 4. Calcular el estadístico chi-cuadrado $X_0^2$.
+
+Paso 5. Determinar el estadístico teórico $X^2_{(f-1)(c-1),\,\alpha}$ de
+la tabla chi-cuadrada.
+
+Paso 6. Establecer la relación entre estadísticos y concluir.
+
+\textbf{Ejemplo resuelto en clase.} Se tiene el posgrado deseado y la
+fuente de financiamiento de 10 titulados (datos ilustrativos):
+
+\begin{mitabla}{Ejemplo: datos de 10 titulados}
+\begin{tabular}{lll}
+\toprule
+Titulado & $X$: Posgrado deseado & $Y$: Fuente de financiamiento \\
+\midrule
+T1 & Maestría & Fondos propios \\
+T2 & Especialidad & Beca educativa \\
+T3 & Maestría & Beca educativa \\
+T4 & Doctorado & Beca educativa \\
+T5 & Maestría & Fondos propios \\
+T6 & Ninguno & Fondos propios \\
+T7 & Maestría & Beca empresarial \\
+T8 & Especialidad & Beca empresarial \\
+T9 & Maestría & Fondos propios \\
+T10 & Maestría & Beca educativa \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 1. Describir el problema.} Establecer el grado de relación
+o dependencia entre el posgrado deseado (variable independiente $X$) y la
+fuente de financiamiento (variable dependiente $Y$).
+$H_0$: el posgrado deseado y la fuente de financiamiento son
+independientes. $H_1$: existe dependencia significativa entre ellos.
+
+\textit{Paso 2. Tabla de contingencia} ($FO_{ij}$, $N = 10$).
+
+\begin{mitabla}{Ejemplo: frecuencia observada $FO_{ij}$}
+\begin{tabular}{lccc|c}
+\toprule
+Posgrado deseado & Fondos propios & Beca educativa & Beca empresarial & Total \\
+\midrule
+Especialidad & 0 & 1 & 1 & 2 \\
+Maestría & 3 & 2 & 1 & 6 \\
+Doctorado & 0 & 1 & 0 & 1 \\
+Ninguno & 1 & 0 & 0 & 1 \\
+\midrule
+Total & 4 & 4 & 2 & $N = 10$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textbf{Mapa de calor.} La herramienta pinta esta misma tabla de
+contingencia por color en vez de por número: cada celda es una
+combinación $X$--$Y$ y su tono de gris representa $FO_{ij}$, de blanco
+(0 respuestas) a gris oscuro (la celda con más respuestas). No agrega
+información nueva respecto a la tabla anterior, es la misma lectura a
+simple vista:
+
+\begin{mitabla}{Mapa de calor de la tabla anterior}
+\begin{tabular}{lccc}
+\toprule
+Posgrado deseado & Fondos propios & Beca educativa & Beca empresarial \\
+\midrule
+Especialidad      & \cellcolor{gray!0}0  & \cellcolor{gray!25}1 & \cellcolor{gray!25}1 \\
+Maestría          & \cellcolor{gray!75}3 & \cellcolor{gray!50}2 & \cellcolor{gray!25}1 \\
+Doctorado         & \cellcolor{gray!0}0  & \cellcolor{gray!25}1 & \cellcolor{gray!0}0  \\
+Ninguno           & \cellcolor{gray!25}1 & \cellcolor{gray!0}0  & \cellcolor{gray!0}0  \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+La celda más oscura (Maestría -- Fondos propios, $FO=3$) salta a la
+vista antes de calcular ningún estadístico: es donde se concentran las
+respuestas. Este mismo mapa de calor es el que la herramienta genera
+para cualquier par de preguntas que se comparen, incluidos los 14 cruces
+reales de más abajo.
+
+\textit{Paso 3. Frecuencia esperada.} Por ejemplo, para la celda
+Especialidad y Fondos propios:
+\[
+FE_{11} = \frac{(2)(4)}{10} = 0.8
+\]
+
+\begin{mitabla}{Ejemplo: frecuencia esperada $FE_{ij}$}
+\begin{tabular}{lccc}
+\toprule
+Posgrado deseado & F. propios & B. educativa & B. empresarial \\
+\midrule
+Especialidad & $2\cdot4/10 = 0.8$ & $2\cdot4/10 = 0.8$ & $2\cdot2/10 = 0.4$ \\
+Maestría & $6\cdot4/10 = 2.4$ & $6\cdot4/10 = 2.4$ & $6\cdot2/10 = 1.2$ \\
+Doctorado & $1\cdot4/10 = 0.4$ & $1\cdot4/10 = 0.4$ & $1\cdot2/10 = 0.2$ \\
+Ninguno & $1\cdot4/10 = 0.4$ & $1\cdot4/10 = 0.4$ & $1\cdot2/10 = 0.2$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+\textit{Paso 4. Estadístico chi-cuadrado.}
+
+\begin{mitabla}{Ejemplo: cálculo de $X_0^2$ celda por celda}
+\begin{tabular}{lccc}
+\toprule
+Posgrado deseado & F. propios & B. educativa & B. empresarial \\
+\midrule
+Especialidad & $\frac{(0-0.8)^2}{0.8} = 0.80$ & $\frac{(1-0.8)^2}{0.8} = 0.05$ & $\frac{(1-0.4)^2}{0.4} = 0.90$ \\[3pt]
+Maestría & $\frac{(3-2.4)^2}{2.4} = 0.15$ & $\frac{(2-2.4)^2}{2.4} = 0.07$ & $\frac{(1-1.2)^2}{1.2} = 0.03$ \\[3pt]
+Doctorado & $\frac{(0-0.4)^2}{0.4} = 0.40$ & $\frac{(1-0.4)^2}{0.4} = 0.90$ & $\frac{(0-0.2)^2}{0.2} = 0.20$ \\[3pt]
+Ninguno & $\frac{(1-0.4)^2}{0.4} = 0.90$ & $\frac{(0-0.4)^2}{0.4} = 0.40$ & $\frac{(0-0.2)^2}{0.2} = 0.20$ \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+\[
+X_0^2 = (0.80 + 0.05 + 0.90) + (0.15 + 0.07 + 0.03) + (0.40 + 0.90 + 0.20) + (0.90 + 0.40 + 0.20) = 5
+\]
+
+\textit{Paso 5. Estadístico teórico.} Con $f = 4$ filas y $c = 3$
+columnas: $gl = (4-1)(3-1) = 6$. De la tabla chi-cuadrada, con
+$\alpha = 0.05$: $X^2_{6,\,0.05} = 12.592$.\footnote{Se usa el valor de
+la cola derecha de la tabla, que es el que corresponde a esta prueba
+(Coss Bu, 1998, cap.~3).}
+
+\textit{Paso 6. Relación entre estadísticos y conclusión.}
+
+\begin{center}
+\begin{tabular}{l}
+$5 < 12.592 \rightarrow$ verdad\\
+Si ($X_0^2 < X^2_{(f-1)(c-1),\,\alpha}$)\\
+\quad \fbox{``Independencia''}\\
+Sino\\
+\quad NO ``Independencia''\\
+FinSi
+\end{tabular}
+\end{center}
+
+No se rechaza $H_0$: con estos datos, la fuente de financiamiento no
+depende del posgrado deseado. \textit{Recomendación:} buscar
+financiamiento a través de organismos internacionales para contar con
+becas educativas o que fomenten la formación de posgrado de los
+titulados. En este ejemplo todas las celdas tienen $FE < 5$ porque la
+muestra es de solo 10 titulados; con pocas respuestas por celda la prueba
+pierde confiabilidad, por eso en los cruces reales se agrupan categorías
+cuando hace falta.
+
+\textbf{Valores teóricos usados en el estudio} ($\alpha = 0.05$):
+
+\begin{mitabla}{Valores de la tabla chi-cuadrada usados}
+\begin{tabular}{cccccc}
+\toprule
+$gl$ & 1 & 2 & 4 & 6 & 8 \\
+\midrule
+$X^2_{gl,\,0.05}$ & 3.841 & 5.991 & 9.488 & 12.592 & 15.507 \\
+\bottomrule
+\end{tabular}
+\end{mitabla}
+
+Con el mismo procedimiento se resuelve cada cruce de la
+Tabla~\ref{tab:cruces} con los datos reales de la encuesta:
+
+\input{generado/cruce_C1}
+\input{generado/cruce_C2}
+\input{generado/cruce_C3}
+\input{generado/cruce_C4}
+\input{generado/cruce_C5}
+\input{generado/cruce_C6}
+\input{generado/cruce_C7}
+\input{generado/cruce_C8}
+\input{generado/cruce_C9}
+\input{generado/cruce_C10}
+\input{generado/cruce_C11}
+\input{generado/cruce_C12}
+\input{generado/cruce_C13}
+\input{generado/cruce_C14}
+
+\subsubsection*{Síntesis de los cruces}
+
+\input{generado/resumen_cruces}
+
+\subsection{Análisis Multivariable: Tabulación Cruzada de Tres Variables}\label{sec:resultado-multivariable}
+
+La prueba de independencia de la Sección~\ref{sec:cruces} cruza dos
+variables a la vez. Para explorar tres variables juntas se sigue el
+ejemplo de la asignatura (apunte del docente): dos variables
+cualitativas $X$ y $Y$ se tabulan de forma cruzada, y en cada
+combinación $X$--$Y$ que aparece se calcula la frecuencia $n$ y el
+promedio de una tercera variable cuantitativa $Z$.
+
+\textbf{Algoritmo}
+
+\begin{enumerate}
+  \item Elegir las tres variables: $X$ y $Y$ cualitativas, $Z$ cuantitativa.
+  \item Para cada combinación $X_i$--$Y_j$ que aparece en los datos,
+  contar cuántos casos hay ($n_{ij}$) y promediar $Z$ entre ellos
+  ($\bar{Z}_{ij}$).
+  \item Calcular el total general $N$ y el promedio general $\bar{Z}$
+  (promedio de $Z$ ponderado por $n_{ij}$ de todas las combinaciones).
+  \item Para cada categoría de $X$, identificar la categoría de $Y$ más
+  frecuente y si su $\bar{Z}$ queda por encima o por debajo del promedio
+  general $\bar{Z}$ -- esto es lo que el apunte llama ``patrón'' y
+  ``hallazgo'' por categoría.
+\end{enumerate}
+
+A diferencia de la prueba de independencia, esto no es una prueba
+estadística (no hay un valor teórico contra el cual comparar): es
+exploración descriptiva, para ver patrones entre tres variables a la vez
+antes de decidir si amerita una prueba de independencia aparte.
+
+\paragraph{Ejemplo 1: nivel del programa, financiamiento y antigüedad.}
+Se cruzan el nivel del programa de posgrado cursado ($X$), la fuente de
+financiamiento ($Y$) y los años de vida profesional ($Z$) de los
+titulados que hicieron formación complementaria.
+
+\input{generado/multivariable}
+
+\paragraph{Ejemplo 2: género, situación laboral y antigüedad.} Sobre
+todos los titulados que respondieron (no solo quienes hicieron formación
+complementaria), se cruzan el género ($X$), la situación laboral ($Y$) y
+los años de vida profesional ($Z$).
+
+\input{generado/multivariable2}
+
+\subsection{Incidencia de las Variables entre Sí}\label{sec:incidencia}
+
+\input{generado/incidencia}
+
+\subsection{Respuesta a los Criterios ARCU-SUR}\label{sec:criterios}
+
+La Guía de Autoevaluación ARCU-SUR pide, para cada componente, analizar
+la carrera en relación con sus criterios y mencionar los aspectos
+favorables y desfavorables (ARCU-SUR, 2016a). A continuación se resume,
+para cada criterio al que este estudio aporta evidencia, qué pide el
+criterio, qué resultado de este trabajo lo respalda y cómo se valora.
+Se considera favorable un indicador cuando la mayoría de los
+encuestados (más del 50\%) responde en el sentido que el criterio
+espera, y desfavorable en caso contrario; los indicadores que no tienen
+un valor de referencia se reportan como línea base.
+
+\input{generado/criterios_arcusur}
+
+\section{Conclusiones y Propuestas Estratégicas}
+
+\subsection*{Conclusiones}
+
+\input{generado/conclusiones}
+
+\subsection*{Propuestas Estratégicas}
+
+\input{generado/propuestas}
+
+\subsection*{Limitaciones}
+
+\begin{itemize}
+  \item El formulario de Microsoft Forms no preguntaba el año de
+  titulación, por lo que no se pueden analizar resultados por cohorte; la
+  antigüedad se aproxima con los años de vida profesional. El formulario
+  de la herramienta ya incluye esa pregunta para las respuestas nuevas.
+  \item El formulario pregunta por el nivel y el financiamiento del
+  programa \emph{ya cursado}, no por el nivel de posgrado \emph{deseado} ni
+  por el financiamiento \emph{futuro} que mencionan las Historias de
+  Usuario~2 y~3; por eso la demanda de posgrado se mide por área de
+  interés e institución, y el financiamiento con lo ya cursado.
+  \item Las escalas de acuerdo del formulario tienen 4 niveles, no 5 como
+  sugiere la Historia de Usuario~4; las medias se calculan sobre la escala
+  de 1 a 4.
+  \item El tiempo al primer empleo solo lo responde quien hoy trabaja en
+  una organización, y su media es una cota inferior.
+  \item La escala de empleadores no es simétrica y algunos de sus ítems
+  agrupan varias afirmaciones.
+  \item El análisis de empleadores es descriptivo: no se cruzaron sus
+  respuestas entre sí ni se aplicaron pruebas de independencia.
+\end{itemize}
+
+\section*{Referencias Bibliográficas}
+\addcontentsline{toc}{section}{Referencias Bibliográficas}
+
+\begin{hangparas}{1.27cm}{1}
+Ali Rodriguez, J. G. (2021). \textit{Simulación de Sistemas: apuntes de
+clases} [Apuntes de la materia dictada por H. F. Villarroel Tapia].
+Carrera de Ingeniería de Sistemas, Universidad Mayor de San Simón.
+
+ARCU-SUR. (2016a). \textit{Guía de autoevaluación para carreras de
+Ingeniería}. Red de Agencias Nacionales de Acreditación, Sector Educativo
+del MERCOSUR.
+\url{https://www.arcusur.org/wp-content/uploads/2024/02/Guia_de_Autoevaluacion_Ingenieria.pdf}
+
+ARCU-SUR. (2016b). \textit{Guía de evaluación para los comités de pares
+evaluadores: Titulación Ingeniería}. Red de Agencias Nacionales de
+Acreditación, Sector Educativo del MERCOSUR.
+\url{https://www.arcusur.org/wp-content/uploads/2024/02/Guia_de_Pares_Ingenieria.pdf}
+
+ARCU-SUR. (2019). \textit{Criterios de calidad para la acreditación
+ARCU-SUR: Ingeniería}. Red de Agencias Nacionales de Acreditación,
+Sector Educativo del MERCOSUR.
+\url{https://www.arcusur.org/wp-content/uploads/2024/03/Criterios_de_Ingenieria_Mayo_2019.pdf}
+
+Coss Bu, R. (1998). \textit{Simulación: un enfoque práctico}. Limusa.
+\end{hangparas}
+
+\appendix
+
+\section{Pruebas Unitarias (Caja Blanca)}\label{anexo:pruebas}
+
+Como el sistema se entrega a otros equipos, las clases de la herramienta
+que no dependen de la base de datos tienen pruebas unitarias automatizadas
+de caja blanca (se conoce y se verifica directamente la lógica interna, no
+solo la respuesta de la API). Se hicieron con JUnit 5, sin Maven, igual que
+el resto del backend; instrucciones para correrlas en el \texttt{README} del
+sistema. Al cierre de este informe, las 36 pruebas pasan. El código completo
+de las tres clases de prueba se transcribe a continuación.
+
+\lstinputlisting[language=Java, caption={EstadisticaTest.java -- media, IC 95\%, prueba de las frecuencias y chi-cuadrada, incluyendo los ejemplos de las Secciones~\ref{sec:ic}, \ref{sec:resultado-uniformidad} y~\ref{sec:cruces}}]{../../sistema/backend/src/test/java/com/actividad2/EstadisticaTest.java}
+
+\lstinputlisting[language=Java, caption={CsvTest.java -- lectura y escritura de CSV (separador, comillas, filas vacías)}]{../../sistema/backend/src/test/java/com/actividad2/CsvTest.java}
+
+\lstinputlisting[language=Java, caption={DatasetTest.java -- privacidad de datos personales y normalización de fechas}]{../../sistema/backend/src/test/java/com/actividad2/DatasetTest.java}
+
+\end{document}
